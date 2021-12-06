@@ -1,0 +1,104 @@
+# Felix specific init.rc
+import /vendor/etc/init/hw/init.gs201.rc
+
+on fs
+    chown system system /sys/devices/platform/odm/odm:fp_fpc1020/clk_enable
+    chown system system /sys/devices/platform/odm/odm:fp_fpc1020/hw_reset
+    chown system system /sys/devices/platform/odm/odm:fp_fpc1020/irq
+    chown system system /sys/devices/platform/odm/odm:fp_fpc1020/wakeup_enable
+    exec_background - system shell -- /vendor/bin/trusty_apploader /vendor/firmware/1540.app
+
+# Permissions for hwcomposer
+    chown system system /sys/class/backlight/panel1-backlight/als_table
+    chown system system /sys/class/backlight/panel1-backlight/brightness
+    chown system system /sys/class/backlight/panel1-backlight/dimming_on
+    chown system system /sys/class/backlight/panel1-backlight/hbm_mode
+
+# Touch
+on property:vendor.device.modules.ready=1
+    chown system input /dev/touch_offload_fts
+    chown system input /dev/touch_offload_fts_ext
+    chmod 660 /dev/touch_offload_fts
+    chmod 660 /dev/touch_offload_fts_ext
+    # Start the twoshay touch service
+    start twoshay
+
+# Toggle glove_mode according to touch_sensitivity_mode
+on property:persist.vendor.touch_sensitivity_mode=0 && property:sys.boot_completed=1
+    write /sys/class/spi_master/spi11/spi11.0/glove_mode 00
+    write /sys/class/spi_master/spi6/spi6.0/glove_mode 00
+
+on property:persist.vendor.touch_sensitivity_mode=1 && property:sys.boot_completed=1
+    write /sys/class/spi_master/spi11/spi11.0/glove_mode 01
+    write /sys/class/spi_master/spi6/spi6.0/glove_mode 01
+
+# Load FPC's internal lib
+on init
+    setprop ro.hardware.fingerprint "fpc"
+    # NFC streset tool name
+    setprop persist.vendor.nfc.streset libstreset21
+    setprop persist.vendor.se.streset libstreset21
+
+# When ro.build.flavor=factory_felix-userdebug, add vendor/bin/factory to default path
+on init && property:ro.build.flavor=factory_felix-userdebug
+    export PATH /product/bin:/apex/com.android.runtime/bin:/apex/com.android.art/bin:/system_ext/bin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin:/vendor/bin/factory
+
+on early-boot
+    # Wait for insmod_sh to finish all common modules
+    wait_for_prop vendor.common.modules.ready 1
+    start insmod_sh_felix
+
+service insmod_sh_felix /vendor/bin/init.insmod.sh /vendor/etc/init.insmod.felix.cfg
+    class main
+    user root
+    group root system
+    disabled
+    oneshot
+
+on boot && property:ro.build.flavor=factory_felix-userdebug
+    # FTM log folder
+    mkdir /data/ftmlog 0775 system system
+
+    # Audio test folder
+    mkdir /data/AudioTest 0775 system system
+
+on property:vendor.mfgapi.touchpanel.permission=1
+    chmod 0600 /sys/devices/virtual/sec/tsp/cmd
+    chown system system /sys/devices/virtual/sec/tsp/cmd
+
+# Bluetooth
+on post-fs-data
+    chown bluetooth system /proc/bluetooth/timesync
+
+# Fingerprint
+on post-fs-data
+    chown system system /dev/goodix_fp
+    exec_background - system shell -- /vendor/bin/trusty_apploader /vendor/firmware/g7.app
+
+# Overrides fingerprint antispoof if following persist sysprops are set
+on boot && property:ro.build.type=userdebug && \
+           property:persist.vendor.fingerprint.disable.fake.override=0
+    setprop vendor.fingerprint.disable.fake ${persist.vendor.fingerprint.disable.fake.override}
+
+on boot && property:ro.build.type=userdebug && \
+           property:persist.vendor.fingerprint.disable.fake.override=1
+    setprop vendor.fingerprint.disable.fake ${persist.vendor.fingerprint.disable.fake.override}
+
+on boot && property:ro.build.type=userdebug && \
+           property:persist.vendor.fingerprint.disable.fake.override=100
+    setprop vendor.fingerprint.disable.fake ${persist.vendor.fingerprint.disable.fake.override}
+
+# Thermal
+on late-init && property:ro.boot.hardware.revision=DEV1.0
+    setprop vendor.thermal.config "thermal_info_config_proto.json"
+
+on late-init && property:ro.boot.hardware.revision=PROTO1.0
+    setprop vendor.thermal.config "thermal_info_config_proto.json"
+
+# Hall sensor
+on init && property:ro.bootmode=normal
+    write /sys/devices/platform/hall_sensor/enable 0
+
+# SecureElement eSE2 cts mode
+on property:persist.vendor.se.ese2.mode=ctsmode
+    write /sys/class/st33spi/st33spi/st33spi_state 33
