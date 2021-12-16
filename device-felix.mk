@@ -35,8 +35,8 @@ ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
 include device/google/felix/uwb/uwb_calibration.mk
 endif
 
-SOONG_CONFIG_lyric_tuning_product := felix
-SOONG_CONFIG_google3a_config_target_device := felix
+$(call soong_config_set,lyric,tuning_product,felix)
+$(call soong_config_set,google3a_config,target_device,felix)
 
 BOARD_SEPOLICY_DIRS += \
     hardware/google/pixel-sepolicy/vibrator/common \
