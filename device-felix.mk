@@ -27,8 +27,7 @@ DEVICE_PACKAGE_OVERLAYS += device/google/felix/felix/overlay
 
 include device/google/gs201/device-shipping-common.mk
 include device/google/felix/audio/felix/audio-tables.mk
-include hardware/google/pixel/vibrator/cs40l25/device-stereo-specific-revision.mk
-include hardware/google/pixel/vibrator/cs40l26/device-stereo-specific-revision.mk
+include hardware/google/pixel/vibrator/cs40l26/device-stereo.mk
 include device/google/gs101/bluetooth/bluetooth.mk
 ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
 include device/google/gs101/uwb/uwb.mk
