@@ -22,11 +22,13 @@ $(call inherit-product-if-exists, vendor/google_devices/felix/prebuilts/device-v
 $(call inherit-product-if-exists, vendor/google_devices/gs201/prebuilts/device-vendor.mk)
 $(call inherit-product-if-exists, vendor/google_devices/gs201/proprietary/device-vendor.mk)
 $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/felix/device-vendor-felix.mk)
+$(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/device-vendor.mk)
 
 DEVICE_PACKAGE_OVERLAYS += device/google/felix/felix/overlay
 
-include device/google/gs201/device-shipping-common.mk
 include device/google/felix/audio/felix/audio-tables.mk
+include device/google/gs201/device-shipping-common.mk
+$(call soong_config_set,fp_hal_feature,pixel_product, product_a)
 include hardware/google/pixel/vibrator/cs40l26/device-stereo.mk
 include device/google/gs101/bluetooth/bluetooth.mk
 ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
@@ -62,6 +64,12 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/felix/display_colordata_dev_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_colordata_dev_cal1.pb \
 	device/google/felix/felix/display_golden_cal0.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal0.pb \
 	device/google/felix/felix/display_golden_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal1.pb
+
+# Display LBE
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.lbe.supported=1
+
+#config of display brightness dimming
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.brightness.dimming.usage=1
 
 # NFC
 PRODUCT_COPY_FILES += \
@@ -105,14 +113,18 @@ PRODUCT_COPY_FILES += \
 
 # Bluetooth HAL
 DEVICE_MANIFEST_FILE += \
-	device/google/pantah/bluetooth/manifest_bluetooth.xml
+	device/google/felix/bluetooth/manifest_bluetooth.xml
 PRODUCT_SOONG_NAMESPACES += \
         vendor/broadcom/bluetooth
 PRODUCT_PACKAGES += \
 	android.hardware.bluetooth@1.1-service.bcmbtlinux \
 	bt_vendor.conf
 PRODUCT_COPY_FILES += \
-	device/google/pantah/bluetooth/bt_vendor_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth/bt_vendor_overlay.conf
+	device/google/felix/bluetooth/bt_vendor_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth/bt_vendor_overlay.conf
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.bluetooth.a2dp_offload.supported=true \
+    persist.bluetooth.a2dp_offload.disabled=false \
+    persist.bluetooth.a2dp_offload.cap=sbc-aac-aptx-aptxhd-ldac
 
 # Keymaster HAL
 #LOCAL_KEYMASTER_PRODUCT_PACKAGE ?= android.hardware.keymaster@4.1-service
@@ -220,3 +232,7 @@ PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
 # Set zram size
 PRODUCT_VENDOR_PROPERTIES += \
        vendor.zram.size=3g
+
+# Set support one-handed mode
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.support_one_handed_mode=true
