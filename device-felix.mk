@@ -216,3 +216,7 @@ PRODUCT_PACKAGES += \
 
 # Trusty liboemcrypto.so
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
+
+# Set zram size
+PRODUCT_VENDOR_PROPERTIES += \
+       vendor.zram.size=3g
