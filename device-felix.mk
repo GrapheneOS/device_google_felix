@@ -166,7 +166,7 @@ ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.gms.dck.eligible_wcc=3
+    ro.gms.dck.eligible_wcc=2
 
 # Bluetooth SAR test tool
 PRODUCT_PACKAGES_DEBUG += \
@@ -216,3 +216,7 @@ PRODUCT_PACKAGES += \
 
 # Trusty liboemcrypto.so
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
+
+# Set zram size
+PRODUCT_VENDOR_PROPERTIES += \
+       vendor.zram.size=3g
