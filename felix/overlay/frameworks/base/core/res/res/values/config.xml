@@ -253,22 +253,4 @@
         <item>"local:4619827677550801153"</item>
     </string-array>
 
-    <array name="config_sfps_sensor_props_1" translatable="false">
-        <item>"local:4619827677550801152"</item>  <!--displayId -->
-        <item>0</item>                            <!--x (not used) -->
-        <item>510</item>                          <!--y -->
-        <item>0</item>                            <!--radius (not used) -->
-    </array>
-
-    <array name="config_sfps_sensor_props_2" translatable="false">
-        <item>"local:4619827677550801153"</item>  <!--displayId -->
-        <item>0</item>                            <!--x (not used) -->
-        <item>590</item>                          <!--y -->
-        <item>0</item>                            <!--radius (not used) -->
-    </array>
-
-    <array name="config_sfps_sensor_props" translatable="false">
-        <item>@array/config_sfps_sensor_props_1</item>
-        <item>@array/config_sfps_sensor_props_2</item>
-    </array>
 </resources>
