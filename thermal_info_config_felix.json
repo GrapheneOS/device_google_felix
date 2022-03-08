@@ -1,11 +1,74 @@
 {
     "Sensors":[
         {
+            "Name":"battery",
+            "Type":"BATTERY",
+            "HotThreshold":[
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "60.0"
+            ],
+            "VrThreshold":"NAN",
+            "Multiplier":0.001
+        },
+        {
             "Name":"neutral_therm",
             "Type":"UNKNOWN",
             "HotThreshold":[
                 "NAN",
-                "31.5",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN"
+            ],
+            "TempPath":"/dev/thermal/tz-by-name/neutral_therm/tz_temp",
+            "VrThreshold":"NAN",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"gnss_tcxo_therm",
+            "Type":"UNKNOWN",
+            "HotThreshold":[
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN"
+            ],
+            "TempPath":"/dev/thermal/tz-by-name/gnss_tcxo_therm/tz_temp",
+            "VrThreshold":"NAN",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"qi_therm",
+            "Type":"UNKNOWN",
+            "HotThreshold":[
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN"
+            ],
+            "TempPath":"/dev/thermal/tz-by-name/qi_therm/tz_temp",
+            "VrThreshold":"NAN",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"quiet_therm",
+            "Type":"UNKNOWN",
+            "HotThreshold":[
+                "NAN",
+                "32.2",
                 "NAN",
                 "NAN",
                 "NAN",
@@ -13,35 +76,19 @@
                 "NAN"
             ],
             "HotHysteresis":[
-                "0.0",
-                "0.9",
-                "0.0",
-                "0.0",
-                "0.0",
-                "0.0",
-                "0.0"
+                0.0,
+                0.9,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
             ],
-            "TempPath":"/dev/thermal/tz-by-name/neutral_therm/adc_channel/channel_temp",
+            "TempPath":"/dev/thermal/tz-by-name/quiet_therm/tz_temp",
             "VrThreshold":"NAN",
             "Multiplier":0.001,
             "PollingDelay":60000,
             "PassiveDelay":7000
-        },
-        {
-            "Name":"quiet_therm",
-            "Type":"UNKNOWN",
-            "HotThreshold":[
-                "NAN",
-                "NAN",
-                "NAN",
-                "NAN",
-                "NAN",
-                "NAN",
-                "NAN"
-            ],
-            "TempPath":"/dev/thermal/tz-by-name/quiet_therm/adc_channel/channel_temp",
-            "VrThreshold":"NAN",
-            "Multiplier":0.001
         },
         {
             "Name":"usb_pwr_therm",
@@ -55,7 +102,7 @@
                 "NAN",
                 "NAN"
             ],
-            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm/adc_channel/channel_temp",
+            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm/tz_temp",
             "VrThreshold":"NAN",
             "Multiplier":0.001
         },
@@ -64,7 +111,7 @@
             "Type":"UNKNOWN",
             "HotThreshold":[
                 "NAN",
-                "39.0",
+                "35.0",
                 "NAN",
                 "NAN",
                 "NAN",
@@ -72,35 +119,50 @@
                 "NAN"
             ],
             "HotHysteresis":[
-                "0.0",
-                "0.9",
-                "0.0",
-                "0.0",
-                "0.0",
-                "0.0",
-                "0.0"
+                0.0,
+                0.9,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
             ],
-            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm2/adc_channel/channel_temp",
+            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm2/tz_temp",
             "VrThreshold":"NAN",
             "Multiplier":0.001,
             "PollingDelay":60000,
             "PassiveDelay":7000
         },
         {
-            "Name":"VIRTUAL-NEUTRAL-QUIET-USB-0",
+            "Name":"disp_therm",
+            "Type":"UNKNOWN",
+            "HotThreshold":[
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN"
+            ],
+            "TempPath":"/dev/thermal/tz-by-name/disp_therm/tz_temp",
+            "VrThreshold":"NAN",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-QI-USB",
             "Type":"UNKNOWN",
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
             "Combination":[
-                "neutral_therm",
-                "quiet_therm",
+                "qi_therm",
                 "usb_pwr_therm"
             ],
             "Coefficient":[
-                "0.35",
-                "0.15",
-                "0.5"
+                "0.650",
+                "0.350"
             ],
+            "Offset":-1300,
             "HotThreshold":[
                 "NAN",
                 "NAN",
@@ -114,21 +176,71 @@
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-NEUTRAL-QUIET-USB-1",
+            "Name":"VIRTUAL-USB2-QUIET",
+            "Type":"UNKNOWN",
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":[
+                "usb_pwr_therm2",
+                "quiet_therm"
+            ],
+            "Coefficient":[
+                "0.465",
+                "0.535"
+            ],
+            "Offset":-1824,
+            "HotThreshold":[
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN"
+            ],
+            "VrThreshold":"NAN",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-QUIET-USB2",
+            "Type":"UNKNOWN",
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":[
+                "quiet_therm",
+                "usb_pwr_therm2"
+            ],
+            "Coefficient":[
+                "1.208",
+                "-0.208"
+            ],
+            "Offset":-874,
+            "HotThreshold":[
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN"
+            ],
+            "VrThreshold":"NAN",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-NEUTRAL-QUIET",
             "Type":"UNKNOWN",
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
             "Combination":[
                 "neutral_therm",
-                "quiet_therm",
-                "usb_pwr_therm"
+                "quiet_therm"
             ],
             "Coefficient":[
-                "0.45",
-                "0.35",
-                "0.15"
+                "0.760",
+                "0.240"
             ],
-            "Offset":1800,
+            "Offset":-2100,
             "HotThreshold":[
                 "NAN",
                 "NAN",
@@ -145,33 +257,35 @@
             "Name":"VIRTUAL-SKIN",
             "Type":"SKIN",
             "VirtualSensor":true,
-            "TriggerSensor":"neutral_therm",
-            "Formula":"MINIMUM",
+            "TriggerSensor":"quiet_therm",
+            "Formula":"MAXIMUM",
             "Combination":[
-                "VIRTUAL-NEUTRAL-QUIET-USB-0",
-                "VIRTUAL-NEUTRAL-QUIET-USB-1"
+                "VIRTUAL-QI-USB",
+                "VIRTUAL-USB2-QUIET",
+                "VIRTUAL-QUIET-USB2"
             ],
             "Coefficient":[
+                "1.0",
                 "1.0",
                 "1.0"
             ],
             "HotThreshold":[
                 "NAN",
-                "39.0",
-                "43.0",
-                "45.0",
-                "47.0",
-                "51.0",
+                "39",
+                "43",
+                "45",
+                "46.5",
+                "52.0",
                 "55.0"
             ],
             "HotHysteresis":[
-                "0.0",
-                "1.9",
-                "1.9",
-                "1.9",
-                "1.9",
-                "1.9",
-                "1.9"
+                0.0,
+                1.9,
+                1.9,
+                1.9,
+                1.4,
+                1.9,
+                1.9
             ],
             "VrThreshold":"NAN",
             "Multiplier":0.001,
@@ -179,65 +293,95 @@
             "Monitor":true,
             "PollingDelay":300000,
             "PassiveDelay":7000,
-            "PIDInfo": {
-                "K_Po":["NAN", "NAN", 1500, 1500, "NAN", "NAN", "NAN"],
-                "K_Pu":["NAN", "NAN", 1500, 750, "NAN", "NAN", "NAN"],
-                "K_I":["NAN", "NAN", 20, 0, "NAN", "NAN", "NAN"],
-                "K_D":["NAN", "NAN", 10, 0, "NAN", "NAN", "NAN"],
-                "I_Max":["NAN", "NAN", 1000, 0, "NAN", "NAN", "NAN"],
-                "S_Power":["NAN", "NAN", 3500, 1800, "NAN", "NAN", "NAN"],
-                "MinAllocPower":["NAN", "NAN", 2500, 1500, "NAN", "NAN", "NAN"],
-                "MaxAllocPower":["NAN", "NAN", 9500, 3000, "NAN", "NAN", "NAN"],
-                "I_Cutoff":["NAN", "NAN", 2, 0, "NAN", "NAN", "NAN"]
-            },
             "BindedCdevInfo": [
                 {
                     "CdevRequest": "thermal-cpufreq-0",
-                    "CdevWeightForPID": [0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.07],
-                    "CdevCeiling": [3, 3, 6, 7, 8, 10, 10],
-                    "LimitInfo": [0, 0, 0, 0, 8, 10, 10],
-                    "BindedPowerRail": "S4M_VDD_CPUCL0",
-                    "PowerThreshold": [200, 200, 200, 200, 50, 0, 0],
-                    "ReleaseLogic": "DECREASE"
+                    "LimitInfo": [0, 0, 0, 7, 8, 10, 10]
                 },
                 {
                     "CdevRequest": "thermal-cpufreq-1",
-                    "CdevWeightForPID": [0.066, 0.066, 0.066, 0.066, 0.066, 0.066, 0.066],
-                    "CdevCeiling": [7, 7, 8, 9, 11, 13, 13],
-                    "LimitInfo": [0, 0, 0, 0, 11, 13, 13],
-                    "BindedPowerRail": "S3M_VDD_CPUCL1",
-                    "PowerThreshold": [200, 200, 200, 200, 50, 0, 0],
-                    "ReleaseLogic": "DECREASE"
+                    "LimitInfo": [0, 0, 0, 10, 12, 14, 14]
                 },
                 {
                     "CdevRequest": "thermal-cpufreq-2",
-                    "CdevWeightForPID": [0.313, 0.313, 0.313, 0.313, 0.313, 0.313, 0.313],
-                    "CdevCeiling": [11, 11, 14, 14, 14, 16, 16],
-                    "LimitInfo": [0, 0, 0, 0, 14, 16, 16],
-                    "BindedPowerRail": "S2M_VDD_CPUCL2",
-                    "PowerThreshold": [200, 200, 200, 200, 50, 0, 0],
-                    "ReleaseLogic": "DECREASE"
+                    "LimitInfo": [0, 0, 0, 15, 15, 17, 17]
                 },
                 {
                     "CdevRequest": "thermal-gpufreq-0",
-                    "CdevWeightForPID": [0.551, 0.551, 0.551, 0.551, 0.551, 0.551, 0.551],
-                    "CdevCeiling": [7, 7, 8, 9, 10, 11, 11],
-                    "LimitInfo": [0, 0, 0, 0, 10, 11, 11],
-                    "BindedPowerRail": "S2S_VDD_G3D",
-                    "PowerThreshold": [200, 200, 200, 200, 50, 0, 0],
-                    "ReleaseLogic": "DECREASE"
+                    "LimitInfo": [0, 0, 0, 9, 10, 11, 11]
                 },
                 {
                     "CdevRequest": "tpu_cooling",
-                    "LimitInfo": [0, 1, 2, 3, 4, 4, 4]
+                    "LimitInfo": [0, 2, 3, 4, 5, 5, 5]
                 },
                 {
+                    "CdevRequest": "gxp-cooling",
+                    "LimitInfo": [0, 0, 0, 0, 0, 9, 9]
+                }
+            ]
+        },
+        {
+            "Name":"VIRTUAL-SKIN-CHARGE",
+            "Type":"UNKNOWN",
+            "VirtualSensor":true,
+            "TriggerSensor":"quiet_therm",
+            "Formula":"MAXIMUM",
+            "Combination":[
+                "VIRTUAL-NEUTRAL-QUIET"
+            ],
+            "Coefficient":[
+                "1.0"
+            ],
+            "HotThreshold":[
+                "NAN",
+                "39.0",
+                "41.0",
+                "43.0",
+                "45.0",
+                "47.0",
+                "55.0"
+            ],
+            "HotHysteresis":[
+                0.0,
+                1.9,
+                1.9,
+                1.9,
+                1.9,
+                1.9,
+                1.9
+            ],
+            "VrThreshold":"NAN",
+            "Multiplier":0.001,
+            "Monitor":true,
+            "PollingDelay":300000,
+            "PassiveDelay":7000,
+            "BindedCdevInfo": [
+                {
                     "CdevRequest": "fcc",
-                    "LimitInfo": [0, 1, 2, 3, 5, 5, 5]
+                    "LimitInfo": [0, 2, 3, 3, 4, 4, 4],
+                    "BindedPowerRail": "POWER_FOR_CHARGING_THROTTLING",
+                    "PowerThreshold": [500, 500, 500, 500, 500, 0, 0],
+                    "CdevFloorWithPowerLink": [0, 0, 2, 2, 3 ,4 ,4],
+                    "ReleaseLogic": "RELEASE_TO_FLOOR",
+                    "ThrottlingWithPowerLink":true
                 },
                 {
                     "CdevRequest": "dc_icl",
-                    "LimitInfo": [0, 1, 2, 3, 4, 4, 4]
+                    "LimitInfo": [0, 1, 2, 3, 4, 4, 4],
+                    "BindedPowerRail": "POWER_FOR_CHARGING_THROTTLING",
+                    "PowerThreshold": [500, 500, 500, 500, 500, 0, 0],
+                    "CdevFloorWithPowerLink": [0, 1, 2, 3, 3, 4, 4],
+                    "ReleaseLogic": "RELEASE_TO_FLOOR",
+                    "ThrottlingWithPowerLink":true
+                },
+                {
+                    "CdevRequest": "wlc_fcc",
+                    "LimitInfo": [0, 3, 3, 4, 5, 5, 5],
+                    "BindedPowerRail": "POWER_FOR_CHARGING_THROTTLING",
+                    "PowerThreshold": [500, 500, 500, 500, 500, 0, 0],
+                    "CdevFloorWithPowerLink": [0, 1, 2, 3, 4, 5, 5],
+                    "ReleaseLogic": "RELEASE_TO_FLOOR",
+                    "ThrottlingWithPowerLink":true
                 }
             ]
         },
@@ -245,13 +389,15 @@
             "Name":"cellular-emergency",
             "Type":"POWER_AMPLIFIER",
             "VirtualSensor":true,
-            "TriggerSensor":"neutral_therm",
-            "Formula":"MINIMUM",
+            "TriggerSensor":"quiet_therm",
+            "Formula":"MAXIMUM",
             "Combination":[
-                "VIRTUAL-NEUTRAL-QUIET-USB-0",
-                "VIRTUAL-NEUTRAL-QUIET-USB-1"
+                "VIRTUAL-QI-USB",
+                "VIRTUAL-USB2-QUIET",
+                "VIRTUAL-QUIET-USB2"
             ],
             "Coefficient":[
+                "1.0",
                 "1.0",
                 "1.0"
             ],
@@ -261,17 +407,17 @@
                 "NAN",
                 "NAN",
                 "NAN",
-                "53.0",
+                "54.0",
                 "NAN"
             ],
             "HotHysteresis":[
-                "0.0",
-                "0.0",
-                "0.0",
-                "0.0",
-                "0.0",
-                "1.9",
-                "0.0"
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.9,
+                0.0
             ],
             "VrThreshold":"NAN",
             "Multiplier":0.001,
@@ -280,18 +426,8 @@
             "PassiveDelay":7000
         },
         {
-            "Name":"USB2-MINUS-USB",
-            "Type":"UNKNOWN",
-            "VirtualSensor":true,
-            "Formula":"WEIGHTED_AVG",
-            "Combination":[
-                "usb_pwr_therm2",
-                "usb_pwr_therm"
-            ],
-            "Coefficient":[
-                "1.0",
-                "-1.0"
-            ],
+            "Name":"LITTLE",
+            "Type":"CPU",
             "HotThreshold":[
                 "NAN",
                 "NAN",
@@ -299,77 +435,44 @@
                 "NAN",
                 "NAN",
                 "NAN",
-                "NAN"
+                115.0
             ],
             "VrThreshold":"NAN",
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-USB-THROTTLING",
-            "Type":"USB_PORT",
-            "VirtualSensor":true,
-            "Formula":"COUNT_THRESHOLD",
-            "TriggerSensor":"usb_pwr_therm2",
-            "Combination":[
-                "usb_pwr_therm2",
-                "USB2-MINUS-USB"
-            ],
-            "Coefficient":[
-                "39000",
-                "7000"
-            ],
+            "Name":"MID",
+            "Type":"CPU",
             "HotThreshold":[
                 "NAN",
                 "NAN",
                 "NAN",
                 "NAN",
-                "2.0",
                 "NAN",
-                "NAN"
-            ],
-            "BindedCdevInfo":[
-                {
-                    "CdevRequest": "usbc-port",
-                    "LimitInfo": [0, 0, 0, 0, 1, 1, 1]
-                }
+                "NAN",
+                115.0
             ],
             "VrThreshold":"NAN",
-            "Multiplier":1,
-            "PollingDelay":60000,
-            "PassiveDelay":7000
+            "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-USB-UI",
-            "Type":"USB_PORT",
-            "VirtualSensor":true,
-            "Formula":"COUNT_THRESHOLD",
-            "TriggerSensor":"usb_pwr_therm2",
-            "Combination":[
-                "usb_pwr_therm2",
-                "USB2-MINUS-USB"
-            ],
-            "Coefficient":[
-                "39000",
-                "10000"
-            ],
+            "Name":"BIG",
+            "Type":"CPU",
             "HotThreshold":[
                 "NAN",
                 "NAN",
                 "NAN",
                 "NAN",
                 "NAN",
-                "2.0",
-                "NAN"
+                "NAN",
+                115.0
             ],
             "VrThreshold":"NAN",
-            "Multiplier":1,
-            "Monitor":true,
-            "PollingDelay":60000,
-            "PassiveDelay":7000
+            "Multiplier":0.001
         },
         {
-            "Name":"battery",
-            "Type":"BATTERY",
+            "Name":"G3D",
+            "Type":"GPU",
             "HotThreshold":[
                 "NAN",
                 "NAN",
@@ -377,11 +480,10 @@
                 "NAN",
                 "NAN",
                 "NAN",
-                "NAN"
+                115.0
             ],
             "VrThreshold":"NAN",
-            "Multiplier":0.001,
-            "Monitor":false
+            "Multiplier":0.001
         },
         {
             "Name":"battery_cycle",
@@ -463,7 +565,7 @@
             "Type":"BCL_PERCENTAGE",
             "HotThreshold":[
                 "NAN",
-                "NAN",
+                80,
                 "NAN",
                 90,
                 93,
@@ -479,14 +581,6 @@
                 {
                     "CdevRequest": "thermal-cpufreq-2",
                     "LimitInfo": [0, 0, 0, 7, 7, 10, 10]
-                },
-                {
-                    "CdevRequest": "thermal-gpufreq-0",
-                    "LimitInfo": [0, 0, 0, 0, 0, 7, 11]
-                },
-                {
-                    "CdevRequest": "tpu_cooling",
-                    "LimitInfo": [0, 0, 0, 0, 0, 4, 5]
                 }
             ]
         },
@@ -527,7 +621,34 @@
                     "CdevRequest": "tpu_cooling",
                     "LimitInfo": [0, 0, 0, 0, 4, 4, 4]
                 }
-	    ]
+            ]
+        },
+        {
+            "Name":"BCL_AUDIO_BAACL",
+            "Type":"BCL_VOLTAGE",
+            "VirtualSensor":true,
+            "Formula":"COUNT_THRESHOLD",
+            "TriggerSensor": "soc",
+            "Combination":[
+                "battery",
+                "soc"
+            ],
+            "Coefficient":[
+                "-25000",
+                "80"
+            ],
+            "HotThreshold":[
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                2.0,
+                "NAN",
+                "NAN"
+            ],
+            "VrThreshold":"NAN",
+            "Multiplier":1,
+            "Monitor":true
         },
         {
             "Name":"vdroop1",
@@ -566,7 +687,7 @@
                     "CdevRequest": "tpu_cooling",
                     "LimitInfo": [0, 0, 0, 0, 4, 4, 4]
                 }
-	    ]
+            ]
         },
         {
             "Name":"vdroop2",
@@ -605,7 +726,7 @@
                     "CdevRequest": "tpu_cooling",
                     "LimitInfo": [0, 0, 0, 0, 4, 4, 4]
                 }
-	    ]
+            ]
         },
         {
             "Name":"smpl_gm",
@@ -644,7 +765,7 @@
                     "CdevRequest": "tpu_cooling",
                     "LimitInfo": [0, 0, 0, 0, 4, 4, 4]
                 }
-	    ]
+            ]
         },
         {
             "Name":"ocp_cpu1",
@@ -754,7 +875,7 @@
                 "NAN",
                 "NAN",
                 "NAN",
-                12000,
+                9000,
                 "NAN",
                 "NAN"
             ],
@@ -845,6 +966,21 @@
             "VrThreshold":"NAN",
             "Multiplier":1,
             "Monitor":true
+        },
+        {
+            "Name":"TPU",
+            "Type":"NPU",
+            "HotThreshold":[
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                115.0
+            ],
+            "VrThreshold":"NAN",
+            "Multiplier":0.001
         }
     ],
     "CoolingDevices":[
@@ -852,33 +988,25 @@
             "Name":"thermal-cpufreq-0",
             "Type":"CPU",
             "WritePath":"/dev/thermal/cdev-by-name/thermal-cpufreq-0/user_vote",
-            "State2Power":["412", "352", "308", "236", "212", "176", "152", "116", "76", "56", "24"],
-            "PowerRail":"S4M_VDD_CPUCL0"
+            "State2Power":["1100", "1050", "1000", "950", "900", "850", "800", "750", "700", "650", "600"]
         },
         {
             "Name":"thermal-cpufreq-1",
             "Type":"CPU",
             "WritePath":"/dev/thermal/cdev-by-name/thermal-cpufreq-1/user_vote",
-            "State2Power":["1198", "1018", "854", "696", "566", "452", "356", "296", "226", "188", "152", "124", "90", "58"],
-            "PowerRail":"S3M_VDD_CPUCL1"
+            "State2Power":["1400", "1350", "1300", "1250", "1200", "1150", "1100", "1050", "1000", "950", "900", "850", "800", "750"]
         },
         {
             "Name":"thermal-cpufreq-2",
             "Type":"CPU",
             "WritePath":"/dev/thermal/cdev-by-name/thermal-cpufreq-2/user_vote",
-            "State2Power":["4208", "3692", "3370", "2898", "2562", "2240", "2084", "1780", "1424", "1276", "1042", "858", "714", "560", "448", "364", "166"],
-            "PowerRail":"S2M_VDD_CPUCL2"
+            "State2Power":["1450", "1400", "1350", "1300", "1250", "1200", "1150", "1100", "1050", "1000", "950", "900", "850", "800", "750"]
         },
         {
             "Name":"thermal-gpufreq-0",
             "Type":"GPU",
             "WritePath":"/dev/thermal/cdev-by-name/thermal-gpufreq-0/user_vote",
-            "State2Power":["4371", "3543", "3085", "2293", "1927", "1707", "1394", "1171", "967", "768", "592", "433"],
-            "PowerRail":"S2S_VDD_G3D"
-        },
-        {
-            "Name":"usbc-port",
-            "Type":"BATTERY"
+            "State2Power":["4371", "3543", "3085", "2293", "1927", "1707", "1394", "1171", "967", "768", "592", "433"]
         },
         {
             "Name":"fcc",
@@ -889,16 +1017,32 @@
             "Type":"BATTERY"
         },
         {
+            "Name":"wlc_fcc",
+            "Type":"BATTERY"
+        },
+        {
             "Name":"tpu_cooling",
             "Type":"NPU",
             "WritePath":"/dev/thermal/cdev-by-name/tpu_cooling/user_vote"
+        },
+        {
+            "Name":"gxp-cooling",
+            "Type":"NPU",
+            "WritePath":"/dev/thermal/cdev-by-name/gxp-cooling/user_vote"
         }
     ],
     "PowerRails":[
         {
+            "Name":"PPVAR_VSYS_PWR_DISP"
+        },
+        {
+            "Name":"VSYS_PWR_MODEM"
+        },
+        {
             "Name":"S2M_VDD_CPUCL2",
             "PowerSampleDelay":14000,
             "PowerSampleCount":5
+
         },
         {
             "Name":"S3M_VDD_CPUCL1",
@@ -911,7 +1055,38 @@
             "PowerSampleCount":5
         },
         {
+            "Name":"S5M_VDD_INT"
+        },
+        {
+            "Name":"S1M_VDD_MIF"
+        },
+        {
             "Name":"S2S_VDD_G3D",
+            "PowerSampleDelay":14000,
+            "PowerSampleCount":5
+        },
+        {
+            "Name":"POWER_FOR_CHARGING_THROTTLING",
+            "VirtualRails":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":[
+                "VSYS_PWR_MODEM",
+                "S2M_VDD_CPUCL2",
+                "S3M_VDD_CPUCL1",
+                "S4M_VDD_CPUCL0",
+                "S5M_VDD_INT",
+                "S1M_VDD_MIF",
+                "S2S_VDD_G3D"
+            ],
+            "Coefficient":[
+                "1.0",
+                "1.0",
+                "1.0",
+                "1.0",
+                "1.0",
+                "1.0",
+                "1.0"
+            ],
             "PowerSampleDelay":14000,
             "PowerSampleCount":5
         }
