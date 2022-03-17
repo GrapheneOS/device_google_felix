@@ -184,9 +184,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES_DEBUG += \
     sar_test
 
-# WirelessCharger
-DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/gs101/device_framework_matrix_product_wireless.xml
-
 # Bluetooth
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.bluetooth.a2dp_aac.vbr_supported=true
