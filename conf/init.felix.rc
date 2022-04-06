@@ -92,11 +92,8 @@ on boot && property:ro.build.type=userdebug && \
     setprop vendor.fingerprint.disable.fake ${persist.vendor.fingerprint.disable.fake.override}
 
 # Thermal
-on late-init && property:ro.boot.hardware.revision=DEV1.0
-    setprop vendor.thermal.config "thermal_info_config_proto.json"
-
-on late-init && property:ro.boot.hardware.revision=PROTO1.0
-    setprop vendor.thermal.config "thermal_info_config_proto.json"
+on late-init
+    setprop persist.vendor.disable.thermal.control 1
 
 # Hall sensor
 on init && property:ro.bootmode=normal
