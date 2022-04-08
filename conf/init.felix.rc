@@ -99,6 +99,9 @@ on late-init
 on init && property:ro.bootmode=normal
     write /sys/devices/platform/hall_sensor/enable 0
 
+on init && property:ro.bootmode=factory
+    write /sys/devices/platform/hall_sensor/enable 0
+
 # SecureElement eSE2 cts mode
 on property:persist.vendor.se.ese2.mode=ctsmode
     write /sys/class/st33spi/st33spi/st33spi_state 33
