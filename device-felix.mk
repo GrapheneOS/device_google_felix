@@ -238,3 +238,9 @@ else
     PRODUCT_COPY_FILES += \
         device/google/felix/location/gps_user.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml
 endif
+
+# WiFi
+PRODUCT_PACKAGES += \
+        WifiOverlay2023Mid_F10
+
+PRODUCT_SOONG_NAMESPACES += device/google/felix
