@@ -159,9 +159,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_SOONG_NAMESPACES += \
     device/google/felix/powerstats/felix
 
-# Remove when b/182979111 is resolved.
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.surface_flinger.primary_display_orientation=ORIENTATION_90
-
 # Increment the SVN for any official public releases
 PRODUCT_VENDOR_PROPERTIES += \
     ro.vendor.build.svn=1
