@@ -73,12 +73,6 @@
      -->
     <string name="config_rounded_mask" translatable="false">M 71,0 C 33,0 22,-1 10,10 -1,22 0,33 0,71</string>
 
-    <!-- Respect drawable/rounded.xml intrinsic size for multiple radius corner path customization -->
-    <bool name="config_roundedCornerMultipleRadius">true</bool>
-    <!-- Respect drawable/rounded_secondary.xml intrinsic size for multiple radius corner path
-         customization for secondary display-->
-    <bool name="config_roundedCornerMultipleRadiusSecondary">true</bool>
-
     <!-- Configure 13px of extra protection around the front-facing camera -->
     <string translatable="false" name="config_frontBuiltInDisplayCutoutProtection">
         M 494,65
