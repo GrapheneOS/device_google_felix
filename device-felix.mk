@@ -169,7 +169,8 @@ PRODUCT_PRODUCT_PROPERTIES +=\
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
 # Fingerprint
-include device/google/gs101/fingerprint/fpc1540/sw35/fpc1540.mk
+include device/google/gs101/fingerprint/fpc1540/sw42/fpc1540.mk
+FPC_MODULE_TYPE=1542_C
 
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
