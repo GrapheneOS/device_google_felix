@@ -88,7 +88,7 @@
     </path>
 
     <path name="usb-capture-gain">
-        <ctl name="Headset Capture Volume" />
+        <ctl name="MIC Record Soft Gain (dB)" />
     </path>
 
     <path name="mic1-only">
