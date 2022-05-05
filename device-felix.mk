@@ -168,6 +168,9 @@ PRODUCT_PRODUCT_PROPERTIES +=\
     ro.vendor.vibrator.hal.long.frequency.shift=0
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
+# Fingerprint
+include device/google/gs101/fingerprint/fpc1540/sw35/fpc1540.mk
+
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.gms.dck.eligible_wcc=2
