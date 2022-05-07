@@ -85,7 +85,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
 	NfcNci \
 	Tag \
-	android.hardware.nfc@1.2-service.st
+	android.hardware.nfc-service.st
 
 # SecureElement
 PRODUCT_PACKAGES += \
@@ -99,7 +99,6 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/nfc/libse-gto-hal2.conf:$(TARGET_COPY_OUT_VENDOR)/etc/libse-gto-hal2.conf
 
 DEVICE_MANIFEST_FILE += \
-	device/google/felix/nfc/manifest_nfc.xml \
 	device/google/felix/nfc/manifest_se.xml
 
 # Power HAL config
@@ -167,6 +166,9 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_PRODUCT_PROPERTIES +=\
     ro.vendor.vibrator.hal.long.frequency.shift=0
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
+
+# Fingerprint
+include device/google/gs101/fingerprint/fpc1540/sw35/fpc1540.mk
 
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
