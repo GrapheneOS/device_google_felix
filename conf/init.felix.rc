@@ -9,6 +9,7 @@ on post-fs-data
     exec_background - system shell -- /vendor/bin/trusty_apploader /vendor/firmware/1540.app
 
 # Permissions for hwcomposer
+on fs
     chown system system /sys/class/backlight/panel1-backlight/als_table
     chown system system /sys/class/backlight/panel1-backlight/brightness
     chown system system /sys/class/backlight/panel1-backlight/dimming_on
