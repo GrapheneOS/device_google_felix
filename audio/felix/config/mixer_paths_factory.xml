@@ -8,6 +8,7 @@
     <ctl name="E Main AMP Enable Switch" value="0" />
     <ctl name="MIC HW Gain At Lower Power Mode (cB)" value="-160" />
     <ctl name="MIC HW Gain At High Power Mode (cB)" value="0" />
+    <ctl name="MIC Record Soft Gain (dB)" value="0"/>
 
     <ctl name="EP1 TX Mixer TDM_0_TX" value="0" />
     <ctl name="DEFAULT_MIC_ID" value="0" />
