@@ -107,6 +107,11 @@ on init && property:ro.bootmode=factory
 on property:persist.vendor.se.ese2.mode=ctsmode
     write /sys/class/st33spi/st33spi/st33spi_state 33
 
+# Allow secure_element group to read / write ST33 SPI state
+on post-fs-data
+    chown secure_element secure_element  /sys/class/st33spi/st33spi/st33spi_state
+    chmod 0660  /sys/class/st33spi/st33spi/st33spi_state
+
 # charger driver exposes now finer grain control, map demo mode to those properties
 # NOTE: demo mode can only be exit wiping data (which reset the persist properties)
 on property:sys.retaildemo.enabled=1
