@@ -121,10 +121,6 @@ on boot && property:ro.build.type=userdebug && \
            property:persist.vendor.fingerprint.disable.fake.override=100
     setprop vendor.fingerprint.disable.fake ${persist.vendor.fingerprint.disable.fake.override}
 
-# Thermal
-on late-init
-    setprop persist.vendor.disable.thermal.control 1
-
 # Hall sensor
 on init && property:ro.bootmode=normal
     write /sys/devices/platform/hall_sensor/enable 0
