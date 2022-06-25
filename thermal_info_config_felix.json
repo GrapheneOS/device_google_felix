@@ -1,0 +1,126 @@
+{
+    "Sensors":[
+        {
+            "Name":"battery",
+            "Type":"BATTERY",
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "NAN", 60.0],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"neutral_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/neutral_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"quiet_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/quiet_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"skin_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/skin_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"usb_pwr_therm",
+            "Type":"UNKNOWN",
+            "HotThreshold":["NAN", 35.0, "NAN", "NAN", "NAN", "NAN", "NAN"],
+            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm/tz_temp",
+            "Multiplier":0.001,
+            "PollingDelay":60000,
+            "PassiveDelay":7000
+        },
+        {
+            "Name":"usb_pwr_therm2",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm2/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"inner_disp_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/inner_disp_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"outer_disp_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/outer_disp_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"gnss_tcxo_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/gnss_tcxo_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"LITTLE",
+            "Type":"CPU",
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "NAN", 115.0],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"MID",
+            "Type":"CPU",
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "NAN", 115.0],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"BIG",
+            "Type":"CPU",
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "NAN", 115.0],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"G3D",
+            "Type":"GPU",
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "NAN", 115.0],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"TPU",
+            "Type":"NPU",
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "NAN", 115.0],
+            "Multiplier":0.001
+        }
+    ],
+    "CoolingDevices":[
+        {
+            "Name":"thermal-cpufreq-0",
+            "Type":"CPU",
+            "WritePath":"/dev/thermal/cdev-by-name/thermal-cpufreq-0/user_vote",
+            "State2Power":[1100, 1050, 1000, 950, 900, 850, 800, 750, 700, 650, 600]
+        },
+        {
+            "Name":"thermal-cpufreq-1",
+            "Type":"CPU",
+            "WritePath":"/dev/thermal/cdev-by-name/thermal-cpufreq-1/user_vote",
+            "State2Power":[1400, 1350, 1300, 1250, 1200, 1150, 1100, 1050, 1000, 950, 900, 850, 800, 750]
+        },
+        {
+            "Name":"thermal-cpufreq-2",
+            "Type":"CPU",
+            "WritePath":"/dev/thermal/cdev-by-name/thermal-cpufreq-2/user_vote",
+            "State2Power":[1450, 1400, 1350, 1300, 1250, 1200, 1150, 1100, 1050, 1000, 950, 900, 850, 800, 750]
+        },
+        {
+            "Name":"thermal-gpufreq-0",
+            "Type":"GPU",
+            "WritePath":"/dev/thermal/cdev-by-name/thermal-gpufreq-0/user_vote",
+            "State2Power":[4599, 3727, 3259, 2378, 2044, 1813, 1449, 1223, 1007, 804, 633, 452]
+        },
+        {
+            "Name":"usbc-port",
+            "Type":"BATTERY"
+        },
+        {
+            "Name":"tpu_cooling",
+            "Type":"NPU",
+            "WritePath":"/dev/thermal/cdev-by-name/tpu_cooling/user_vote"
+        }
+    ]
+}

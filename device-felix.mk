@@ -101,6 +101,10 @@ PRODUCT_COPY_FILES += \
 DEVICE_MANIFEST_FILE += \
 	device/google/felix/nfc/manifest_se.xml
 
+# Thermal Config
+PRODUCT_COPY_FILES += \
+        device/google/felix/thermal_info_config_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config.json
+
 # Power HAL config
 PRODUCT_COPY_FILES += \
 	device/google/felix/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
