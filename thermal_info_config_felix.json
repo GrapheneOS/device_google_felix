@@ -27,17 +27,17 @@
         {
             "Name":"usb_pwr_therm",
             "Type":"UNKNOWN",
-            "HotThreshold":["NAN", 35.0, "NAN", "NAN", "NAN", "NAN", "NAN"],
             "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm/tz_temp",
-            "Multiplier":0.001,
-            "PollingDelay":60000,
-            "PassiveDelay":7000
+            "Multiplier":0.001
         },
         {
             "Name":"usb_pwr_therm2",
             "Type":"UNKNOWN",
+            "HotThreshold":["NAN", 40.0, "NAN", "NAN", "NAN", "NAN", "NAN"],
             "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm2/tz_temp",
-            "Multiplier":0.001
+            "Multiplier":0.001,
+            "PollingDelay":60000,
+            "PassiveDelay":7000
         },
         {
             "Name":"inner_disp_therm",
@@ -56,6 +56,60 @@
             "Type":"UNKNOWN",
             "TempPath":"/dev/thermal/tz-by-name/gnss_tcxo_therm/tz_temp",
             "Multiplier":0.001
+        },
+        {
+            "Name":"USB2-MINUS-USB",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "TriggerSensor": "usb_pwr_therm2",
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["usb_pwr_therm2", "usb_pwr_therm"],
+            "Coefficient":[1.0, -1.0],
+            "HotThreshold":["NAN", "7.0", "NAN", "NAN", "NAN", "NAN", "NAN"],
+            "BindedCdevInfo": [
+                {
+                    "CdevRequest": "usbc-port",
+                    "LimitInfo": [0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "Multiplier":0.001,
+            "PollingDelay":0,
+            "PassiveDelay":7000
+        },
+        {
+            "Name":"VIRTUAL-USB-THROTTLING",
+            "Type":"USB_PORT",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"COUNT_THRESHOLD",
+            "TriggerSensor": "usb_pwr_therm2",
+            "Combination":["usb_pwr_therm2", "USB2-MINUS-USB"],
+            "Coefficient":[40000, 10000],
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "2.0", "NAN", "NAN"],
+            "BindedCdevInfo": [
+                {
+                    "CdevRequest": "usbc-port",
+                    "LimitInfo": [0, 0, 0, 0, 1, 1, 1]
+                }
+            ],
+            "Multiplier":1,
+            "PollingDelay":60000,
+            "PassiveDelay":7000
+        },
+        {
+            "Name":"VIRTUAL-USB-UI",
+            "Type":"USB_PORT",
+            "VirtualSensor":true,
+            "Formula":"COUNT_THRESHOLD",
+            "TriggerSensor": "usb_pwr_therm2",
+            "Combination":["usb_pwr_therm2", "USB2-MINUS-USB"],
+            "Coefficient":[40000, 13000],
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "2.0", "NAN"],
+            "Multiplier":1,
+            "Monitor":true,
+            "PollingDelay":60000,
+            "PassiveDelay":7000
         },
         {
             "Name":"LITTLE",
