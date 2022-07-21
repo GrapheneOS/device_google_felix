@@ -16,8 +16,7 @@
 <resources>
   <bool name="nfcc_always_on_allowed">true</bool>
   <string-array name="config_skuSupportsSecureNfc" translatable="false">
-    <item>GFQM1</item>
-    <item>GPQ72</item>
-    <item>GNA8F</item>
+    <item>G9FPL</item>
+    <item>G0B96</item>
   </string-array>
 </resources>
