@@ -19,6 +19,9 @@ TARGET_SCREEN_DENSITY := 420
 BOARD_USES_GENERIC_AUDIO := true
 USES_DEVICE_GOOGLE_FELIX := true
 
+#Display
+USES_IDISPLAY_INTF_SEC := true
+
 include device/google/gs201/BoardConfig-common.mk
 -include vendor/google_devices/gs201/prebuilts/BoardConfigVendor.mk
 -include vendor/google_devices/felix/proprietary/BoardConfigVendor.mk
