@@ -235,3 +235,5 @@ PRODUCT_PACKAGES += \
         WifiOverlay2023Mid_F10
 
 PRODUCT_SOONG_NAMESPACES += device/google/felix
+
+DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework_matrix_product_felix.xml
