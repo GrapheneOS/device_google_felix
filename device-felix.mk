@@ -65,7 +65,9 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/felix/display_golden_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal1.pb
 
 # Display LBE
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.lbe.supported=1
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+	vendor.display.lbe.supported=1 \
+	vendor.display.async_off.supported=true
 
 #config of display brightness dimming
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.brightness.dimming.usage=1
