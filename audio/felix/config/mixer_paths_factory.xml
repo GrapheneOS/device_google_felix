@@ -138,7 +138,7 @@
         <ctl name="ASPTX2 Slot Position" value="4" />
         <ctl name="ASPTX3 Slot Position" value="5" />
         <ctl name="ASPTX4 Slot Position" value="6" />
-        <ctl name="E ASP TX1 Source" value="ASPRX1" />
+        <ctl name="E ASP TX1 Source" value="VMON" />
         <ctl name="E ASP TX2 Source" value="Zero" />
         <ctl name="E ASP TX3 Source" value="Zero" />
         <ctl name="E ASP TX4 Source" value="Zero" />
@@ -146,7 +146,7 @@
         <ctl name="R ASP TX2 Source" value="ASPRX1" />
         <ctl name="R ASP TX3 Source" value="Zero" />
         <ctl name="R ASP TX4 Source" value="Zero" />
-        <ctl name="ASP TX1 Source" value="ASPRX1" />
+        <ctl name="ASP TX1 Source" value="VMON" />
         <ctl name="ASP TX2 Source" value="Zero" />
         <ctl name="ASP TX3 Source" value="Zero" />
         <ctl name="ASP TX4 Source" value="Zero" />
