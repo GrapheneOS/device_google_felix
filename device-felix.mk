@@ -72,6 +72,10 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 #config of display brightness dimming
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.brightness.dimming.usage=1
 
+# Early wake up sysfs path for the secondary display
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+	vendor.display.secondary_early_wakeup_node=/sys/devices/platform/1c241000.drmdecon/early_wakeup
+
 # NFC
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.nfc.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.nfc.xml \
