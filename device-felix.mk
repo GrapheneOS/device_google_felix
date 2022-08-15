@@ -70,7 +70,8 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	vendor.display.async_off.supported=true
 
 #config of display brightness dimming
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.brightness.dimming.usage=1
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.0.brightness.dimming.usage=1
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.1.brightness.dimming.usage=0
 
 # Early wake up sysfs path for the secondary display
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
