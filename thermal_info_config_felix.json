@@ -174,6 +174,7 @@
             "Multiplier":0.001,
             "PollingDelay":60000,
             "PassiveDelay":7000,
+            "SendCallback":true,
             "BindedCdevInfo": [
                 {
                     "CdevRequest": "tpu_cooling",
@@ -297,7 +298,7 @@
             "Coefficient":[40000, 13000],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "2.0", "NAN"],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "PollingDelay":60000,
             "PassiveDelay":7000
         },
@@ -335,7 +336,7 @@
             "Name":"battery_cycle",
             "Type":"BCL_VOLTAGE",
             "Multiplier":1,
-            "Monitor":false
+            "SendCallback":false
         },
         {
             "Name":"critical-battery-cell",
@@ -347,7 +348,7 @@
             "Coefficient":[-10000, 400, 1000],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", 3.00, "NAN"],
             "Multiplier":1,
-            "Monitor":true
+            "SendCallback":true
         },
         {
             "Name":"FLASH_LED_REDUCE",
@@ -359,7 +360,7 @@
             "Coefficient":[-10000, 400, 1000],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 3.00, "NAN", "NAN"],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "SendPowerHint":true
         },
         {
@@ -378,7 +379,7 @@
             "Coefficient":[1, -10],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 13000, "NAN", "NAN"],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "BindedCdevInfo": [
                 {
                     "CdevRequest": "tpu_cooling",
@@ -396,7 +397,7 @@
             "Coefficient":[1, -10],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 13000, "NAN", "NAN"],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "BindedCdevInfo": [
                 {
                     "CdevRequest": "thermal-gpufreq-0",
@@ -414,7 +415,7 @@
             "Coefficient":[5000, 12000, -1000 ],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN",  3.0, "NAN", "NAN"],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "BindedCdevInfo": [
                 {
                     "CdevRequest": "thermal-gpufreq-0",
@@ -432,7 +433,7 @@
             "Coefficient":[5000, 12000, -1000],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 3.0, "NAN", "NAN"],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "BindedCdevInfo": [
                 {
                     "CdevRequest": "tpu_cooling",
@@ -450,7 +451,7 @@
             "Coefficient":[5000, 12000],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 2.0, "NAN", "NAN"],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "BindedCdevInfo": [
                 {
                     "CdevRequest": "thermal-gpufreq-0",
@@ -471,7 +472,7 @@
             "Coefficient":[5000, 12000],
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 2.0, "NAN", "NAN"],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "BindedCdevInfo": [
                 {
                     "CdevRequest": "tpu_cooling",
@@ -485,7 +486,7 @@
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 5000, "NAN", "NAN"],
             "HotHysteresis":[0.0, 0.0, 0.0, 0.0, 100, 0.0, 0.0],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "PollingDelay":0,
             "PassiveDelay":60000,
             "BindedCdevInfo": [
@@ -513,7 +514,7 @@
             "Coefficient":[-25000, 80],
             "HotThreshold":["NAN", "NAN",  "NAN", "NAN", 2.0, "NAN", "NAN"],
             "Multiplier":1,
-            "Monitor":true
+            "SendCallback":true
         },
         {
             "Name":"vdroop1",
@@ -521,7 +522,7 @@
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 1000, "NAN", "NAN"],
             "HotHysteresis":[0.0, 0.0, 0.0, 0.0, 100, 0.0, 0.0],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "PollingDelay":0,
             "PassiveDelay":60000,
             "BindedCdevInfo": [
@@ -545,7 +546,7 @@
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 1200, "NAN", "NAN"],
             "HotHysteresis":[0.0, 0.0, 0.0, 0.0, 100, 0.0, 0.0],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "PollingDelay":0,
             "PassiveDelay":60000,
             "BindedCdevInfo": [
@@ -569,7 +570,7 @@
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", 1100, "NAN", "NAN"],
             "HotHysteresis":[0.0, 0.0, 0.0, 0.0, 100, 0.0, 0.0],
             "Multiplier":1,
-            "Monitor":true,
+            "SendCallback":true,
             "PollingDelay":0,
             "PassiveDelay":60000,
             "BindedCdevInfo": [
