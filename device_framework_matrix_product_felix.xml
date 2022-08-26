@@ -7,12 +7,4 @@
             <instance>secondary</instance>
         </interface>
     </hal>
-    <hal format="hidl">
-        <name>hardware.google.bluetooth.ccc</name>
-        <version>1.1</version>
-        <interface>
-            <name>IBluetoothCcc</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
 </compatibility-matrix>
