@@ -30,7 +30,7 @@ include device/google/felix/audio/felix/audio-tables.mk
 include device/google/gs201/device-shipping-common.mk
 $(call soong_config_set,fp_hal_feature,pixel_product, product_a)
 include hardware/google/pixel/vibrator/cs40l26/device-stereo.mk
-include device/google/gs101/bluetooth/bluetooth.mk
+include device/google/gs-common/bcmbt/bluetooth.mk
 ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
 include device/google/felix/uwb/uwb_calibration.mk
 endif
@@ -120,7 +120,6 @@ DEVICE_MANIFEST_FILE += \
 PRODUCT_SOONG_NAMESPACES += \
         vendor/broadcom/bluetooth
 PRODUCT_PACKAGES += \
-	android.hardware.bluetooth@1.1-service.bcmbtlinux \
 	bt_vendor.conf
 PRODUCT_COPY_FILES += \
 	device/google/felix/bluetooth/bt_vendor_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth/bt_vendor_overlay.conf
