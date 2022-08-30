@@ -1,10 +1,300 @@
 {
     "Sensors":[
         {
-            "Name":"battery",
-            "Type":"BATTERY",
-            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "NAN", 60.0],
+            "Name":"neutral_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/neutral_therm/tz_temp",
             "Multiplier":0.001
+        },
+        {
+            "Name":"quiet_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/quiet_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"skin_therm",
+            "Type":"UNKNOWN",
+            "HotThreshold":["NAN", 32, "NAN", "NAN", "NAN", "NAN", "NAN"],
+            "TempPath":"/dev/thermal/tz-by-name/skin_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"usb_pwr_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"usb_pwr_therm2",
+            "Type":"UNKNOWN",
+            "HotThreshold":["NAN", 40.0, "NAN", "NAN", "NAN", "NAN", "NAN"],
+            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm2/tz_temp",
+            "Multiplier":0.001,
+            "PollingDelay":60000,
+            "PassiveDelay":7000
+        },
+        {
+            "Name":"inner_disp_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/inner_disp_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"outer_disp_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/outer_disp_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"gnss_tcxo_therm",
+            "Type":"UNKNOWN",
+            "TempPath":"/dev/thermal/tz-by-name/gnss_tcxo_therm/tz_temp",
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-SKIN-OUTER-INNER",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["outer_disp_therm", "inner_disp_therm"],
+            "Coefficient":[2.5, -1.0],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"IS_UNFOLD",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"COUNT_THRESHOLD",
+            "Combination":["VIRTUAL-SKIN-OUTER-INNER"],
+            "Coefficient":[-40000.0],
+            "Multiplier":1
+        },
+        {
+            "Name":"IS_FOLD",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"COUNT_THRESHOLD",
+            "Combination":["VIRTUAL-SKIN-OUTER-INNER"],
+            "Coefficient":[40000.0],
+            "Multiplier":1
+        },
+        {
+            "Name":"VIRTUAL-SKIN-UNFOLD-SUB1-0",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["neutral_therm", "skin_therm", "usb_pwr_therm"],
+            "Coefficient":[0.15, 0.6, 0.2],
+            "Offset":2000,
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-SKIN-UNFOLD-SUB1",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"MAXIMUM",
+            "Combination":["VIRTUAL-SKIN-UNFOLD-SUB1-0", "neutral_therm", "skin_therm"],
+            "Coefficient":[1.0, 0.84, 0.955],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-SKIN-UNFOLD",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["VIRTUAL-SKIN-UNFOLD-SUB1", "IS_FOLD"],
+            "Coefficient":[1.0, -1000000],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-SKIN-FOLD-SUB1-0",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["neutral_therm", "quiet_therm", "skin_therm"],
+            "Coefficient":[0.3, 0.05, 0.6],
+            "Offset":2500,
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-SKIN-FOLD-SUB1-1",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["skin_therm", "usb_pwr_therm"],
+            "Coefficient":[0.55, 0.45],
+            "Offset":-2300,
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-SKIN-FOLD-SUB1",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"MAXIMUM",
+            "Combination":["VIRTUAL-SKIN-FOLD-SUB1-0", "VIRTUAL-SKIN-FOLD-SUB1-1", "neutral_therm"],
+            "Coefficient":[1.0, 1.0, 0.83],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-SKIN-FOLD",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["VIRTUAL-SKIN-UNFOLD-SUB1", "IS_UNFOLD"],
+            "Coefficient":[1.0, -1000000],
+            "Multiplier":0.001
+        },
+        {
+            "Name":"VIRTUAL-SKIN-CHARGE",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "TriggerSensor":"skin_therm",
+            "Formula":"MAXIMUM",
+            "Combination":["VIRTUAL-SKIN-UNFOLD", "VIRTUAL-SKIN-FOLD"],
+            "Coefficient":[1.0, 1.0],
+            "HotThreshold":["NAN", 39.0, 41.0, 43.0, 45.0, 47.0, 55.0],
+            "HotHysteresis":[0.0, 1.9, 1.9, 1.9, 1.9, 1.9, 1.9],
+            "Multiplier":0.001,
+            "PollingDelay":300000,
+            "PassiveDelay":7000,
+            "PIDInfo": {
+                "K_Po":["NAN", "NAN", 800, "NAN", "NAN", "NAN", "NAN"],
+                "K_Pu":["NAN", "NAN", 800, "NAN", "NAN", "NAN", "NAN"],
+                "K_I":["NAN", "NAN", 5, "NAN", "NAN", "NAN", "NAN"],
+                "K_D":["NAN", "NAN", 0, "NAN", "NAN", "NAN", "NAN"],
+                "I_Max":["NAN", "NAN", 800, "NAN", "NAN", "NAN", "NAN"],
+                "S_Power":["NAN", "NAN", 3600, "NAN", "NAN", "NAN", "NAN"],
+                "MinAllocPower":["NAN", "NAN", 300, "NAN", "NAN", "NAN", "NAN"],
+                "MaxAllocPower":["NAN", "NAN", 6000, "NAN", "NAN", "NAN", "NAN"],
+                "I_Cutoff":["NAN", "NAN", 2, "NAN", "NAN", "NAN", "NAN"]
+            },
+            "ExcludedPowerInfo": [
+                {
+                    "PowerRail": "PARTIAL_SYSTEM_POWER",
+                    "PowerWeight": [0.5, 0.5, 0.8, 1.0, 1.0, 1.0, 1.0]
+                }
+            ],
+            "BindedCdevInfo": [
+                {
+                    "CdevRequest": "chg_mdis",
+                    "CdevWeightForPID": [1, 1, 1, 1, 1, 1, 1],
+                    "MaxReleaseStep": 1,
+                    "MaxThrottleStep": 1,
+                    "CdevCeiling": [0, 7, 10, 11, 12, 12, 12],
+                    "LimitInfo": [0, 0, 0, 0, 0, 12, 12]
+                }
+            ]
+        },
+        {
+            "Name":"USB2-MINUS-USB",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "TriggerSensor": "usb_pwr_therm2",
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["usb_pwr_therm2", "usb_pwr_therm"],
+            "Coefficient":[1.0, -1.0],
+            "HotThreshold":["NAN", "7.0", "NAN", "NAN", "NAN", "NAN", "NAN"],
+            "BindedCdevInfo": [
+                {
+                    "CdevRequest": "usbc-port",
+                    "LimitInfo": [0, 0, 0, 0, 0, 0, 0]
+                }
+            ],
+            "Multiplier":0.001,
+            "PollingDelay":0,
+            "PassiveDelay":7000
+        },
+        {
+            "Name":"VIRTUAL-USB-THROTTLING",
+            "Type":"USB_PORT",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"COUNT_THRESHOLD",
+            "TriggerSensor": "usb_pwr_therm2",
+            "Combination":["usb_pwr_therm2", "USB2-MINUS-USB"],
+            "Coefficient":[40000, 10000],
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "2.0", "NAN", "NAN"],
+            "BindedCdevInfo": [
+                {
+                    "CdevRequest": "usbc-port",
+                    "LimitInfo": [0, 0, 0, 0, 1, 1, 1]
+                }
+            ],
+            "Multiplier":1,
+            "PollingDelay":60000,
+            "PassiveDelay":7000
+        }
+    ],
+    "CoolingDevices":[
+        {
+            "Name":"chg_mdis",
+            "Type":"BATTERY"
+        },
+        {
+            "Name":"usbc-port",
+            "Type":"BATTERY"
+        }
+    ],
+    "PowerRails":[
+        {
+            "Name":"PPVAR_VSYS_PWR_DISP"
+        },
+        {
+            "Name":"VSYS_PWR_MODEM"
+        },
+        {
+            "Name":"S2M_VDD_CPUCL2",
+            "PowerSampleDelay":7000,
+            "PowerSampleCount":1
+
+        },
+        {
+            "Name":"S3M_VDD_CPUCL1",
+            "PowerSampleDelay":7000,
+            "PowerSampleCount":1
+        },
+        {
+            "Name":"S4M_VDD_CPUCL0",
+            "PowerSampleDelay":7000,
+            "PowerSampleCount":1
+        },
+        {
+            "Name":"S5M_VDD_INT"
+        },
+        {
+            "Name":"S1M_VDD_MIF"
+        },
+        {
+            "Name":"S2S_VDD_G3D",
+            "PowerSampleDelay":7000,
+            "PowerSampleCount":1
+        },
+        {
+            "Name":"VSYS_PWR_WLAN_BT",
+            "PowerSampleDelay":7000,
+            "PowerSampleCount":1
+        },
+        {
+            "Name":"PARTIAL_SYSTEM_POWER",
+            "VirtualRails":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["VSYS_PWR_MODEM", "S2M_VDD_CPUCL2", "S3M_VDD_CPUCL1", "S4M_VDD_CPUCL0", "S5M_VDD_INT", "S1M_VDD_MIF", "S2S_VDD_G3D", "VSYS_PWR_WLAN_BT"],
+            "Coefficient":[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            "PowerSampleDelay":7000,
+            "PowerSampleCount":5
         }
     ]
 }
