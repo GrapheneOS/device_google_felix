@@ -250,3 +250,7 @@ PRODUCT_COPY_FILES += \
 # Enable adpf cpu hint session for SurfaceFlinger
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     debug.sf.enable_adpf_cpu_hint=true
+
+# Control camera exif model/make redaction
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.camera.redact_exif=1
