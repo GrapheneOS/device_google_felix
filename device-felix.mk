@@ -255,3 +255,8 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 # Control camera exif model/make redaction
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.camera.redact_exif=1
+
+# Camera
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.vendor.camera.extended_launch_boost=1 \
+    persist.vendor.camera.raise_buf_allocation_priority=1
