@@ -64,10 +64,11 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/felix/display_golden_cal0.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal0.pb \
 	device/google/felix/felix/display_golden_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal1.pb
 
-# Display LBE
+# Display
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	vendor.display.lbe.supported=1 \
-	vendor.display.async_off.supported=true
+	vendor.display.async_off.supported=true \
+	ro.surface_flinger.ignore_hdr_camera_layers=true
 
 #config of display brightness dimming
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.0.brightness.dimming.usage=1
