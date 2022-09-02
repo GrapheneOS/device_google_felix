@@ -230,10 +230,14 @@ PRODUCT_COPY_FILES += \
 # Location
 ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
     PRODUCT_COPY_FILES += \
-        device/google/felix/location/gps.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml
+        device/google/felix/location/gps.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml \
+        device/google/felix/location/lhd.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/lhd.conf \
+        device/google/felix/location/scd.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/scd.conf
 else
     PRODUCT_COPY_FILES += \
-        device/google/felix/location/gps_user.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml
+        device/google/felix/location/gps_user.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml \
+        device/google/felix/location/lhd_user.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/lhd.conf \
+        device/google/felix/location/scd_user.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/scd.conf
 endif
 
 # WiFi
