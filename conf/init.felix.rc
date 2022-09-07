@@ -78,7 +78,7 @@ on early-boot
     wait_for_prop vendor.common.modules.ready 1
     start insmod_sh_felix
 
-service insmod_sh_felix /vendor/bin/init.insmod.sh /vendor/etc/init.insmod.felix.cfg
+service insmod_sh_felix /vendor/bin/insmod.sh /vendor/etc/init.insmod.felix.cfg
     class main
     user root
     group root system
