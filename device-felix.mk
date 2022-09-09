@@ -117,18 +117,23 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
 
 # Bluetooth HAL
-DEVICE_MANIFEST_FILE += \
-	device/google/felix/bluetooth/manifest_bluetooth.xml
-PRODUCT_SOONG_NAMESPACES += \
-        vendor/broadcom/bluetooth
-PRODUCT_PACKAGES += \
-	bt_vendor.conf
 PRODUCT_COPY_FILES += \
 	device/google/felix/bluetooth/bt_vendor_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth/bt_vendor_overlay.conf
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.bluetooth.a2dp_offload.supported=true \
     persist.bluetooth.a2dp_offload.disabled=false \
     persist.bluetooth.a2dp_offload.cap=sbc-aac-aptx-aptxhd-ldac
+# Bluetooth SAR test tool
+PRODUCT_PACKAGES_DEBUG += \
+    sar_test
+
+# Bluetooth
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.bluetooth.a2dp_aac.vbr_supported=true
+
+# default BDADDR for EVB only
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.vendor.bluetooth.evb_bdaddr="22:22:22:33:44:55"
 
 # Keymaster HAL
 #LOCAL_KEYMASTER_PRODUCT_PACKAGE ?= android.hardware.keymaster@4.1-service
@@ -160,10 +165,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # 	ro.hardware.keystore=software \
 # 	ro.hardware.gatekeeper=software
 
-# default BDADDR for EVB only
-PRODUCT_PROPERTY_OVERRIDES += \
-	ro.vendor.bluetooth.evb_bdaddr="22:22:22:33:44:55"
-
 # PowerStats HAL
 PRODUCT_SOONG_NAMESPACES += \
     device/google/felix/powerstats/felix
@@ -184,18 +185,6 @@ FPC_MODULE_TYPE=1542_C
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.gms.dck.eligible_wcc=2
-
-# Bluetooth SAR test tool
-PRODUCT_PACKAGES_DEBUG += \
-    sar_test
-
-# Bluetooth
-PRODUCT_PRODUCT_PROPERTIES += \
-    persist.bluetooth.a2dp_aac.vbr_supported=true
-
-# Bluetooth HAL
-PRODUCT_PACKAGES += \
-	bt_vendor.conf
 
 # Graphics
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.surface_flinger.enable_frame_rate_override=true
