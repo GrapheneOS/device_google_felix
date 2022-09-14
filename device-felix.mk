@@ -35,6 +35,8 @@ ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
 include device/google/felix/uwb/uwb_calibration.mk
 endif
 
+# go/lyric-soong-variables
+$(call soong_config_set,lyric,camera_hardware,felix)
 $(call soong_config_set,lyric,tuning_product,felix)
 $(call soong_config_set,google3a_config,target_device,felix)
 
