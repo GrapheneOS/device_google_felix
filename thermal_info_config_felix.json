@@ -183,6 +183,21 @@
             ]
        },
        {
+            "Name":"cellular-emergency",
+            "Type":"POWER_AMPLIFIER",
+            "VirtualSensor":true,
+            "TriggerSensor":"skin_therm",
+            "Formula":"MAXIMUM",
+            "Combination":["VIRTUAL-SKIN-UNFOLD", "VIRTUAL-SKIN-FOLD"],
+            "Coefficient":[1.0, 1.0],
+            "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", 54.0, "NAN"],
+            "HotHysteresis":[0.0, 0.0, 0.0, 0.0, 0.0, 1.9, 0.0],
+            "Multiplier":0.001,
+            "PollingDelay":60000,
+            "PassiveDelay":7000,
+            "SendCallback":true
+       },
+       {
             "Name":"VIRTUAL-SKIN-CPU-GPU",
             "Type":"UNKNOWN",
             "Hidden":true,
