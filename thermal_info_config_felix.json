@@ -157,7 +157,7 @@
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
-            "Combination":["VIRTUAL-SKIN-UNFOLD-SUB1", "IS_UNFOLD"],
+            "Combination":["VIRTUAL-SKIN-FOLD-SUB1", "IS_UNFOLD"],
             "Coefficient":[1.0, -1000000],
             "Multiplier":0.001
         },
@@ -181,7 +181,7 @@
                     "LimitInfo": [0, 2, 3, 4, 5, 5, 5]
                 }
             ]
-        },
+       },
        {
             "Name":"VIRTUAL-SKIN-CPU-GPU",
             "Type":"UNKNOWN",
