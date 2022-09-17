@@ -34,36 +34,42 @@ using aidl::android::hardware::power::stats::GenericStateResidencyDataProvider;
 using aidl::android::hardware::power::stats::PowerStatsEnergyConsumer;
 
 void addDisplay(std::shared_ptr<PowerStats> p) {
-    // Add display residency stats
-    std::vector<std::string> states = {
+    // Add display residency stats for inner display
+    std::vector<std::string> inner_states = {
         "Off",
-        "LP: 1440x3120@1",
-        "LP: 1440x3120@10",
-        "LP: 1440x3120@30",
-        "On: 1440x3120@60",
-        "On: 1440x3120@90",
-        "On: 1440x3120@120",
-        "HBM: 1440x3120@60",
-        "HBM: 1440x3120@90",
-        "HBM: 1440x3120@120"};
+        "LP: 1840x2208@30",
+        "On: 1840x2208@10",
+        "On: 1840x2208@60",
+        "On: 1840x2208@120",
+        "HBM: 1840x2208@60",
+        "HBM: 1840x2208@120"};
 
     p->addStateResidencyDataProvider(std::make_unique<DisplayStateResidencyDataProvider>(
-            "Display",
+            "Inner Display",
             "/sys/class/backlight/panel0-backlight/state",
-            states));
+            inner_states));
+
+    // Add display residency stats for outer display
+    std::vector<std::string> outer_states = {
+        "Off",
+        "LP: 1080x2092@30",
+        "On: 1080x2092@10",
+        "On: 1080x2092@60",
+        "On: 1080x2092@120",
+        "HBM: 1080x2092@60",
+        "HBM: 1080x2092@120"};
+
+    p->addStateResidencyDataProvider(std::make_unique<DisplayStateResidencyDataProvider>(
+            "Outer Display",
+            "/sys/class/backlight/panel1-backlight/state",
+            outer_states));
 
     // Add display energy consumer
-    p->addEnergyConsumer(PowerStatsEnergyConsumer::createMeterAndEntityConsumer(
-            p, EnergyConsumerType::DISPLAY, "display", {"PPVAR_VSYS_PWR_DISP"}, "Display",
-            {{"LP: 1440x3120@1", 1},
-             {"LP: 1440x3120@10", 2},
-             {"LP: 1440x3120@30", 3},
-             {"On: 1440x3120@60", 4},
-             {"On: 1440x3120@90", 5},
-             {"On: 1440x3120@120", 6},
-             {"HBM: 1440x3120@60", 7},
-             {"HBM: 1440x3120@90", 8},
-             {"HBM: 1440x3120@120", 9}}));
+    p->addEnergyConsumer(PowerStatsEnergyConsumer::createMeterConsumer(
+            p,
+            EnergyConsumerType::DISPLAY,
+            "Display",
+            {"VSYS_PWR_DISPLAY"}));// VSYS_PWR_DISPLAY = inner + outer
 }
 
 void addUwb(std::shared_ptr<PowerStats> p) {
