@@ -74,17 +74,15 @@
 
     <!-- Display cutout configuration -->
     <string translatable="false" name="config_secondaryBuiltInDisplayCutout">
-        M 505,61
-        a 35,35 0 1 0 70,0 35,35 0 1 0 -70,0
-        Z
-        @left
+      m 576.2,66.53 a 36.5,36.5 0 0 1 -36.5,36.5 36.5,36.5 0 0 1 -36.5,-36.5 36.5,36.5 0 0 1 36.5,-36.5 36.5,36.5 0 0 1 36.5,36.5 z
+      @left
     </string>
 
     <string translatable="false" name="config_secondaryBuiltInDisplayCutoutRectApproximation">
-        M 480,0
-        h 110
-        v 110
-        h -110
+        M 503.2,0
+        h 73
+        v 103
+        h 73
         Z
         @left
     </string>
@@ -230,13 +228,13 @@
         orientation. If zero, the value of rounded_corner_radius is used. -->
     <dimen name="rounded_corner_radius_top">52px</dimen>
     <!-- For secondary display -->
-    <dimen name="secondary_rounded_corner_radius_top">52px</dimen>
+    <dimen name="secondary_rounded_corner_radius_top">91px</dimen>
 
     <!-- Radius of the software rounded corners at the bottom of primary display in its natural
         orientation. If zero, the value of rounded_corner_radius is used. -->
     <dimen name="rounded_corner_radius_bottom">48px</dimen>
     <!-- For secondary display -->
-    <dimen name="secondary_rounded_corner_radius_bottom">48px</dimen>
+    <dimen name="secondary_rounded_corner_radius_bottom">91px</dimen>
 
     <!-- Top adjustment for the software rounded corners since corners are not perfectly
         round.  This value is used when retrieving the "radius" of the top rounded corner in cases
@@ -244,8 +242,6 @@
         rounded_corner_radius_top to more accurately provide a "radius" for the top rounded corners.
          -->
     <dimen name="rounded_corner_radius_top_adjustment">5px</dimen>
-    <!-- For secondary display -->
-    <dimen name="secondary_rounded_corner_radius_top_adjustment">5px</dimen>
 
     <!-- Bottom adjustment for the software rounded corners since corners are not perfectly
         round.  This value is used when retrieving the "radius" of the bottom rounded corner in
@@ -253,8 +249,6 @@
         rounded_corner_radius_bottom to more accurately provide a "radius" for the bottom rounded
         corners. -->
     <dimen name="rounded_corner_radius_bottom_adjustment">4px</dimen>
-    <!-- For secondary display -->
-    <dimen name="secondary_rounded_corner_radius_bottom_adjustment">4px</dimen>
 
     <!-- the number of the max cached processes in the system. -->
     <integer name="config_customizedMaxCachedProcesses">64</integer>
