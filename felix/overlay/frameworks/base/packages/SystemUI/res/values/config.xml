@@ -75,14 +75,11 @@
 
     <!-- Configure 13px of extra protection around the front-facing camera -->
     <string translatable="false" name="config_frontBuiltInDisplayCutoutProtection">
-        M 494,65
-        a 46,46 0 1 0 92,0
-        a 46,46 0 1 0 -92,0
-        Z
+      m 589.2,66.53 a 49.5,49.5 0 0 1 -49.5,49.5 49.5,49.5 0 0 1 -49.5,-49.5 49.5,49.5 0 0 1 49.5,-49.5 49.5,49.5 0 0 1 49.5,49.5 z
     </string>
 
-    <!-- Camera 1 is the front camera on barbet -->
-    <string translatable="false" name="config_protectedCameraId">1</string>
+    <!-- Camera 0 is the front camera -->
+    <string translatable="false" name="config_protectedCameraId">0</string>
 
     <!-- Comma-separated list of packages to exclude from camera protection. In our case,
     ignore the gaze detection package -->
