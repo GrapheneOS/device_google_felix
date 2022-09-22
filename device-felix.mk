@@ -23,6 +23,7 @@ $(call inherit-product-if-exists, vendor/google_devices/gs201/prebuilts/device-v
 $(call inherit-product-if-exists, vendor/google_devices/gs201/proprietary/device-vendor.mk)
 $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/felix/device-vendor-felix.mk)
 $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/WallpapersFelix.mk)
 
 DEVICE_PACKAGE_OVERLAYS += device/google/felix/felix/overlay
 
