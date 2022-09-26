@@ -89,7 +89,7 @@
             "Multiplier":1
         },
         {
-            "Name":"VIRTUAL-SKIN-UNFOLD-SUB1-0",
+            "Name":"UNFOLD-NEUTRAL-SKIN-USB",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
@@ -100,12 +100,12 @@
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-SKIN-UNFOLD-SUB1",
+            "Name":"VIRTUAL-SKIN-UNFOLD-SUB",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"MAXIMUM",
-            "Combination":["VIRTUAL-SKIN-UNFOLD-SUB1-0", "neutral_therm", "skin_therm"],
+            "Combination":["UNFOLD-NEUTRAL-SKIN-USB", "neutral_therm", "skin_therm"],
             "Coefficient":[1.0, 0.84, 0.955],
             "Multiplier":0.001
         },
@@ -115,40 +115,39 @@
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
-            "Combination":["VIRTUAL-SKIN-UNFOLD-SUB1", "IS_FOLD"],
+            "Combination":["VIRTUAL-SKIN-UNFOLD-SUB", "IS_FOLD"],
             "Coefficient":[1.0, -1000000],
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-SKIN-FOLD-SUB1-0",
+            "Name":"FOLD-SKIN-QUIET-NEUTRAL",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
-            "Combination":["neutral_therm", "quiet_therm", "skin_therm"],
-            "Coefficient":[0.3, 0.05, 0.6],
-            "Offset":2500,
+            "Combination":["skin_therm", "quiet_therm", "neutral_therm"],
+            "Coefficient":[0.6, 0.1, 0.3],
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-SKIN-FOLD-SUB1-1",
+            "Name":"FOLD-SKIN-MINUS-2.2",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
-            "Combination":["skin_therm", "usb_pwr_therm"],
-            "Coefficient":[0.55, 0.45],
-            "Offset":-2300,
+            "Combination":["skin_therm"],
+            "Coefficient":[1],
+            "Offset":-2200,
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-SKIN-FOLD-SUB1",
+            "Name":"VIRTUAL-SKIN-FOLD-SUB",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"MAXIMUM",
-            "Combination":["VIRTUAL-SKIN-FOLD-SUB1-0", "VIRTUAL-SKIN-FOLD-SUB1-1", "neutral_therm"],
-            "Coefficient":[1.0, 1.0, 0.83],
+            "Combination":["FOLD-SKIN-QUIET-NEUTRAL", "neutral_therm", "FOLD-SKIN-MINUS-2.2"],
+            "Coefficient":[1.0, 1.0, 1.0],
             "Multiplier":0.001
         },
         {
@@ -157,13 +156,14 @@
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
-            "Combination":["VIRTUAL-SKIN-FOLD-SUB1", "IS_UNFOLD"],
+            "Combination":["VIRTUAL-SKIN-FOLD-SUB", "IS_UNFOLD"],
             "Coefficient":[1.0, -1000000],
             "Multiplier":0.001
         },
         {
             "Name":"VIRTUAL-SKIN",
             "Type":"SKIN",
+            "Version":"1.1",
             "VirtualSensor":true,
             "TriggerSensor":"skin_therm",
             "Formula":"MAXIMUM",
