@@ -54,13 +54,13 @@ class VibMgrHwApi : public VibratorManager::HwApi {
         }
         mGPIOPin = utils::getProperty(mPropertyPrefix + "gpio.num", DEBUG_GPI_PIN);
         if (mGPIOPin == DEBUG_GPI_PIN) {
-            ALOGE("GetGPIO: Fail to get the GPIO num: %s", strerror(errno));
+            ALOGE("GetGPIO: Failed to get the GPIO num: %s", strerror(errno));
             return false;
         }
         mGPIOShift = utils::getProperty(mPropertyPrefix + "gpio.shift", DEBUG_GPI_PIN_SHIFT);
 
         if (mGPIOShift == DEBUG_GPI_PIN_SHIFT) {
-            ALOGE("GetGPIO: Fail to get the GPIO shift num: %s", strerror(errno));
+            ALOGE("GetGPIO: Failed to get the GPIO shift num: %s", strerror(errno));
             return false;
         }
 

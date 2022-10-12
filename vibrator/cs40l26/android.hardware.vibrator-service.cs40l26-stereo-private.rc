@@ -9,6 +9,7 @@ service vendor.vibrator.cs40l26-stereo /vendor/bin/hw/android.hardware.vibrator-
     user root
     group root
 
+    setenv HAPTIC_MGR_NAME HapticsMgr
     setenv PROPERTY_PREFIX ro.vendor.vibrator.hal.
 
     disabled

@@ -100,6 +100,18 @@ static constexpr float PWLE_BW_MAP_SIZE =
  */
 static constexpr uint32_t GPIO_TRIGGER_CONFIG = 0x9100;
 
+const char *kHAPNAME = std::getenv("HAPTIC_NAME");
+#undef ALOGV
+#define ALOGV(...) ((void)ALOG(LOG_VERBOSE, kHAPNAME, __VA_ARGS__))
+#undef ALOGD
+#define ALOGD(...) ((void)ALOG(LOG_DEBUG, kHAPNAME, __VA_ARGS__))
+#undef ALOGI
+#define ALOGI(...) ((void)ALOG(LOG_INFO, kHAPNAME, __VA_ARGS__))
+#undef ALOGW
+#define ALOGW(...) ((void)ALOG(LOG_WARN, kHAPNAME, __VA_ARGS__))
+#undef ALOGE
+#define ALOGE(...) ((void)ALOG(LOG_ERROR, kHAPNAME, __VA_ARGS__))
+
 static uint16_t amplitudeToScale(float amplitude, float maximum) {
     float ratio = 100; /* Unit: % */
     if (maximum != 0)
@@ -248,7 +260,7 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
         for (uint8_t retry = 0; retry < 10; retry++) {
             ret = glob(inputEventPathName, 0, nullptr, &inputEventPaths);
             if (ret) {
-                ALOGE("Fail to get input event paths (%d): %s", errno, strerror(errno));
+                ALOGE("Failed to get input event paths (%d): %s", errno, strerror(errno));
             } else {
                 for (int i = 0; i < inputEventPaths.gl_pathc; i++) {
                     fd = TEMP_FAILURE_RETRY(open(inputEventPaths.gl_pathv[i], O_RDWR));
@@ -278,7 +290,7 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
         }
 
         if (!mInputFd.ok()) {
-            ALOGE("Fail to get an input event with name %s", inputEventName);
+            ALOGE("Failed to get an input event with name %s", inputEventName);
         }
     } else {
         ALOGE("The input name %s is not cs40l26_input or cs40l26_dual_input", inputEventName);
@@ -1360,7 +1372,7 @@ void Vibrator::waitForComplete(std::shared_ptr<IVibratorCallback> &&callback) {
 
     if (!mHwApi->pollVibeState(VIBE_STATE_HAPTIC,
                                (mSyncedCallback) ? POLLING_TIMEOUT_IN_SYNC : POLLING_TIMEOUT)) {
-        ALOGV("Fail to get state \"Haptic\"");
+        ALOGV("Failed to get state \"Haptic\"");
     }
 
     mHwApi->pollVibeState(VIBE_STATE_STOPPED);

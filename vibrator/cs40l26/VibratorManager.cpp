@@ -27,6 +27,18 @@ namespace android {
 namespace hardware {
 namespace vibrator {
 
+const char *kHAPMGRNAME = std::getenv("HAPTIC_MGR_NAME");
+#undef ALOGV
+#define ALOGV(...) ((void)ALOG(LOG_VERBOSE, kHAPMGRNAME, __VA_ARGS__))
+#undef ALOGD
+#define ALOGD(...) ((void)ALOG(LOG_DEBUG, kHAPMGRNAME, __VA_ARGS__))
+#undef ALOGI
+#define ALOGI(...) ((void)ALOG(LOG_INFO, kHAPMGRNAME, __VA_ARGS__))
+#undef ALOGW
+#define ALOGW(...) ((void)ALOG(LOG_WARN, kHAPMGRNAME, __VA_ARGS__))
+#undef ALOGE
+#define ALOGE(...) ((void)ALOG(LOG_ERROR, kHAPMGRNAME, __VA_ARGS__))
+
 using ::android::sp;
 using ::android::binder::Status;
 using ::android::hardware::vibrator::BnVibratorSyncCallback;
