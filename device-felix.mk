@@ -60,6 +60,11 @@ PRODUCT_COPY_FILES += \
 # Media Performance Class 13
 PRODUCT_PROPERTY_OVERRIDES += ro.odm.build.media_performance_class=33
 
+# sysconfig and permissions XML from stock
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/product-sysconfig-stock.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/product-sysconfig-stock.xml \
+    $(LOCAL_PATH)/product-permissions-stock.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/product-permissions-stock.xml
+
 # Display Config
 PRODUCT_COPY_FILES += \
 	device/google/felix/felix/display_colordata_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_colordata_cal1.pb \
