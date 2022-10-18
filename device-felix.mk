@@ -139,6 +139,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PACKAGES_DEBUG += \
     sar_test
 
+# Bluetooth hci_inject test tool
+PRODUCT_PACKAGES_DEBUG += \
+    hci_inject
+
 # Bluetooth
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.bluetooth.a2dp_aac.vbr_supported=true
