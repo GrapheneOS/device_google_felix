@@ -19,6 +19,7 @@
 #include <dataproviders/DisplayStateResidencyDataProvider.h>
 #include <dataproviders/GenericStateResidencyDataProvider.h>
 #include <dataproviders/PowerStatsEnergyConsumer.h>
+#include <DevfreqStateResidencyDataProvider.h>
 #include <Gs201CommonDataProviders.h>
 #include <PowerStatsAidl.h>
 
@@ -28,6 +29,7 @@
 #include <android/binder_process.h>
 #include <log/log.h>
 
+using aidl::android::hardware::power::stats::DevfreqStateResidencyDataProvider;
 using aidl::android::hardware::power::stats::DisplayStateResidencyDataProvider;
 using aidl::android::hardware::power::stats::EnergyConsumerType;
 using aidl::android::hardware::power::stats::GenericStateResidencyDataProvider;
@@ -105,6 +107,39 @@ void addUwb(std::shared_ptr<PowerStats> p) {
             "/sys/devices/platform/10db0000.spi/spi_master/spi16/spi16.0/uwb/power_stats", cfgs));
 }
 
+void addGPUGs202(std::shared_ptr<PowerStats> p) {
+    std::map<std::string, int32_t> stateCoeffs;
+
+    // Add GPU state residency
+    p->addStateResidencyDataProvider(std::make_unique<DevfreqStateResidencyDataProvider>(
+            "GPU",
+            "/sys/devices/platform/28000000.mali"));
+
+    // Add GPU energy consumer
+    stateCoeffs = {
+        {"202000",  890},
+        {"251000", 1102},
+        {"302000", 1308},
+        {"351000", 1522},
+        {"400000", 1772},
+        {"434000", 1931},
+        {"471000", 2105},
+        {"510000", 2292},
+        {"572000", 2528},
+        {"633000", 2811},
+        {"701000", 3127},
+        {"762000", 3452},
+        {"848000", 4044}};
+
+    p->addEnergyConsumer(PowerStatsEnergyConsumer::createMeterAndAttrConsumer(
+            p,
+            EnergyConsumerType::OTHER,
+            "GPU",
+            {"S2S_VDD_G3D", "S8S_VDD_G3D_L2"},
+            {{UID_TIME_IN_STATE, "/sys/devices/platform/28000000.mali/uid_time_in_state"}},
+            stateCoeffs));
+}
+
 int main() {
     LOG(INFO) << "Pixel PowerStats HAL AIDL Service is starting.";
 
@@ -113,10 +148,24 @@ int main() {
 
     std::shared_ptr<PowerStats> p = ndk::SharedRefBase::make<PowerStats>();
 
-    addGs201CommonDataProviders(p);
+    setEnergyMeter(p);
+    addAoC(p);
+    addPixelStateResidencyDataProvider(p);
+    addCPUclusters(p);
     addDisplay(p);
-    addUwb(p);
+    addSoC(p);
+    addGNSS(p);
+    addMobileRadio(p);
+    addPCIe(p);
+    addWifi(p);
+    addTPU(p);
+    addUfs(p);
     addNFC(p, "/sys/devices/platform/10970000.hsi2c/i2c-4/i2c-st21nfc/power_stats");
+    addUwb(p);
+    addPowerDomains(p);
+    addDevfreq(p);
+    addGPUGs202(p);
+    addDvfsStats(p);
 
     const std::string instance = std::string() + PowerStats::descriptor + "/default";
     binder_status_t status = AServiceManager_addService(p->asBinder().get(), instance.c_str());
