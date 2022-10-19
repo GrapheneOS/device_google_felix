@@ -51,7 +51,7 @@ on property:vendor.device.modules.ready=1
     chmod 660 /dev/touch_offload_fts
     chmod 660 /dev/touch_offload_fts_ext
     # Start the twoshay touch service
-    # start twoshay
+    start twoshay
 
 # Toggle glove_mode according to touch_sensitivity_mode
 on property:persist.vendor.touch_sensitivity_mode=0 && property:sys.boot_completed=1
