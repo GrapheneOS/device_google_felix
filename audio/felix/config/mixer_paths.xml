@@ -119,6 +119,12 @@
     <ctl name="R ASP TX4 Source" value="Zero" />
     <ctl name="E ASP TX4 Source" value="Zero" />
 
+    <!-- Cirrus fast switch init -->
+    <ctl name="Fast Use Case Switch Enable" value="0" />
+    <ctl name="Fast Use Case Delta File" value="fast_switch5.txt" />
+    <ctl name="R Fast Use Case Switch Enable" value="0" />
+    <ctl name="R Fast Use Case Delta File" value="fast_switch5.txt" />
+
     <!-- audio RX route initial/default value -->
     <ctl name="TDM_0_RX Mixer EP1" value="0"/>
     <ctl name="TDM_0_RX Mixer EP2" value="0"/>
@@ -652,19 +658,29 @@
     <path name="speaker">
         <ctl name="Main AMP Enable Switch" value="1"/>
         <ctl name="R Main AMP Enable Switch" value="1"/>
+        <ctl name="Fast Use Case Delta File" value="fast_switch3.txt" />
+        <ctl name="Fast Use Case Switch Enable" value="1" />
+        <ctl name="R Fast Use Case Delta File" value="fast_switch4.txt" />
+        <ctl name="R Fast Use Case Switch Enable" value="1" />
     </path>
 
-    <path name="voice-speaker">
+   <path name="voice-speaker">
         <ctl name="ASPTX1 Slot Position" value="1"/>
         <ctl name="R ASPTX1 Slot Position" value="0"/>
         <ctl name="ASPRX1 Slot Position" value="0"/>
         <ctl name="R ASPRX1 Slot Position" value="1"/>
         <ctl name="Main AMP Enable Switch" value="1"/>
         <ctl name="R Main AMP Enable Switch" value="1"/>
+        <ctl name="Fast Use Case Delta File" value="fast_switch1.txt" />
+        <ctl name="Fast Use Case Switch Enable" value="1" />
+        <ctl name="R Fast Use Case Delta File" value="fast_switch2.txt" />
+        <ctl name="R Fast Use Case Switch Enable" value="1" />
     </path>
 
     <path name="speaker-safe">
         <ctl name="R Main AMP Enable Switch" value="1"/>
+        <ctl name="R Fast Use Case Delta File" value="fast_switch4.txt" />
+        <ctl name="R Fast Use Case Switch Enable" value="1" />
     </path>
 
     <path name="builtin-3mics">
