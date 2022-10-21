@@ -1,11 +1,14 @@
 # Felix specific init.rc
 import /vendor/etc/init/hw/init.gs201.rc
 
+# SFPS Fingerprint
 on post-fs-data
     chown system system /sys/devices/platform/odm/odm:fp_fpc1020/clk_enable
     chown system system /sys/devices/platform/odm/odm:fp_fpc1020/hw_reset
     chown system system /sys/devices/platform/odm/odm:fp_fpc1020/irq
     chown system system /sys/devices/platform/odm/odm:fp_fpc1020/wakeup_enable
+
+on fs
     exec_background - system shell -- /vendor/bin/trusty_apploader /vendor/firmware/1540.app
 
 # Permissions for hwcomposer
@@ -102,24 +105,6 @@ on post-fs-data
 
     # Speaker amp permission
     chmod 644 /mnt/vendor/persist/audio/speaker.cal
-
-# Fingerprint
-on post-fs-data
-    chown system system /dev/goodix_fp
-    exec_background - system shell -- /vendor/bin/trusty_apploader /vendor/firmware/g7.app
-
-# Overrides fingerprint antispoof if following persist sysprops are set
-on boot && property:ro.build.type=userdebug && \
-           property:persist.vendor.fingerprint.disable.fake.override=0
-    setprop vendor.fingerprint.disable.fake ${persist.vendor.fingerprint.disable.fake.override}
-
-on boot && property:ro.build.type=userdebug && \
-           property:persist.vendor.fingerprint.disable.fake.override=1
-    setprop vendor.fingerprint.disable.fake ${persist.vendor.fingerprint.disable.fake.override}
-
-on boot && property:ro.build.type=userdebug && \
-           property:persist.vendor.fingerprint.disable.fake.override=100
-    setprop vendor.fingerprint.disable.fake ${persist.vendor.fingerprint.disable.fake.override}
 
 # Hall sensor
 on init && property:ro.bootmode=normal
