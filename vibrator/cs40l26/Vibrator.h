@@ -17,6 +17,7 @@
 
 #include <aidl/android/hardware/vibrator/BnVibrator.h>
 #include <android-base/unique_fd.h>
+#include <android/hardware/vibrator/BnVibratorSyncCallback.h>
 #include <linux/input.h>
 #include <tinyalsa/asoundlib.h>
 
@@ -28,6 +29,10 @@ namespace aidl {
 namespace android {
 namespace hardware {
 namespace vibrator {
+
+using ::android::sp;
+using ::android::binder::Status;
+using ::android::hardware::vibrator::IVibratorSyncCallback;
 
 class Vibrator : public BnVibrator {
   public:
@@ -80,6 +85,8 @@ class Vibrator : public BnVibrator {
                                      int *status) = 0;
         // Erase OWT waveform
         virtual bool eraseOwtEffect(int fd, int8_t effectIndex, std::vector<ff_effect> *effect) = 0;
+        // Erase trigger button information
+        virtual void clearTrigBtn(int fd, struct ff_effect *effect, int8_t id) = 0;
         // Emit diagnostic information to the given file.
         virtual void debug(int fd) = 0;
     };
@@ -121,6 +128,7 @@ class Vibrator : public BnVibrator {
   public:
     Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal);
 
+    // BnVibrator APIs
     ndk::ScopedAStatus getCapabilities(int32_t *_aidl_return) override;
     ndk::ScopedAStatus off() override;
     ndk::ScopedAStatus on(int32_t timeoutMs,
@@ -152,6 +160,11 @@ class Vibrator : public BnVibrator {
     ndk::ScopedAStatus composePwle(const std::vector<PrimitivePwle> &composite,
                                    const std::shared_ptr<IVibratorCallback> &callback) override;
 
+    // BnVibratorSync APIs
+    Status prepareSynced(const sp<IVibratorSyncCallback> &callback);
+    Status cancelSynced();
+
+    // BnCInterface APIs
     binder_status_t dump(int fd, const char **args, uint32_t numArgs) override;
 
   private:
@@ -182,6 +195,9 @@ class Vibrator : public BnVibrator {
     bool hasHapticAlsaDevice();
     bool enableHapticPcmAmp(struct pcm **haptic_pcm, bool enable, int card, int device);
 
+    bool isBusy();
+    bool isSynced();
+
     std::unique_ptr<HwApi> mHwApi;
     std::unique_ptr<HwCal> mHwCal;
     uint32_t mF0Offset;
@@ -203,6 +219,9 @@ class Vibrator : public BnVibrator {
     uint32_t mSupportedPrimitivesBits = 0x0;
     std::vector<CompositePrimitive> mSupportedPrimitives;
     bool mConfigHapticAlsaDeviceDone{false};
+    // prevent concurrent execution of IVibrator and IVibratorSync APIs
+    sp<IVibratorSyncCallback> mSyncedCallback;
+    std::recursive_mutex mApiMutex;
 };
 
 }  // namespace vibrator

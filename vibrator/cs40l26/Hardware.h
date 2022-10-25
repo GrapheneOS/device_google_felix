@@ -250,6 +250,17 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
         }
         return true;
     }
+    void clearTrigBtn(int fd, struct ff_effect *effect, int8_t id) override {
+        if ((*effect).trigger.button != 0x00) {
+            (*effect).trigger.button = 0x00;
+            if (id < WAVEFORM_MAX_PHYSICAL_INDEX) {
+                /* Clear the trigger pin setting */
+                if ((ioctl(fd, EVIOCSFF, effect) < 0)) {
+                    ALOGE("OFF: Failed to edit effect %d (%d): %s", id, errno, strerror(errno));
+                }
+            }
+        }
+    }
 
     void debug(int fd) override { HwApiBase::debug(fd); }
 
