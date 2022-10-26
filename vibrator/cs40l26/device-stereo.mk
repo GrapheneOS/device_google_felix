@@ -3,4 +3,5 @@ PRODUCT_PACKAGES += \
     android.hardware.vibrator-service.cs40l26-dual \
 
 BOARD_SEPOLICY_DIRS += \
-    hardware/google/pixel-sepolicy/vibrator/cs40l26 \
+    device/google/felix-sepolicy/vibrator/common \
+    device/google/felix-sepolicy/vibrator/cs40l26

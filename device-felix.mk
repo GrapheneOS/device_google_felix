@@ -30,7 +30,7 @@ DEVICE_PACKAGE_OVERLAYS += device/google/felix/felix/overlay
 include device/google/felix/audio/felix/audio-tables.mk
 include device/google/gs201/device-shipping-common.mk
 $(call soong_config_set,fp_hal_feature,pixel_product, product_a)
-include hardware/google/pixel/vibrator/cs40l26/device-stereo.mk
+include device/google/felix/vibrator/cs40l26/device-stereo.mk
 include device/google/gs101/bluetooth/bluetooth.mk
 ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
 include device/google/felix/uwb/uwb_calibration.mk
@@ -40,9 +40,6 @@ endif
 $(call soong_config_set,lyric,camera_hardware,felix)
 $(call soong_config_set,lyric,tuning_product,felix)
 $(call soong_config_set,google3a_config,target_device,felix)
-
-BOARD_SEPOLICY_DIRS += \
-    hardware/google/pixel-sepolicy/vibrator/common \
 
 # Init files
 PRODUCT_COPY_FILES += \
