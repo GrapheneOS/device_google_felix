@@ -107,7 +107,7 @@ void addUwb(std::shared_ptr<PowerStats> p) {
             "/sys/devices/platform/10db0000.spi/spi_master/spi16/spi16.0/uwb/power_stats", cfgs));
 }
 
-void addGPUGs202(std::shared_ptr<PowerStats> p) {
+void addGPU(std::shared_ptr<PowerStats> p) {
     std::map<std::string, int32_t> stateCoeffs;
 
     // Add GPU state residency
@@ -122,11 +122,9 @@ void addGPUGs202(std::shared_ptr<PowerStats> p) {
         {"302000", 1308},
         {"351000", 1522},
         {"400000", 1772},
-        {"434000", 1931},
         {"471000", 2105},
         {"510000", 2292},
         {"572000", 2528},
-        {"633000", 2811},
         {"701000", 3127},
         {"762000", 3452},
         {"848000", 4044}};
@@ -164,7 +162,7 @@ int main() {
     addUwb(p);
     addPowerDomains(p);
     addDevfreq(p);
-    addGPUGs202(p);
+    addGPU(p);
     addDvfsStats(p);
 
     const std::string instance = std::string() + PowerStats::descriptor + "/default";
