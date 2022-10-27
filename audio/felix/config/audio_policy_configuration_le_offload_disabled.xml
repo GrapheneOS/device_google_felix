@@ -17,6 +17,7 @@
         <module name="primary" halVersion="2.0">
             <attachedDevices>
                 <item>Speaker</item>
+                <item>Speaker Safe</item>
                 <item>Earpiece</item>
                 <item>Built-In Mic</item>
                 <item>Built-In Back Mic</item>
@@ -26,17 +27,16 @@
             </attachedDevices>
             <defaultOutputDevice>Speaker</defaultOutputDevice>
             <mixPorts>
-                <mixPort name="primary output" role="source" flags="AUDIO_OUTPUT_FLAG_PRIMARY AUDIO_OUTPUT_FLAG_FAST"
-                         recommendedMuteDurationMs="40">
+                <mixPort name="primary output" role="source" flags="AUDIO_OUTPUT_FLAG_PRIMARY AUDIO_OUTPUT_FLAG_FAST">
                     <profile name="" format="AUDIO_FORMAT_PCM_FLOAT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
                 <mixPort name="deep buffer" role="source" flags="AUDIO_OUTPUT_FLAG_DEEP_BUFFER">
-                    <profile name="" format="AUDIO_FORMAT_PCM_FLOAT"
+                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
                 <mixPort name="compressed_offload" role="source"
-                         flags="AUDIO_OUTPUT_FLAG_DIRECT AUDIO_OUTPUT_FLAG_COMPRESS_OFFLOAD AUDIO_OUTPUT_FLAG_NON_BLOCKING AUDIO_OUTPUT_FLAG_GAPLESS_OFFLOAD">
+                         flags="AUDIO_OUTPUT_FLAG_DIRECT AUDIO_OUTPUT_FLAG_COMPRESS_OFFLOAD AUDIO_OUTPUT_FLAG_NON_BLOCKING">
                     <profile name="" format="AUDIO_FORMAT_MP3"
                              samplingRates="8000 16000 24000 32000 44100 48000"
                              channelMasks="AUDIO_CHANNEL_OUT_STEREO AUDIO_CHANNEL_OUT_MONO"/>
@@ -60,7 +60,7 @@
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
                 <mixPort name="mmap_no_irq_out" role="source" flags="AUDIO_OUTPUT_FLAG_DIRECT AUDIO_OUTPUT_FLAG_MMAP_NOIRQ">
-                    <profile name="" format="AUDIO_FORMAT_PCM_FLOAT"
+                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
                 <mixPort name="immersive_out" role="source" flags="AUDIO_OUTPUT_FLAG_SPATIALIZER">
@@ -132,6 +132,8 @@
                 </devicePort>
                 <devicePort tagName="Speaker" type="AUDIO_DEVICE_OUT_SPEAKER" role="sink">
                 </devicePort>
+                <devicePort tagName="Speaker Safe" type="AUDIO_DEVICE_OUT_SPEAKER_SAFE" role="sink">
+                </devicePort>
                 <devicePort tagName="BT SCO" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO" role="sink">
                 </devicePort>
                 <devicePort tagName="BT SCO Headset" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET" role="sink">
@@ -166,18 +168,6 @@
                     <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
                              samplingRates="44100 48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </devicePort>
-                <devicePort tagName="BT BLE Headset" type="AUDIO_DEVICE_OUT_BLE_HEADSET" role="sink"
-                            encodedFormats="AUDIO_FORMAT_LC3">
-                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
-                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
-                </devicePort>
-                <devicePort tagName="BT BLE Speaker" type="AUDIO_DEVICE_OUT_BLE_SPEAKER" role="sink"
-                            encodedFormats="AUDIO_FORMAT_LC3">
-                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
-                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
-                </devicePort>
-                <devicePort tagName="BLE Headset Mic" type="AUDIO_DEVICE_IN_BLE_HEADSET" role="source">
-                </devicePort>
                 <devicePort tagName="USB Device In" type="AUDIO_DEVICE_IN_USB_DEVICE" role="source">
                 </devicePort>
                 <devicePort tagName="USB Headset In" type="AUDIO_DEVICE_IN_USB_HEADSET" role="source">
@@ -200,10 +190,6 @@
                        sources="primary output,deep buffer,haptic,compressed_offload,voip_rx,immersive_out,raw,mmap_no_irq_out"/>
                 <route type="mix" sink="BT A2DP Speaker"
                        sources="primary output,deep buffer,haptic,compressed_offload,voip_rx,immersive_out,raw,mmap_no_irq_out"/>
-                <route type="mix" sink="BT BLE Headset"
-                       sources="primary output,deep buffer,haptic,compressed_offload,voip_rx,immersive_out,raw,mmap_no_irq_out"/>
-                <route type="mix" sink="BT BLE Speaker"
-                       sources="primary output,deep buffer,haptic,compressed_offload,voip_rx,immersive_out,raw,mmap_no_irq_out"/>
                 <route type="mix" sink="USB Device Out"
                        sources="primary output,deep buffer,haptic,raw,compressed_offload,mmap_no_irq_out,voip_rx,hifi_playback,immersive_out"/>
                 <route type="mix" sink="USB Headset Out"
@@ -216,13 +202,13 @@
                        sources="primary output,deep buffer,haptic,compressed_offload,voip_rx,raw,mmap_no_irq_out"/>
                 <route type="mix" sink="Telephony Tx" sources="incall playback,voice call tx" />
                 <route type="mix" sink="primary input"
-                       sources="Built-In Mic,Built-In Back Mic,USB Device In,USB Headset In,BT SCO Headset Mic,BLE Headset Mic"/>
+                       sources="Built-In Mic,Built-In Back Mic,USB Device In,USB Headset In,BT SCO Headset Mic"/>
                 <route type="mix" sink="hotword input"
-                       sources="Built-In Mic,Built-In Back Mic,USB Device In,USB Headset In,BT SCO Headset Mic,BLE Headset Mic"/>
+                       sources="Built-In Mic,Built-In Back Mic,USB Device In,USB Headset In,BT SCO Headset Mic"/>
                 <route type="mix" sink="incall capture" sources="Voice Call And Telephony Rx" />
                 <route type="mix" sink="voice call rx" sources="Voice Call And Telephony Rx" />
                 <route type="mix" sink="voip_tx"
-                       sources="Built-In Mic,Built-In Back Mic,USB Device In,USB Headset In,BT SCO Headset Mic,BLE Headset Mic"/>
+                       sources="Built-In Mic,Built-In Back Mic,USB Device In,USB Headset In,BT SCO Headset Mic"/>
                 <route type="mix" sink="fast input"
                        sources="Built-In Mic,Built-In Back Mic,USB Device In,USB Headset In,BT SCO Headset Mic"/>
                 <route type="mix" sink="mmap_no_irq_in"
