@@ -81,7 +81,7 @@
     <string translatable="false" name="config_secondaryBuiltInDisplayCutoutRectApproximation">
         M 503.2,0
         h 73
-        v 103
+        v 133
         h 73
         Z
         @left
@@ -94,7 +94,7 @@
          Do not read this dimen directly. Use {@link SystemBarUtils#getStatusBarHeight} instead.
          -->
     <dimen name="status_bar_height_default">110px</dimen>
-    <dimen name="status_bar_height_portrait">110px</dimen>
+    <dimen name="status_bar_height_portrait">133px</dimen>
     <dimen name="status_bar_height_landscape">110px</dimen>
 
     <!-- Adjustment for software rounded corners since corners aren't perfectly round. -->
