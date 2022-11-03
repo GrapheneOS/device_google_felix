@@ -32,17 +32,23 @@ using ::android::sp;
 using ::android::String16;
 using ::android::hardware::vibrator::VibratorSync;
 
-#if !defined(VIBRATOR_NAME)
-#define VIBRATOR_NAME "default"
-#endif
-
 int main() {
+    const char *inputEventName = std::getenv("INPUT_EVENT_NAME");
+    std::string vibName = "";
+    if (strstr(inputEventName, "cs40l26_input") != nullptr) {
+        vibName.assign("default");
+    } else if (strstr(inputEventName, "cs40l26_dual_input") != nullptr) {
+        vibName.assign("dual");
+    } else {
+        ALOGE("Failed to init vibrator HAL");
+        return EXIT_FAILURE;  // should not reach
+    }
     auto svc = ndk::SharedRefBase::make<Vibrator>(std::make_unique<HwApi>(),
                                                   std::make_unique<HwCal>());
-    const auto svcName = std::string() + svc->descriptor + "/" + VIBRATOR_NAME;
+    const auto svcName = std::string() + svc->descriptor + "/" + vibName;
 
     auto ext = sp<VibratorSync>::make(svc);
-    const auto extName = std::stringstream() << ext->descriptor << "/" << VIBRATOR_NAME;
+    const auto extName = std::stringstream() << ext->descriptor << "/" << vibName;
 
     ProcessState::initWithDriver("/dev/vndbinder");
 

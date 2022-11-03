@@ -80,25 +80,6 @@ cc_binary {
     shared_libs: [
         "android.hardware.vibrator-impl.cs40l26-private",
     ],
-    cflags: [
-        "-DLOG_TAG=\"android.hardware.vibrator-cs40l26-private\"",
-    ],
-    proprietary: true,
-}
-
-cc_binary {
-    name: "android.hardware.vibrator-service.cs40l26-dual-private",
-    defaults: ["VibratorHalCs40l26BinaryDefaultsPrivate"],
-    init_rc: ["android.hardware.vibrator-service.cs40l26-dual-private.rc"],
-    vintf_fragments: ["android.hardware.vibrator-service.cs40l26-dual-private.xml"],
-    srcs: ["service.cpp"],
-    shared_libs: [
-        "android.hardware.vibrator-impl.cs40l26-private",
-    ],
-    cflags: [
-        "-DVIBRATOR_NAME=\"dual\"",
-        "-DLOG_TAG=\"android.hardware.vibrator-cs40l26-dual-private\"",
-    ],
     proprietary: true,
 }
 
@@ -110,9 +91,6 @@ cc_binary {
     srcs: ["service-stereo.cpp"],
     shared_libs: [
         "android.hardware.vibrator-impl.cs40l26-private",
-    ],
-    cflags: [
-        "-DLOG_TAG=\"android.hardware.vibrator-cs40l26-stereo-private\"",
     ],
     proprietary: true,
 }
