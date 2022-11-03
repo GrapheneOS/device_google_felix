@@ -21,6 +21,7 @@
 
 #include "Hardware.h"
 #include "Vibrator.h"
+#include "VibratorSync.h"
 
 using ::aidl::android::hardware::vibrator::HwApi;
 using ::aidl::android::hardware::vibrator::HwCal;
@@ -29,6 +30,7 @@ using ::android::defaultServiceManager;
 using ::android::ProcessState;
 using ::android::sp;
 using ::android::String16;
+using ::android::hardware::vibrator::VibratorSync;
 
 #if !defined(VIBRATOR_NAME)
 #define VIBRATOR_NAME "default"
@@ -39,7 +41,12 @@ int main() {
                                                   std::make_unique<HwCal>());
     const auto svcName = std::string() + svc->descriptor + "/" + VIBRATOR_NAME;
 
+    auto ext = sp<VibratorSync>::make(svc);
+    const auto extName = std::stringstream() << ext->descriptor << "/" << VIBRATOR_NAME;
+
     ProcessState::initWithDriver("/dev/vndbinder");
+
+    defaultServiceManager()->addService(String16(extName.str().c_str()), ext);
 
     auto svcBinder = svc->asBinder();
     binder_status_t status = AServiceManager_addService(svcBinder.get(), svcName.c_str());
