@@ -1,0 +1,13 @@
+aidl_interface {
+    name: "android.hardware.vibrator.cs40l26-private",
+    srcs: [
+        "android/hardware/vibrator/*.aidl"
+    ],
+    backend: {
+        java: {
+            enabled: false,
+        },
+    },
+    unstable: true,
+    vendor_available: true,
+}
