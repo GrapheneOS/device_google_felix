@@ -286,3 +286,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Bluetooth OPUS codec
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.bluetooth.opus.enabled=true
+
+# Biometrics virtual HAL for e2e testing
+PRODUCT_PACKAGES_DEBUG += \
+    android.hardware.biometrics.fingerprint-service.example
+
