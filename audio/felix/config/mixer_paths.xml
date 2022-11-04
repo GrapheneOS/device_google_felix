@@ -44,9 +44,9 @@
     <ctl name="HAPTIC_RX Chan" value="Four"/>
     <ctl name="HAPTIC_RX nSlot" value="Four"/>
     <ctl name="RX Slots" id="0" value="2"/>
-    <ctl name="RX Slots" id="1" value="3"/>
-    <ctl name="HR RX Slots" id="0" value="2"/>
-    <ctl name="HR RX Slots" id="1" value="3"/>
+    <ctl name="RX Slots" id="1" value="0"/>
+    <ctl name="HR RX Slots" id="0" value="3"/>
+    <ctl name="HR RX Slots" id="1" value="0"/>
 
     <!-- Cirrus Booster Amp TDM slot assignment-->
     <!-- RX slot -->
