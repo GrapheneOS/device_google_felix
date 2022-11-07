@@ -349,13 +349,18 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
         mHwApi->setQ(caldata);
     }
 
-    mHwCal->getLongFrequencyShift(&longFrequencyShift);
-    if (longFrequencyShift > 0) {
-        mF0Offset = longFrequencyShift * std::pow(2, 14);
-    } else if (longFrequencyShift < 0) {
-        mF0Offset = std::pow(2, 24) - std::abs(longFrequencyShift) * std::pow(2, 14);
+    if (mHwCal->getF0SyncOffset(&mF0Offset)) {
+        ALOGI("Vibrator::Vibrator: F0 offset calculated from both base and flip calibration data: %u", mF0Offset);
     } else {
+      mHwCal->getLongFrequencyShift(&longFrequencyShift);
+      if (longFrequencyShift > 0) {
+        mF0Offset = longFrequencyShift * std::pow(2, 14);
+      } else if (longFrequencyShift < 0) {
+        mF0Offset = std::pow(2, 24) - std::abs(longFrequencyShift) * std::pow(2, 14);
+      } else {
         mF0Offset = 0;
+      }
+      ALOGI("Vibrator::Vibrator: F0 offset calculated from long shift frequency: %u", mF0Offset);
     }
 
     mHwCal->getVersion(&calVer);
