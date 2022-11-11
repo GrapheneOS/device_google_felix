@@ -422,7 +422,7 @@ ndk::ScopedAStatus Vibrator::off() {
 
         mHwApi->clearTrigBtn(mInputFd, &mFfEffects[mActiveId], mActiveId);
     } else {
-        ALOGV("Vibrator is already off");
+        ALOGV("Off: Vibrator is already off");
     }
 
     mActiveId = -1;
@@ -1370,10 +1370,12 @@ void Vibrator::waitForComplete(std::shared_ptr<IVibratorCallback> &&callback) {
             (!mHwApi->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects))) {
             ALOGE("Failed to clean up the composed effect %d", mActiveId);
         }
-
-        mHwApi->clearTrigBtn(mInputFd, &mFfEffects[mActiveId], mActiveId);
-
-        mActiveId = -1;
+        if (mActiveId >= 0) {
+            mHwApi->clearTrigBtn(mInputFd, &mFfEffects[mActiveId], mActiveId);
+            mActiveId = -1;
+        } else {
+            ALOGV("waitForComplete: Vibrator is already off");
+        }
     }
 
     if (callback) {
