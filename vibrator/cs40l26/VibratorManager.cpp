@@ -101,7 +101,7 @@ ndk::ScopedAStatus VibratorManager::prepareSynced(const std::vector<int32_t> &id
     ATRACE_NAME("VibratorManager::prepareSynced");
 
     if (!mGPIOStatus) {
-        ALOGE("GetVibrator: GPIO status error");
+        ALOGE("prepareSynced: GPIO status error");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
@@ -123,10 +123,14 @@ ndk::ScopedAStatus VibratorManager::prepareSynced(const std::vector<int32_t> &id
         auto &[vib, ext] = mVibrators.at(id);
         auto callback = sp<VibratorSyncCallback>::make();
 
-        ext->prepareSynced(callback);
-
-        mSyncContext.emplace_back(id, callback->getFuture());
+        if (ext->prepareSynced(callback).isOk()) {
+            mSyncContext.emplace_back(id, callback->getFuture());
+        } else {
+            ALOGV("prepareSynced: Fail");
+            return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+        }
     }
+    ALOGV("prepareSynced: Done");
     if (mHwApi->initGPIO()) {
         return ndk::ScopedAStatus::ok();
     } else {
@@ -138,6 +142,7 @@ ndk::ScopedAStatus VibratorManager::prepareSynced(const std::vector<int32_t> &id
 ndk::ScopedAStatus VibratorManager::triggerSynced(
         const std::shared_ptr<IVibratorCallback> &callback) {
     ATRACE_NAME("VibratorManager::triggerSynced");
+    ALOGV("TriggerSynced");
     if (isBusy()) {
         ALOGE("TriggerSynced isBusy");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
@@ -171,6 +176,7 @@ ndk::ScopedAStatus VibratorManager::triggerSynced(
 ndk::ScopedAStatus VibratorManager::cancelSynced() {
     ATRACE_NAME("VibratorManager::cancelSynced");
 
+    ALOGV("Do cancelSynced");
     mHwApi->setTrigger(false);
     {
         std::shared_lock lock(mContextMutex);
