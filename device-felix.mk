@@ -207,6 +207,11 @@ FPC_MODULE_TYPE=1542_C
 # Fingerprint config
 include device/google/felix/fingerprint_config.mk
 
+# The default value of this variable is false and should only be set to true when
+# the device allows users to enable the seamless transfer feature.
+PRODUCT_PRODUCT_PROPERTIES += \
+   euicc.seamless_transfer_enabled_in_non_qs=true
+
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.gms.dck.eligible_wcc=3
