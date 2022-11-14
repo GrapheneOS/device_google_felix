@@ -277,6 +277,7 @@
         <cfg id="IN_USB_HEADSET_MIC_BE_CFG" mux="HW_MUX_GP_0"/>
         <cfg id="IN_VOICECALL_USB_HEADSET_MIC_BE_CFG" mux="HW_MUX_GP_0"/>
         <cfg id="IN_UNPROCESSED_USB_HEADSET_MIC_BE_CFG" mux="HW_MUX_GP_0"/>
+        <cfg id="IN_VOICE_RECOGN_MIC_BE_CFG" tuning_id="77"/>
     </cfg_attr>
 
     <xlate_id>
