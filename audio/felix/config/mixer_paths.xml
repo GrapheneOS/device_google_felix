@@ -667,8 +667,8 @@
    <path name="voice-speaker">
         <ctl name="ASPTX1 Slot Position" value="1"/>
         <ctl name="R ASPTX1 Slot Position" value="0"/>
-        <ctl name="ASPRX1 Slot Position" value="0"/>
-        <ctl name="R ASPRX1 Slot Position" value="1"/>
+        <ctl name="Digital PCM Volume" value="825"/>
+        <ctl name="R Digital PCM Volume" value="825"/>
         <ctl name="Main AMP Enable Switch" value="1"/>
         <ctl name="R Main AMP Enable Switch" value="1"/>
         <ctl name="Fast Use Case Delta File" value="fast_switch1.txt" />
@@ -743,6 +743,7 @@
 
     <path name="voice-recog-mic">
         <path name="builtin-3mics" />
+        <ctl name="Mic Spatial Module Enable" value="1"/>
         <ctl name="MIC DC Blocker" value="1"/>
     </path>
 
