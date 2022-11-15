@@ -191,7 +191,6 @@ PRODUCT_VENDOR_PROPERTIES += \
 # Vibrator HAL
 PRODUCT_PRODUCT_PROPERTIES +=\
     ro.vendor.vibrator.hal.long.frequency.shift=0 \
-    ro.vendor.vibrator.hal.chirp.enabled=1 \
     ro.vendor.vibrator.hal.gpio.num=44 \
     ro.vendor.vibrator.hal.gpio.shift=2
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
