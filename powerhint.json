@@ -234,8 +234,7 @@
       "Path": "/dev/cpuset/camera-daemon-high-group/cpus",
       "Values": [
         "0-3",
-        "6-7",
-        "0-7"
+        "6-7"
       ],
       "ResetOnInit": true
     },
@@ -244,8 +243,7 @@
       "Path": "/dev/cpuset/camera-daemon-mid-group/cpus",
       "Values": [
         "0-3",
-        "4-5",
-        "0-7"
+        "4-5"
       ],
       "ResetOnInit": true
     },
@@ -254,8 +252,7 @@
       "Path": "/dev/cpuset/camera-daemon-mid-high-group/cpus",
       "Values": [
         "0-3",
-        "4-7",
-        "0-7"
+        "4-7"
       ],
       "ResetOnInit": true
     },
@@ -748,15 +745,15 @@
     },
     {
       "PowerHint": "CAMERA_LAUNCH",
-      "Node": "CDCpuset",
-      "Duration": 1000,
-      "Value": "4-7"
-    },
-    {
-      "PowerHint": "CAMERA_LAUNCH",
       "Node": "NPITaskPacking",
       "Duration": 1000,
       "Value": "0"
+    },
+    {
+      "PowerHint": "CAMERA_LAUNCH",
+      "Node": "CDCpuset",
+      "Duration": 1000,
+      "Value": "4-7"
     },
     {
       "PowerHint": "CAMERA_LAUNCH_EXTENDED",
@@ -1024,24 +1021,6 @@
     },
     {
       "PowerHint": "CAMERA_STREAMING_EXTREME",
-      "Node": "CDHighCpusetCpus",
-      "Duration": 0,
-      "Value": "6-7"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_EXTREME",
-      "Node": "CDMidCpusetCpus",
-      "Duration": 0,
-      "Value": "4-5"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_EXTREME",
-      "Node": "CDMidHighCpusetCpus",
-      "Duration": 0,
-      "Value": "4-7"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_EXTREME",
       "Node": "NPITaskPacking",
       "Duration": 0,
       "Value": "0"
@@ -1108,24 +1087,6 @@
     },
     {
       "PowerHint": "CAMERA_STREAMING_HIGH",
-      "Node": "CDHighCpusetCpus",
-      "Duration": 0,
-      "Value": "6-7"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_HIGH",
-      "Node": "CDMidCpusetCpus",
-      "Duration": 0,
-      "Value": "4-5"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_HIGH",
-      "Node": "CDMidHighCpusetCpus",
-      "Duration": 0,
-      "Value": "4-7"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_HIGH",
       "Node": "NPITaskPacking",
       "Duration": 0,
       "Value": "0"
@@ -1186,24 +1147,6 @@
     },
     {
       "PowerHint": "CAMERA_STREAMING_STANDARD",
-      "Node": "CDHighCpusetCpus",
-      "Duration": 0,
-      "Value": "6-7"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_STANDARD",
-      "Node": "CDMidCpusetCpus",
-      "Duration": 0,
-      "Value": "4-5"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_STANDARD",
-      "Node": "CDMidHighCpusetCpus",
-      "Duration": 0,
-      "Value": "4-7"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_STANDARD",
       "Node": "NPITaskPacking",
       "Duration": 0,
       "Value": "0"
@@ -1261,24 +1204,6 @@
       "Node": "MIFTargetLoad",
       "Duration": 0,
       "Value": "20 10 80"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_LOW",
-      "Node": "CDHighCpusetCpus",
-      "Duration": 0,
-      "Value": "6-7"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_LOW",
-      "Node": "CDMidCpusetCpus",
-      "Duration": 0,
-      "Value": "4-5"
-    },
-    {
-      "PowerHint": "CAMERA_STREAMING_LOW",
-      "Node": "CDMidHighCpusetCpus",
-      "Duration": 0,
-      "Value": "4-7"
     },
     {
       "PowerHint": "CAMERA_STREAMING_LOW",
