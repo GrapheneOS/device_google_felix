@@ -420,6 +420,7 @@ ndk::ScopedAStatus Vibrator::off() {
     const std::scoped_lock<std::mutex> lock(mActiveId_mutex);
 
     if (mActiveId >= 0) {
+        ALOGV("Off: Stop the active effect: %d", mActiveId);
         /* Stop the active effect. */
         if (!mHwApi->setFFPlay(mInputFd, mActiveId, false)) {
             ALOGE("Failed to stop effect %d (%d): %s", mActiveId, errno, strerror(errno));
@@ -1403,6 +1404,7 @@ void Vibrator::waitForComplete(std::shared_ptr<IVibratorCallback> &&callback) {
         }
         mSyncedCallback = nullptr;
     }
+    ALOGV("waitForComplete: Done");
 }
 
 uint32_t Vibrator::intensityToVolLevel(float intensity, uint32_t effectIndex) {
