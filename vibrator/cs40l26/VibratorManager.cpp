@@ -114,7 +114,8 @@ ndk::ScopedAStatus VibratorManager::prepareSynced(const std::vector<int32_t> &id
         if (ext->prepareSynced(callback).isOk()) {
             mSyncContext.emplace_back(id, callback->getFuture());
         } else {
-            ALOGV("prepareSynced: Fail");
+            cancelSynced();
+            ALOGV("prepareSynced: Fail: %d", id);
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
         }
     }
