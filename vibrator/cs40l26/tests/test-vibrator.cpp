@@ -203,20 +203,24 @@ class VibratorTest : public Test {
         setenv("INPUT_EVENT_NAME", "CS40L26TestSuite", true);
         std::unique_ptr<MockApi> mockapi;
         std::unique_ptr<MockCal> mockcal;
+        std::unique_ptr<MockGPIO> mockgpio;
 
-        createMock(&mockapi, &mockcal);
-        createVibrator(std::move(mockapi), std::move(mockcal));
+        createMock(&mockapi, &mockcal, &mockgpio);
+        createVibrator(std::move(mockapi), std::move(mockcal), std::move(mockgpio));
     }
 
     void TearDown() override { deleteVibrator(); }
 
   protected:
-    void createMock(std::unique_ptr<MockApi> *mockapi, std::unique_ptr<MockCal> *mockcal) {
+    void createMock(std::unique_ptr<MockApi> *mockapi, std::unique_ptr<MockCal> *mockcal,
+                    std::unique_ptr<MockGPIO> *mockgpio) {
         *mockapi = std::make_unique<MockApi>();
         *mockcal = std::make_unique<MockCal>();
+        *mockgpio = std::make_unique<MockGPIO>();
 
         mMockApi = mockapi->get();
         mMockCal = mockcal->get();
+        mMockGpio = mockgpio->get();
 
         ON_CALL(*mMockApi, destructor()).WillByDefault(Assign(&mMockApi, nullptr));
 
@@ -242,15 +246,20 @@ class VibratorTest : public Test {
         ON_CALL(*mMockCal, getLongVolLevels(_))
                 .WillByDefault(DoAll(SetArgPointee<0>(V_LONG_DEFAULT), Return(true)));
 
+        ON_CALL(*mMockGpio, destructor()).WillByDefault(Assign(&mMockGpio, nullptr));
+
         relaxMock(false);
     }
 
     void createVibrator(std::unique_ptr<MockApi> mockapi, std::unique_ptr<MockCal> mockcal,
-                        bool relaxed = true) {
+                        std::unique_ptr<MockGPIO> mockgpio, bool relaxed = true) {
         if (relaxed) {
             relaxMock(true);
         }
-        mVibrator = ndk::SharedRefBase::make<Vibrator>(std::move(mockapi), std::move(mockcal));
+        // TODO(b/261415845): Need to add dual parameters to test the vibrator HAL's code in haptics
+        // mock test
+        mVibrator = ndk::SharedRefBase::make<Vibrator>(std::move(mockapi), std::move(mockcal),
+                                                       nullptr, nullptr, std::move(mockgpio));
         if (relaxed) {
             relaxMock(false);
         }
@@ -306,6 +315,7 @@ class VibratorTest : public Test {
   protected:
     MockApi *mMockApi;
     MockCal *mMockCal;
+    MockGPIO *mMockGpio;
     std::shared_ptr<IVibrator> mVibrator;
     uint32_t mEffectIndex;
 };
@@ -313,6 +323,7 @@ class VibratorTest : public Test {
 TEST_F(VibratorTest, Constructor) {
     std::unique_ptr<MockApi> mockapi;
     std::unique_ptr<MockCal> mockcal;
+    std::unique_ptr<MockGPIO> mockgpio;
     std::string f0Val = std::to_string(std::rand());
     std::string redcVal = std::to_string(std::rand());
     std::string qVal = std::to_string(std::rand());
@@ -323,10 +334,11 @@ TEST_F(VibratorTest, Constructor) {
 
     EXPECT_CALL(*mMockApi, destructor()).WillOnce(DoDefault());
     EXPECT_CALL(*mMockCal, destructor()).WillOnce(DoDefault());
+    EXPECT_CALL(*mMockGpio, destructor()).WillOnce(DoDefault());
 
     deleteVibrator(false);
 
-    createMock(&mockapi, &mockcal);
+    createMock(&mockapi, &mockcal, &mockgpio);
 
     EXPECT_CALL(*mMockCal, getF0(_))
             .InSequence(f0Seq)
@@ -363,7 +375,7 @@ TEST_F(VibratorTest, Constructor) {
             .WillOnce(DoAll(SetArgPointee<0>(supportedPrimitivesBits), Return(true)));
 
     EXPECT_CALL(*mMockApi, setMinOnOffInterval(MIN_ON_OFF_INTERVAL_US)).WillOnce(Return(true));
-    createVibrator(std::move(mockapi), std::move(mockcal), false);
+    createVibrator(std::move(mockapi), std::move(mockcal), std::move(mockgpio), false);
 }
 
 TEST_F(VibratorTest, on) {

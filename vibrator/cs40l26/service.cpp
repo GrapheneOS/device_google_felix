@@ -20,39 +20,59 @@
 #include <log/log.h>
 
 #include "Hardware.h"
+#include "VibMgrHwApi.h"
 #include "Vibrator.h"
-#include "VibratorSync.h"
 
 using ::aidl::android::hardware::vibrator::HwApi;
 using ::aidl::android::hardware::vibrator::HwCal;
+using ::aidl::android::hardware::vibrator::VibMgrHwApi;
 using ::aidl::android::hardware::vibrator::Vibrator;
 using ::android::defaultServiceManager;
 using ::android::ProcessState;
 using ::android::sp;
 using ::android::String16;
-using ::android::hardware::vibrator::VibratorSync;
+
+#if !defined(VIBRATOR_NAME)
+#define VIBRATOR_NAME "default"
+#endif
 
 int main() {
-    const char *inputEventName = std::getenv("INPUT_EVENT_NAME");
-    std::string vibName = "";
-    if (strstr(inputEventName, "cs40l26_input") != nullptr) {
-        vibName.assign("default");
-    } else if (strstr(inputEventName, "cs40l26_dual_input") != nullptr) {
-        vibName.assign("dual");
-    } else {
-        ALOGE("Failed to init vibrator HAL");
-        return EXIT_FAILURE;  // should not reach
-    }
-    auto svc = ndk::SharedRefBase::make<Vibrator>(std::make_unique<HwApi>(),
-                                                  std::make_unique<HwCal>());
-    const auto svcName = std::string() + svc->descriptor + "/" + vibName;
+    const char *hwApiPathPrefixDual = std::getenv("HWAPI_PATH_PREFIX_DUAL");
+    const char *calFilePath = std::getenv("CALIBRATION_FILEPATH");
+    const char *calFilePathDual = std::getenv("CALIBRATION_FILEPATH_DUAL");
 
-    auto ext = sp<VibratorSync>::make(svc);
-    const auto extName = std::stringstream() << ext->descriptor << "/" << vibName;
+    auto hwgpio = VibMgrHwApi::Create();
+    if (!hwgpio) {
+        return EXIT_FAILURE;
+    }
+    auto hwApiDef = HwApi::Create();
+    if (!hwApiDef) {
+        return EXIT_FAILURE;
+    }
+    auto hwCalDef = HwCal::Create();
+    if (!hwCalDef) {
+        return EXIT_FAILURE;
+    }
+
+    std::shared_ptr<Vibrator> svc;
+    // Synchronize base and flip actuator F0.
+    // Replace dual cal file path to base and copy the base to dual's path.
+    if ((hwApiPathPrefixDual != nullptr) && !setenv("HWAPI_PATH_PREFIX", hwApiPathPrefixDual, 1) &&
+        (calFilePathDual != nullptr) && !setenv("CALIBRATION_FILEPATH", calFilePathDual, 1) &&
+        !setenv("CALIBRATION_FILEPATH_DUAL", calFilePath, 1)) {
+        ALOGD("Init dual HAL: %s", std::getenv("HWAPI_PATH_PREFIX"));
+        svc = ndk::SharedRefBase::make<Vibrator>(std::move(hwApiDef), std::move(hwCalDef),
+                                                 std::make_unique<HwApi>(),
+                                                 std::make_unique<HwCal>(), std::move(hwgpio));
+    } else {
+        ALOGD("Failed to init dual HAL");
+        svc = ndk::SharedRefBase::make<Vibrator>(std::move(hwApiDef), std::move(hwCalDef), nullptr,
+                                                 nullptr, std::move(hwgpio));
+    }
+
+    const auto svcName = std::string() + svc->descriptor + "/" + VIBRATOR_NAME;
 
     ProcessState::initWithDriver("/dev/vndbinder");
-
-    defaultServiceManager()->addService(String16(extName.str().c_str()), ext);
 
     auto svcBinder = svc->asBinder();
     binder_status_t status = AServiceManager_addService(svcBinder.get(), svcName.c_str());

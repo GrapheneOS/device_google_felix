@@ -22,8 +22,8 @@ cc_test {
     defaults: ["VibratorHalCs40l26TestDefaultsPrivate"],
     srcs: [
         "test-hwcal.cpp",
-	"test-hwapi.cpp",
-	"test-vibrator.cpp",
+        "test-hwapi.cpp",
+        "test-vibrator.cpp",
     ],
     static_libs: [
         "libc++fs",
