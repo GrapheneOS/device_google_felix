@@ -194,7 +194,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # PowerStats HAL
 PRODUCT_SOONG_NAMESPACES += \
-    device/google/felix/powerstats/felix
+    device/google/felix/powerstats/felix \
+    device/google/felix
 
 # Increment the SVN for any official public releases
 PRODUCT_VENDOR_PROPERTIES += \
@@ -233,7 +234,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 # SKU specific RROs
 PRODUCT_PACKAGES += \
-    SettingsOverlayGPQ72
+    SettingsOverlayG0B96
 
 # Trusty liboemcrypto.so
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
