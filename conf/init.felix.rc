@@ -56,17 +56,37 @@ on property:vendor.device.modules.ready=1
     chown system input /dev/touch_offload_fts_ext
     chmod 660 /dev/touch_offload_fts
     chmod 660 /dev/touch_offload_fts_ext
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/force_active
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/fw_ver
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ms_base
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ms_diff
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ms_raw
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/self_test
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ss_base
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ss_diff
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ss_raw
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/force_active
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/fw_ver
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ms_base
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ms_diff
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ms_raw
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/self_test
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ss_base
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ss_diff
+    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ss_raw
     # Start the twoshay touch service
     start twoshay
 
-# Toggle glove_mode according to touch_sensitivity_mode
+# Toggle glove_mode according to touch_sensitivity_mode, only apply to outer panel
 on property:persist.vendor.touch_sensitivity_mode=0 && property:sys.boot_completed=1
-    write /sys/class/spi_master/spi11/spi11.0/glove_mode 00
-    write /sys/class/spi_master/spi6/spi6.0/glove_mode 00
+    write /sys/devices/virtual/goog_touch_interface/gti.1/force_active 1
+    write /sys/devices/virtual/goog_touch_interface/gti.1/screen_protector_mode_enabled 0
+    write /sys/devices/virtual/goog_touch_interface/gti.1/force_active 0
 
 on property:persist.vendor.touch_sensitivity_mode=1 && property:sys.boot_completed=1
-    write /sys/class/spi_master/spi11/spi11.0/glove_mode 01
-    write /sys/class/spi_master/spi6/spi6.0/glove_mode 01
+    write /sys/devices/virtual/goog_touch_interface/gti.1/force_active 1
+    write /sys/devices/virtual/goog_touch_interface/gti.1/screen_protector_mode_enabled 1
+    write /sys/devices/virtual/goog_touch_interface/gti.1/force_active 0
 
 # Load FPC's internal lib
 on init
