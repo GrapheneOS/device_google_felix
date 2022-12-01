@@ -3,6 +3,6 @@ package {
 }
 
 runtime_resource_overlay {
-    name: "SettingsOverlayGPQ72",
+    name: "SettingsOverlayG0B96",
     product_specific: true,
 }
