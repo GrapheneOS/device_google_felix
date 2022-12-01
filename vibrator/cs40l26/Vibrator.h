@@ -100,6 +100,9 @@ class Vibrator : public BnVibrator {
         // Obtains the LRA resonant frequency to be used for PWLE playback
         // and click compensation.
         virtual bool getF0(std::string *value) = 0;
+        // Obtains the offset for actuator that will adjust configured F0 to target
+        // frequency for dual actuators
+        virtual bool getF0SyncOffset(uint32_t *value) = 0;
         // Obtains the LRA series resistance to be used for click
         // compensation.
         virtual bool getRedc(std::string *value) = 0;

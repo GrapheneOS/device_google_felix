@@ -43,6 +43,7 @@ service vendor.vibrator.cs40l26 /vendor/bin/hw/android.hardware.vibrator-service
     setenv INPUT_EVENT_PATH /dev/input/event*
     setenv PROPERTY_PREFIX ro.vendor.vibrator.hal.
     setenv CALIBRATION_FILEPATH /mnt/vendor/persist/haptics/cs40l26.cal
+    setenv CALIBRATION_FILEPATH_OTHER /mnt/vendor/persist/haptics/cs40l26_dual.cal
 
     setenv HWAPI_PATH_PREFIX /sys/bus/i2c/devices/i2c-cs40l26a/
     setenv HWAPI_DEBUG_PATHS "
@@ -70,6 +71,7 @@ service vendor.vibrator.cs40l26-dual /vendor/bin/hw/android.hardware.vibrator-se
     setenv INPUT_EVENT_PATH /dev/input/event*
     setenv PROPERTY_PREFIX ro.vendor.vibrator.hal.
     setenv CALIBRATION_FILEPATH /mnt/vendor/persist/haptics/cs40l26_dual.cal
+    setenv CALIBRATION_FILEPATH_OTHER /mnt/vendor/persist/haptics/cs40l26.cal
 
     setenv HWAPI_PATH_PREFIX /sys/bus/i2c/devices/i2c-cs40l26a-dual/
     setenv HWAPI_DEBUG_PATHS "
