@@ -54,6 +54,7 @@ class MockCal : public ::aidl::android::hardware::vibrator::Vibrator::HwCal {
     MOCK_METHOD0(destructor, void());
     MOCK_METHOD1(getVersion, bool(uint32_t *value));
     MOCK_METHOD1(getF0, bool(std::string &value));
+    MOCK_METHOD1(getF0SyncOffset, bool(uint32_t *value));
     MOCK_METHOD1(getRedc, bool(std::string &value));
     MOCK_METHOD1(getQ, bool(std::string &value));
     MOCK_METHOD1(getLongFrequencyShift, bool(int32_t *value));
