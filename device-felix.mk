@@ -194,7 +194,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # PowerStats HAL
 PRODUCT_SOONG_NAMESPACES += \
-    device/google/felix/powerstats/felix
+    device/google/felix/powerstats/felix \
+    device/google/felix
 
 # Increment the SVN for any official public releases
 PRODUCT_VENDOR_PROPERTIES += \
@@ -233,7 +234,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 # SKU specific RROs
 PRODUCT_PACKAGES += \
-    SettingsOverlayGPQ72
+    SettingsOverlayG0B96
 
 # Trusty liboemcrypto.so
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
@@ -266,6 +267,11 @@ endif
 # WiFi
 PRODUCT_PACKAGES += \
         WifiOverlay2023Mid_F10
+
+# MIPI Coex Configs
+PRODUCT_COPY_FILES += \
+    device/google/felix/felix/radio/felix_camera_front_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/camera_front_mipi_coex_table.csv \
+    device/google/felix/felix/radio/felix_display_secondary_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/display_secondary_mipi_coex_table.csv
 
 PRODUCT_SOONG_NAMESPACES += device/google/felix
 
