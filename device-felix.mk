@@ -304,6 +304,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.camera.extended_launch_boost=1 \
+    persist.vendor.camera.optimized_tnr_freq=1 \
     persist.vendor.camera.raise_buf_allocation_priority=1
 
 # Bluetooth OPUS codec
