@@ -79,7 +79,7 @@
     </string>
 
     <!-- Camera 0 is the front camera -->
-    <string translatable="false" name="config_protectedCameraId">0</string>
+    <string translatable="false" name="config_protectedCameraId">1</string>
 
     <!-- Comma-separated list of packages to exclude from camera protection. In our case,
     ignore the gaze detection package -->
@@ -129,5 +129,15 @@
         <item>Binned Brightness 0 (wake-up)</item> <!-- HALF_OPENED -->
         <item>Binned Brightness 0 (wake-up)</item> <!-- OPENED -->
     </string-array>
+
+    <!-- Whether to only support face auth on specific posture, default 0(DEVICE_POSTURE_UNKNOWN)
+         to support face all postures.
+         0 : DEVICE_POSTURE_UNKNOWN
+         1 : DEVICE_POSTURE_CLOSED
+         2 : DEVICE_POSTURE_HALF_OPENED
+         3 : DEVICE_POSTURE_OPENED
+         4 : DEVICE_POSTURE_FLIPPED
+    -->
+    <integer name="config_face_auth_supported_posture">1</integer>
 </resources>
 
