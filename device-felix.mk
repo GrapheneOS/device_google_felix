@@ -279,7 +279,7 @@ PRODUCT_PACKAGES += \
 
 # MIPI Coex Configs
 PRODUCT_COPY_FILES += \
-    device/google/felix/felix/radio/felix_camera_front_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/camera_front_mipi_coex_table.csv \
+    device/google/felix/felix/radio/felix_camera_front_inner_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/camera_front_inner_mipi_coex_table.csv \
     device/google/felix/felix/radio/felix_display_secondary_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/display_secondary_mipi_coex_table.csv
 
 PRODUCT_SOONG_NAMESPACES += device/google/felix
