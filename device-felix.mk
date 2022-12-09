@@ -265,8 +265,8 @@ else
         device/google/felix/location/scd_user.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/scd.conf
 endif
 
-# WiFi
 PRODUCT_PACKAGES += \
+        UwbOverlayF10 \
         WifiOverlay2023Mid_F10
 
 # MIPI Coex Configs
