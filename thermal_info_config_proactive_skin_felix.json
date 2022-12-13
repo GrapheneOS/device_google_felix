@@ -518,6 +518,37 @@
             "PassiveDelay":7000
         },
         {
+            "Name":"LEFT-INNER-DISPLAY",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["outer_disp_therm"],
+            "Coefficient":[1.56],
+            "Offset":-14540,
+            "Multiplier":0.001
+        },
+        {
+            "Name":"RIGHT-INNER-DISPLAY",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["neutral_therm", "quiet_therm", "skin_therm", "usb_pwr_therm", "usb_pwr_therm2", "inner_disp_therm"],
+            "Coefficient":[0.35, -0.2, 0.55, -0.95, 0.35, 0.8],
+            "Offset":3110,
+            "Multiplier":0.001
+        },
+        {
+            "Name":"INNER-DISPLAY-DIFF",
+            "Type":"UNKNOWN",
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["LEFT-INNER-DISPLAY", "RIGHT-INNER-DISPLAY"],
+            "Coefficient":[1.0, -1.0],
+            "Multiplier":0.001
+        },
+        {
             "Name":"LITTLE",
             "Type":"CPU",
             "HotThreshold":["NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN"],
