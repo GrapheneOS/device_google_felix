@@ -17,7 +17,6 @@
 
 #include <aidl/android/hardware/vibrator/BnVibrator.h>
 #include <android-base/unique_fd.h>
-#include <android/hardware/vibrator/BnVibratorSyncCallback.h>
 #include <linux/input.h>
 #include <tinyalsa/asoundlib.h>
 
@@ -30,12 +29,22 @@ namespace android {
 namespace hardware {
 namespace vibrator {
 
-using ::android::sp;
-using ::android::binder::Status;
-using ::android::hardware::vibrator::IVibratorSyncCallback;
-
 class Vibrator : public BnVibrator {
   public:
+    // APIs for interfacing with the GPIO pin.
+    class HwGPIO {
+      public:
+        virtual ~HwGPIO() = default;
+        // Get the GPIO pin num and address shift information
+        virtual bool getGPIO() = 0;
+        // Init the GPIO function
+        virtual bool initGPIO() = 0;
+        // Trigger the GPIO pin to synchronize both vibrators's play
+        virtual bool setGPIOOutput(bool value) = 0;
+        // Emit diagnostic information to the given file.
+        virtual void debug(int fd) = 0;
+    };
+
     // APIs for interfacing with the kernel driver.
     class HwApi {
       public:
@@ -85,8 +94,6 @@ class Vibrator : public BnVibrator {
                                      int *status) = 0;
         // Erase OWT waveform
         virtual bool eraseOwtEffect(int fd, int8_t effectIndex, std::vector<ff_effect> *effect) = 0;
-        // Erase trigger button information
-        virtual void clearTrigBtn(int fd, struct ff_effect *effect, int8_t id) = 0;
         // Emit diagnostic information to the given file.
         virtual void debug(int fd) = 0;
     };
@@ -129,7 +136,9 @@ class Vibrator : public BnVibrator {
     };
 
   public:
-    Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal);
+    Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> hwCalDefault,
+             std::unique_ptr<HwApi> hwApiDual, std::unique_ptr<HwCal> hwCalDual,
+             std::unique_ptr<HwGPIO> hwgpio);
 
     // BnVibrator APIs
     ndk::ScopedAStatus getCapabilities(int32_t *_aidl_return) override;
@@ -163,10 +172,6 @@ class Vibrator : public BnVibrator {
     ndk::ScopedAStatus composePwle(const std::vector<PrimitivePwle> &composite,
                                    const std::shared_ptr<IVibratorCallback> &callback) override;
 
-    // BnVibratorSync APIs
-    Status prepareSynced(const sp<IVibratorSyncCallback> &callback);
-    Status cancelSynced();
-
     // BnCInterface APIs
     binder_status_t dump(int fd, const char **args, uint32_t numArgs) override;
 
@@ -198,33 +203,36 @@ class Vibrator : public BnVibrator {
     bool hasHapticAlsaDevice();
     bool enableHapticPcmAmp(struct pcm **haptic_pcm, bool enable, int card, int device);
 
-    bool isBusy();
-    bool isSynced();
-
-    std::unique_ptr<HwApi> mHwApi;
-    std::unique_ptr<HwCal> mHwCal;
+    std::unique_ptr<HwApi> mHwApiDef;
+    std::unique_ptr<HwCal> mHwCalDef;
+    std::unique_ptr<HwApi> mHwApiDual;
+    std::unique_ptr<HwCal> mHwCalDual;
+    std::unique_ptr<HwGPIO> mHwGPIO;
     uint32_t mF0Offset;
+    uint32_t mF0OffsetDual;
     std::array<uint32_t, 2> mTickEffectVol;
     std::array<uint32_t, 2> mClickEffectVol;
     std::array<uint32_t, 2> mLongEffectVol;
     std::vector<ff_effect> mFfEffects;
+    std::vector<ff_effect> mFfEffectsDual;
     std::vector<uint32_t> mEffectDurations;
     std::future<void> mAsyncHandle;
     ::android::base::unique_fd mInputFd;
+    ::android::base::unique_fd mInputFdDual;
     int8_t mActiveId{-1};
     struct pcm *mHapticPcm;
     int mCard;
     int mDevice;
     bool mHasHapticAlsaDevice{false};
     bool mIsUnderExternalControl;
-    float mLongEffectScale = 1.0;
+    float mLongEffectScale{1.0};
     bool mIsChirpEnabled;
     uint32_t mSupportedPrimitivesBits = 0x0;
     std::vector<CompositePrimitive> mSupportedPrimitives;
     bool mConfigHapticAlsaDeviceDone{false};
-    // prevent concurrent execution of IVibrator and IVibratorSync APIs
-    sp<IVibratorSyncCallback> mSyncedCallback;
-    std::recursive_mutex mApiMutex;
+    bool mGPIOStatus;
+    bool mIsDual{false};
+    std::mutex mActiveId_mutex;  // protects mActiveId
 };
 
 }  // namespace vibrator
