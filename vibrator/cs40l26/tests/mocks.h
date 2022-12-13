@@ -20,6 +20,17 @@
 
 #include "Vibrator.h"
 
+class MockGPIO : public ::aidl::android::hardware::vibrator::Vibrator::HwGPIO {
+  public:
+    MOCK_METHOD0(destructor, void());
+    MOCK_METHOD0(getGPIO, bool());
+    MOCK_METHOD0(initGPIO, bool());
+    MOCK_METHOD1(setGPIOOutput, bool(bool value));
+    MOCK_METHOD1(debug, void(int fd));
+
+    ~MockGPIO() override { destructor(); };
+};
+
 class MockApi : public ::aidl::android::hardware::vibrator::Vibrator::HwApi {
   public:
     MOCK_METHOD0(destructor, void());
@@ -43,7 +54,6 @@ class MockApi : public ::aidl::android::hardware::vibrator::Vibrator::HwApi {
                  bool(int fd, uint8_t *owtData, uint32_t numBytes, struct ff_effect *effect,
                       uint32_t *outEffectIndex, int *status));
     MOCK_METHOD3(eraseOwtEffect, bool(int fd, int8_t effectIndex, std::vector<ff_effect> *effect));
-    MOCK_METHOD3(clearTrigBtn, void(int fd, struct ff_effect *effect, int8_t index));
     MOCK_METHOD1(debug, void(int fd));
 
     ~MockApi() override { destructor(); };
