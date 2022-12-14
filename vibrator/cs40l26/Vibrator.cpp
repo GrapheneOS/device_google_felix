@@ -529,6 +529,8 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
         mSupportedPrimitives = defaultSupportedPrimitives;
     }
 
+    mPrimitiveMinScale = {0.0f, 0.01f, 0.11f, 0.23f, 0.0f, 0.25f, 0.02f, 0.03f, 0.16f};
+
     // ====== Get GPIO status and init it ================
     mGPIOStatus = mHwGPIO->getGPIO();
     if (!mGPIOStatus || !mHwGPIO->initGPIO()) {
@@ -758,8 +760,13 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
         auto &e_curr = composite[i_curr];
         uint32_t effectIndex = 0;
         uint32_t effectVolLevel = 0;
-        if (e_curr.scale < 0.0f || e_curr.scale > 1.0f) {
+        float effectScale = e_curr.scale;
+        if (effectScale < 0.0f || effectScale > 1.0f) {
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+        }
+
+        if(effectScale < mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)]) {
+            effectScale = mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)];
         }
 
         if (e_curr.primitive != CompositePrimitive::NOOP) {
@@ -768,7 +775,7 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
             if (!status.isOk()) {
                 return status;
             }
-            effectVolLevel = intensityToVolLevel(e_curr.scale, effectIndex);
+            effectVolLevel = intensityToVolLevel(effectScale, effectIndex);
             totalDuration += mEffectDurations[effectIndex];
         }
 
