@@ -220,7 +220,6 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
     }
     bool eraseOwtEffect(int fd, int8_t effectIndex, std::vector<ff_effect> *effect) override {
         uint32_t effectCountBefore, effectCountAfter, i, successFlush = 0;
-        static constexpr uint32_t MIN_ON_OFF_INTERVAL_US = 8500;  // SVC initialization time
 
         if (effectIndex < WAVEFORM_MAX_PHYSICAL_INDEX) {
             ALOGE("Invalid waveform index for OWT erase: %d", effectIndex);
@@ -258,7 +257,7 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
             }
         }
         // Turn on the waiting time for SVC init phase to complete
-        setMinOnOffInterval(MIN_ON_OFF_INTERVAL_US);
+        setMinOnOffInterval(Vibrator::MIN_ON_OFF_INTERVAL_US);
         return true;
     }
 
