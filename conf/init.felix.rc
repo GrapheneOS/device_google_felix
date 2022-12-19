@@ -123,6 +123,10 @@ on property:vendor.mfgapi.touchpanel.permission=1
     chmod 0600 /sys/devices/virtual/sec/tsp/cmd
     chown system system /sys/devices/virtual/sec/tsp/cmd
 
+# Thermal
+on property:persist.device_config.vendor_system_native_boot.thermal_proactive_skin=1
+    setprop vendor.thermal.config "thermal_info_config_proactive_skin.json"
+
 # Bluetooth
 on post-fs-data
     chown bluetooth system /proc/bluetooth/timesync
