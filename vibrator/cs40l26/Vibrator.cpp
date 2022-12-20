@@ -53,8 +53,7 @@ static constexpr uint32_t WAVEFORM_LONG_VIBRATION_THRESHOLD_MS = 50;
 static constexpr uint8_t VOLTAGE_SCALE_MAX = 100;
 
 static constexpr int8_t MAX_COLD_START_LATENCY_MS = 6;  // I2C Transaction + DSP Return-From-Standby
-static constexpr uint32_t MIN_ON_OFF_INTERVAL_US = 8500;  // SVC initialization time
-static constexpr int8_t MAX_PAUSE_TIMING_ERROR_MS = 1;    // ALERT Irq Handling
+static constexpr int8_t MAX_PAUSE_TIMING_ERROR_MS = 1;  // ALERT Irq Handling
 static constexpr uint32_t MAX_TIME_MS = UINT16_MAX;
 static constexpr float SETTING_TIME_OVERHEAD = 26;  // This time was combined by
                                                     // HAL set the effect to
@@ -570,23 +569,22 @@ ndk::ScopedAStatus Vibrator::off() {
             ALOGE("Off: Failed to stop effect %d (%d): %s", mActiveId, errno, strerror(errno));
             ret = false;
         }
+        if (mIsDual && (!mHwApiDual->setFFPlay(mInputFdDual, mActiveId, false))) {
+            ALOGE("Off: Failed to stop flip's effect %d (%d): %s", mActiveId, errno,
+                  strerror(errno));
+            ret = false;
+        }
+        /* Do erase process */
         if ((mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
             (!mHwApiDef->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects))) {
             ALOGE("Off: Failed to clean up the composed effect %d", mActiveId);
             ret = false;
         }
 
-        if (mIsDual) {
-            if (!mHwApiDual->setFFPlay(mInputFdDual, mActiveId, false)) {
-                ALOGE("Off: Failed to stop flip's effect %d (%d): %s", mActiveId, errno,
-                      strerror(errno));
-                ret = false;
-            }
-            if ((mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
-                (!mHwApiDual->eraseOwtEffect(mInputFdDual, mActiveId, &mFfEffectsDual))) {
-                ALOGE("Off: Failed to clean up flip's the composed effect %d", mActiveId);
-                ret = false;
-            }
+        if (mIsDual && (mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
+            (!mHwApiDual->eraseOwtEffect(mInputFdDual, mActiveId, &mFfEffectsDual))) {
+            ALOGE("Off: Failed to clean up flip's the composed effect %d", mActiveId);
+            ret = false;
         }
         if (!mHwGPIO->setGPIOOutput(false)) {
             ALOGE("Off: Failed to reset GPIO(%d): %s", errno, strerror(errno));
@@ -596,7 +594,6 @@ ndk::ScopedAStatus Vibrator::off() {
         ALOGD("Off: Vibrator is already off");
     }
 
-    mActiveId = -1;
     setGlobalAmplitude(false);
     if (mF0Offset) {
         mHwApiDef->setF0Offset(0);
@@ -607,6 +604,7 @@ ndk::ScopedAStatus Vibrator::off() {
 
     if (ret) {
         ALOGD("Off: Done.");
+        mActiveId = -1;
         return ndk::ScopedAStatus::ok();
     } else {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
@@ -725,6 +723,7 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
     ALOGD("Vibrator::compose");
     uint16_t size;
     uint16_t nextEffectDelay;
+    uint16_t totalDuration = 0;
 
     auto ch = dspmem_chunk_create(new uint8_t[FF_CUSTOM_DATA_LEN_MAX_COMP]{0x00},
                                   FF_CUSTOM_DATA_LEN_MAX_COMP);
@@ -735,6 +734,7 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
 
     /* Check if there is a wait before the first effect. */
     nextEffectDelay = composite.front().delayMs;
+    totalDuration += nextEffectDelay;
     if (nextEffectDelay > COMPOSE_DELAY_MAX_MS || nextEffectDelay < 0) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     } else if (nextEffectDelay > 0) {
@@ -769,6 +769,7 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
                 return status;
             }
             effectVolLevel = intensityToVolLevel(e_curr.scale, effectIndex);
+            totalDuration += mEffectDurations[effectIndex];
         }
 
         /* Fetch the next composite effect delay and fill into the current section */
@@ -781,6 +782,7 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
             nextEffectDelay = delay;
+            totalDuration += delay;
         }
 
         if (effectIndex == 0 && nextEffectDelay == 0) {
@@ -797,6 +799,10 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
     if (header_count == dspmem_chunk_bytes(ch)) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     } else {
+        mFfEffects[WAVEFORM_COMPOSE].replay.length = totalDuration;
+        if (mIsDual) {
+            mFfEffectsDual[WAVEFORM_COMPOSE].replay.length = totalDuration;
+        }
         return performEffect(WAVEFORM_MAX_INDEX /*ignored*/, VOLTAGE_SCALE_MAX /*ignored*/, ch,
                              callback);
     }
@@ -1325,7 +1331,7 @@ binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
     }
 
     dprintf(fd, "Base: OWT waveform:\n");
-    dprintf(fd, "\tId\tBytes\tData\ttrigger button\n");
+    dprintf(fd, "\tId\tBytes\tData\tt\ttrigger button\n");
     for (effectId = WAVEFORM_MAX_PHYSICAL_INDEX; effectId < WAVEFORM_MAX_INDEX; effectId++) {
         uint32_t numBytes = mFfEffects[effectId].u.periodic.custom_len * 2;
         std::stringstream ss;
@@ -1337,12 +1343,12 @@ binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
                           i))
                << " ";
         }
-        dprintf(fd, "\t%d\t%d\t{%s}\t%X\n", mFfEffects[effectId].id, numBytes, ss.str().c_str(),
-                mFfEffects[effectId].trigger.button);
+        dprintf(fd, "\t%d\t%d\t{%s}\t%u\t%X\n", mFfEffects[effectId].id, numBytes, ss.str().c_str(),
+                mFfEffectsDual[effectId].replay.length, mFfEffects[effectId].trigger.button);
     }
     if (mIsDual) {
         dprintf(fd, "Flip: OWT waveform:\n");
-        dprintf(fd, "\tId\tBytes\tData\ttrigger button\n");
+        dprintf(fd, "\tId\tBytes\tData\tt\ttrigger button\n");
         for (effectId = WAVEFORM_MAX_PHYSICAL_INDEX; effectId < WAVEFORM_MAX_INDEX; effectId++) {
             uint32_t numBytes = mFfEffectsDual[effectId].u.periodic.custom_len * 2;
             std::stringstream ss;
@@ -1354,8 +1360,9 @@ binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
                                    i))
                    << " ";
             }
-            dprintf(fd, "\t%d\t%d\t{%s}\t%X\n", mFfEffectsDual[effectId].id, numBytes,
-                    ss.str().c_str(), mFfEffectsDual[effectId].trigger.button);
+            dprintf(fd, "\t%d\t%d\t{%s}\t%u\t%X\n", mFfEffectsDual[effectId].id, numBytes,
+                    ss.str().c_str(), mFfEffectsDual[effectId].replay.length,
+                    mFfEffectsDual[effectId].trigger.button);
         }
     }
     dprintf(fd, "\n");
@@ -1606,36 +1613,39 @@ void Vibrator::waitForComplete(std::shared_ptr<IVibratorCallback> &&callback) {
     ALOGD("waitForComplete: get STOP");
     {
         const std::scoped_lock<std::mutex> lock(mActiveId_mutex);
-        uint32_t effectCount;
-        mHwApiDef->getEffectCount(&effectCount);
-        if (mActiveId >= 0) {
-            if ((mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
-                (!mHwApiDef->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects))) {
+        if (mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) {
+            if (!mHwApiDef->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects)) {
                 ALOGE("Failed to clean up the composed effect %d", mActiveId);
             }
-            if (mIsDual && (mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
+            if (mIsDual &&
                 (!mHwApiDual->eraseOwtEffect(mInputFdDual, mActiveId, &mFfEffectsDual))) {
                 ALOGE("Failed to clean up flip's composed effect %d", mActiveId);
             }
-            if (mGPIOStatus && !mHwGPIO->setGPIOOutput(false)) {
-                ALOGE("waitForComplete: Failed to reset GPIO(%d): %s", errno, strerror(errno));
-            }
-
-            mActiveId = -1;
-        } else if (effectCount > WAVEFORM_MAX_PHYSICAL_INDEX) {
-            if (!mHwApiDef->eraseOwtEffect(mInputFd, effectCount - 1, &mFfEffects)) {
-                ALOGE("Failed to clean up the composed effect %d", effectCount - 1);
-            }
-            if (mIsDual) {
-                mHwApiDual->getEffectCount(&effectCount);
-                if ((effectCount > WAVEFORM_MAX_PHYSICAL_INDEX) &&
-                    (!mHwApiDual->eraseOwtEffect(mInputFdDual, effectCount - 1, &mFfEffectsDual))) {
-                    ALOGE("Failed to clean up flip's composed effect %d", effectCount - 1);
-                }
-            }
-
         } else {
             ALOGD("waitForComplete: Vibrator is already off");
+        }
+        mActiveId = -1;
+        if (mGPIOStatus && !mHwGPIO->setGPIOOutput(false)) {
+            ALOGE("waitForComplete: Failed to reset GPIO(%d): %s", errno, strerror(errno));
+        }
+        // Do waveform number checking
+        uint32_t effectCount = WAVEFORM_MAX_PHYSICAL_INDEX;
+        mHwApiDef->getEffectCount(&effectCount);
+        if (effectCount > WAVEFORM_MAX_PHYSICAL_INDEX) {
+            // Forcibly clean all OWT waveforms
+            if (!mHwApiDef->eraseOwtEffect(mInputFd, WAVEFORM_MAX_INDEX, &mFfEffects)) {
+                ALOGE("Failed to clean up all base's composed effect");
+            }
+        }
+
+        if (mIsDual) {
+            // Forcibly clean all OWT waveforms
+            effectCount = WAVEFORM_MAX_PHYSICAL_INDEX;
+            mHwApiDual->getEffectCount(&effectCount);
+            if ((effectCount > WAVEFORM_MAX_PHYSICAL_INDEX) &&
+                (!mHwApiDual->eraseOwtEffect(mInputFdDual, WAVEFORM_MAX_INDEX, &mFfEffectsDual))) {
+                ALOGE("Failed to clean up all flip's composed effect");
+            }
         }
     }
 
