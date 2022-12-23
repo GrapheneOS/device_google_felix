@@ -119,6 +119,7 @@ DEVICE_MANIFEST_FILE += \
 # Thermal Config
 PRODUCT_COPY_FILES += \
 	device/google/felix/thermal_info_config_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config.json \
+	device/google/felix/thermal_info_config_proactive_skin_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_proactive_skin.json \
 	device/google/felix/thermal_info_config_charge_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_charge.json
 
 # Power HAL config
