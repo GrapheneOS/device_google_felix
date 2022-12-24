@@ -37,6 +37,7 @@ include device/google/gs-common/touch/stm/stm6.mk
 ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
 include device/google/felix/uwb/uwb_calibration.mk
 endif
+include device/google/gs-common/wireless_charger/wireless_charger.mk
 
 # go/lyric-soong-variables
 $(call soong_config_set,lyric,camera_hardware,felix)
@@ -118,6 +119,7 @@ DEVICE_MANIFEST_FILE += \
 # Thermal Config
 PRODUCT_COPY_FILES += \
 	device/google/felix/thermal_info_config_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config.json \
+	device/google/felix/thermal_info_config_proactive_skin_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_proactive_skin.json \
 	device/google/felix/thermal_info_config_charge_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_charge.json
 
 # Power HAL config
@@ -285,10 +287,6 @@ DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework
 # Device features
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
-
-# Enable adpf cpu hint session for SurfaceFlinger
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    debug.sf.enable_adpf_cpu_hint=true
 
 # Control camera exif model/make redaction
 PRODUCT_PROPERTY_OVERRIDES += \
