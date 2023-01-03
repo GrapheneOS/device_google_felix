@@ -1508,6 +1508,10 @@ ndk::ScopedAStatus Vibrator::getCompoundDetails(Effect effect, EffectStrength st
     }
 
     *outTimeMs = timeMs;
+    mFfEffects[WAVEFORM_COMPOSE].replay.length = static_cast<uint16_t>(timeMs);
+    if (mIsDual) {
+        mFfEffectsDual[WAVEFORM_COMPOSE].replay.length = static_cast<uint16_t>(timeMs);
+    }
 
     return ndk::ScopedAStatus::ok();
 }
