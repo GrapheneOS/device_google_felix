@@ -458,11 +458,11 @@
     </path>
 
     <path name="immersive-playbackP bt">
-        <ctl name="BT_RX Mixer IMSV" value="1"/>
+        <ctl name="BT_RX Mixer EP4" value="1"/>
     </path>
 
     <path name="immersive-playbackP usb-headphone">
-        <ctl name="USB_RX Mixer IMSV" value="1"/>
+        <ctl name="USB_RX Mixer EP4" value="1"/>
     </path>
 
     <path name="voip-playbackP">
