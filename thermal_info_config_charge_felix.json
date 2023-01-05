@@ -55,9 +55,14 @@
             "Multiplier":0.001
         },
         {
-            "Name":"inner-disp",
+            "Name":"VIRTUAL-SKIN-OUTER-INNER",
             "Type":"UNKNOWN",
-            "Multiplier":1
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["outer_disp_therm", "inner_disp_therm"],
+            "Coefficient":[2.5, -1.0],
+            "Multiplier":0.001
         },
         {
             "Name":"IS_OPEN",
@@ -65,8 +70,8 @@
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"COUNT_THRESHOLD",
-            "Combination":["inner-disp"],
-            "Coefficient":[1.0],
+            "Combination":["VIRTUAL-SKIN-OUTER-INNER"],
+            "Coefficient":[-40000.0],
             "Multiplier":1
         },
         {
@@ -75,8 +80,8 @@
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"COUNT_THRESHOLD",
-            "Combination":["inner-disp"],
-            "Coefficient":[-1.0],
+            "Combination":["VIRTUAL-SKIN-OUTER-INNER"],
+            "Coefficient":[40000.0],
             "Multiplier":1
         },
         {
