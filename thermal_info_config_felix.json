@@ -710,7 +710,7 @@
             "Formula":"COUNT_THRESHOLD",
             "TriggerSensor": "soc",
             "Combination":["battery", "soc"],
-            "Coefficient":[-25000, 80],
+            "Coefficient":[-10000, 80],
             "HotThreshold":["NAN", "NAN",  "NAN", "NAN", 2.0, "NAN", "NAN"],
             "Multiplier":1,
             "SendCallback":true
