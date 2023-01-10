@@ -30,6 +30,9 @@
     <ctl name="PCM Stream Wait Time in MSec" value="100"/>
     <ctl name="Voice PCM Stream Wait Time in MSec" value="500"/>
 
+    <!-- Enable it when AOC is ready to trim delay and padding -->
+    <ctl name="Gapless Offload Enable" value="1"/>
+
     <!-- TDM 0 setting -->
     <ctl name="TDM_0_RX Chan" value="Four"/>
     <ctl name="TDM_0_RX Format" value="S32_LE"/>
@@ -44,9 +47,9 @@
     <ctl name="HAPTIC_RX Chan" value="Four"/>
     <ctl name="HAPTIC_RX nSlot" value="Four"/>
     <ctl name="RX Slots" id="0" value="2"/>
-    <ctl name="RX Slots" id="1" value="3"/>
-    <ctl name="HR RX Slots" id="0" value="2"/>
-    <ctl name="HR RX Slots" id="1" value="3"/>
+    <ctl name="RX Slots" id="1" value="0"/>
+    <ctl name="HR RX Slots" id="0" value="3"/>
+    <ctl name="HR RX Slots" id="1" value="0"/>
 
     <!-- Cirrus Booster Amp TDM slot assignment-->
     <!-- RX slot -->
@@ -119,6 +122,11 @@
     <ctl name="R ASP TX4 Source" value="Zero" />
     <ctl name="E ASP TX4 Source" value="Zero" />
 
+    <!-- Cirrus fast switch init -->
+    <ctl name="Fast Use Case Switch Enable" value="0" />
+    <ctl name="Fast Use Case Delta File" value="fast_switch5.txt" />
+    <ctl name="R Fast Use Case Switch Enable" value="0" />
+    <ctl name="R Fast Use Case Delta File" value="fast_switch5.txt" />
 
     <!-- audio RX route initial/default value -->
     <ctl name="TDM_0_RX Mixer EP1" value="0"/>
@@ -132,6 +140,7 @@
     <ctl name="TDM_0_RX Mixer NoHost1" value="0"/>
     <ctl name="TDM_0_RX Mixer VOIP" value="0"/>
     <ctl name="TDM_0_RX Mixer RAW" value="0"/>
+    <ctl name="TDM_0_RX Mixer IMSV" value="0"/>
 
     <ctl name="TDM_1_RX Mixer EP1" value="0"/>
     <ctl name="TDM_1_RX Mixer EP2" value="0"/>
@@ -154,6 +163,7 @@
     <ctl name="USB_RX Mixer VOIP" value="0"/>
     <ctl name="USB_RX Mixer HIFI" value="0"/>
     <ctl name="USB_RX Mixer RAW" value="0"/>
+    <ctl name="USB_RX Mixer IMSV" value="0"/>
 
     <ctl name="BT_RX Mixer EP1" value="0"/>
     <ctl name="BT_RX Mixer EP2" value="0"/>
@@ -164,6 +174,7 @@
     <ctl name="BT_RX Mixer EP7" value="0"/>
     <ctl name="BT_RX Mixer NoHost1" value="0"/>
     <ctl name="BT_RX Mixer VOIP" value="0"/>
+    <ctl name="BT_RX Mixer IMSV" value="0"/>
 
     <ctl name="INCALL_RX Mixer EP1" value="0"/>
     <ctl name="INCALL_RX Mixer EP2" value="0"/>
@@ -621,7 +632,7 @@
     <!-- Rx device -->
     <path name="handset">
         <ctl name="E PCM Source" value="ASP"/>
-        <ctl name="E AMP PCM Gain" value="6"/>
+        <ctl name="E AMP PCM Gain" value="9"/>
         <ctl name="ASPTX1 Slot Position" value="4"/>
         <ctl name="E ASPTX1 Slot Position" value="0"/>
         <ctl name="ASPTX2 Slot Position" value="5"/>
@@ -631,7 +642,7 @@
 
     <path name="voice-handset">
         <ctl name="E PCM Source" value="ASP"/>
-        <ctl name="E AMP PCM Gain" value="6"/>
+        <ctl name="E AMP PCM Gain" value="9"/>
         <ctl name="ASPTX1 Slot Position" value="4"/>
         <ctl name="E ASPTX1 Slot Position" value="0"/>
         <ctl name="ASPTX2 Slot Position" value="5"/>
@@ -650,21 +661,29 @@
     <path name="speaker">
         <ctl name="Main AMP Enable Switch" value="1"/>
         <ctl name="R Main AMP Enable Switch" value="1"/>
+        <ctl name="Fast Use Case Delta File" value="fast_switch3.txt" />
+        <ctl name="Fast Use Case Switch Enable" value="1" />
+        <ctl name="R Fast Use Case Delta File" value="fast_switch4.txt" />
+        <ctl name="R Fast Use Case Switch Enable" value="1" />
     </path>
 
-    <path name="voice-speaker">
-        <ctl name="ASP TX1 Source" value="VMON" />
-        <ctl name="R ASP TX1 Source" value="Zero" />
-        <ctl name="ASPTX1 Slot Position" value="0"/>
-        <ctl name="R ASPTX1 Slot Position" value="1"/>
-        <ctl name="ASPRX1 Slot Position" value="0"/>
-        <ctl name="R ASPRX1 Slot Position" value="1"/>
+   <path name="voice-speaker">
+        <ctl name="ASPTX1 Slot Position" value="1"/>
+        <ctl name="R ASPTX1 Slot Position" value="0"/>
+        <ctl name="Digital PCM Volume" value="841"/>
+        <ctl name="R Digital PCM Volume" value="841"/>
         <ctl name="Main AMP Enable Switch" value="1"/>
         <ctl name="R Main AMP Enable Switch" value="1"/>
+        <ctl name="Fast Use Case Delta File" value="fast_switch1.txt" />
+        <ctl name="Fast Use Case Switch Enable" value="1" />
+        <ctl name="R Fast Use Case Delta File" value="fast_switch2.txt" />
+        <ctl name="R Fast Use Case Switch Enable" value="1" />
     </path>
 
     <path name="speaker-safe">
         <ctl name="R Main AMP Enable Switch" value="1"/>
+        <ctl name="R Fast Use Case Delta File" value="fast_switch4.txt" />
+        <ctl name="R Fast Use Case Switch Enable" value="1" />
     </path>
 
     <path name="builtin-3mics">
@@ -727,6 +746,7 @@
 
     <path name="voice-recog-mic">
         <path name="builtin-3mics" />
+        <ctl name="Mic Spatial Module Enable" value="1"/>
         <ctl name="MIC DC Blocker" value="1"/>
     </path>
 

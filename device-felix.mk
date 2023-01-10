@@ -23,23 +23,23 @@ $(call inherit-product-if-exists, vendor/google_devices/gs201/prebuilts/device-v
 $(call inherit-product-if-exists, vendor/google_devices/gs201/proprietary/device-vendor.mk)
 $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/felix/device-vendor-felix.mk)
 $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/WallpapersFelix.mk)
 
 DEVICE_PACKAGE_OVERLAYS += device/google/felix/felix/overlay
 
 include device/google/felix/audio/felix/audio-tables.mk
 include device/google/gs201/device-shipping-common.mk
 $(call soong_config_set,fp_hal_feature,pixel_product, product_a)
-include hardware/google/pixel/vibrator/cs40l26/device-stereo.mk
+include device/google/felix/vibrator/cs40l26/device.mk
 include device/google/gs101/bluetooth/bluetooth.mk
 ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
 include device/google/felix/uwb/uwb_calibration.mk
 endif
 
+# go/lyric-soong-variables
+$(call soong_config_set,lyric,camera_hardware,felix)
 $(call soong_config_set,lyric,tuning_product,felix)
 $(call soong_config_set,google3a_config,target_device,felix)
-
-BOARD_SEPOLICY_DIRS += \
-    hardware/google/pixel-sepolicy/vibrator/common \
 
 # Init files
 PRODUCT_COPY_FILES += \
@@ -57,6 +57,9 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
 	device/google/felix/media_profiles_felix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
 
+# Media Performance Class 13
+PRODUCT_PROPERTY_OVERRIDES += ro.odm.build.media_performance_class=33
+
 # Display Config
 PRODUCT_COPY_FILES += \
 	device/google/felix/felix/display_colordata_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_colordata_cal1.pb \
@@ -64,13 +67,19 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/felix/display_golden_cal0.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal0.pb \
 	device/google/felix/felix/display_golden_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal1.pb
 
-# Display LBE
+# Display
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	vendor.display.lbe.supported=1 \
-	vendor.display.async_off.supported=true
+	vendor.display.async_off.supported=true \
+	ro.surface_flinger.ignore_hdr_camera_layers=true
 
 #config of display brightness dimming
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.brightness.dimming.usage=1
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.0.brightness.dimming.usage=1
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.1.brightness.dimming.usage=0
+
+# Early wake up sysfs path for the secondary display
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+	vendor.display.secondary_early_wakeup_node=/sys/devices/platform/1c241000.drmdecon/early_wakeup
 
 # NFC
 PRODUCT_COPY_FILES += \
@@ -103,7 +112,9 @@ DEVICE_MANIFEST_FILE += \
 
 # Thermal Config
 PRODUCT_COPY_FILES += \
-        device/google/felix/thermal_info_config_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config.json
+	device/google/felix/thermal_info_config_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config.json \
+	device/google/felix/thermal_info_config_proactive_skin_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_proactive_skin.json \
+	device/google/felix/thermal_info_config_charge_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_charge.json
 
 # Power HAL config
 PRODUCT_COPY_FILES += \
@@ -122,7 +133,27 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.bluetooth.a2dp_offload.supported=true \
     persist.bluetooth.a2dp_offload.disabled=false \
-    persist.bluetooth.a2dp_offload.cap=sbc-aac-aptx-aptxhd-ldac
+    persist.bluetooth.a2dp_offload.cap=sbc-aac-aptx-aptxhd-ldac-opus
+
+# Bluetooth Tx power caps
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/bluetooth/bluetooth_power_limits_felix_US.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits.csv \
+    $(LOCAL_PATH)/bluetooth/bluetooth_power_limits_felix_JP.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_JP.csv \
+    $(LOCAL_PATH)/bluetooth/bluetooth_power_limits_felix_EU.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_EU.csv \
+    $(LOCAL_PATH)/bluetooth/bluetooth_power_limits_felix_US.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_US.csv
+
+# Spatial Audio
+PRODUCT_PACKAGES += \
+	libspatialaudio
+
+# optimize spatializer effect
+PRODUCT_PROPERTY_OVERRIDES += \
+       audio.spatializer.effect.util_clamp_min=300
+
+# declare use of spatial audio
+PRODUCT_PROPERTY_OVERRIDES += \
+       ro.audio.spatializer_enabled=true \
+       persist.vendor.audio.spatializer.speaker_enabled=true
 
 # Keymaster HAL
 #LOCAL_KEYMASTER_PRODUCT_PACKAGE ?= android.hardware.keymaster@4.1-service
@@ -160,7 +191,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # PowerStats HAL
 PRODUCT_SOONG_NAMESPACES += \
-    device/google/felix/powerstats/felix
+    device/google/felix/powerstats/felix \
+    device/google/felix
 
 # Increment the SVN for any official public releases
 PRODUCT_VENDOR_PROPERTIES += \
@@ -168,20 +200,33 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 # Vibrator HAL
 PRODUCT_PRODUCT_PROPERTIES +=\
-    ro.vendor.vibrator.hal.long.frequency.shift=0
+    ro.vendor.vibrator.hal.long.frequency.shift=0 \
+    ro.vendor.vibrator.hal.gpio.num=44 \
+    ro.vendor.vibrator.hal.gpio.shift=2
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
 # Fingerprint
 include device/google/gs101/fingerprint/fpc1540/sw42/fpc1540.mk
 FPC_MODULE_TYPE=1542_C
+# Fingerprint config
+include device/google/felix/fingerprint_config.mk
+
+# The default value of this variable is false and should only be set to true when
+# the device allows users to enable the seamless transfer feature.
+PRODUCT_PRODUCT_PROPERTIES += \
+   euicc.seamless_transfer_enabled_in_non_qs=true
 
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.gms.dck.eligible_wcc=2
+    ro.gms.dck.eligible_wcc=3
 
 # Bluetooth SAR test tool
 PRODUCT_PACKAGES_DEBUG += \
     sar_test
+
+# Bluetooth hci_inject test tool
+PRODUCT_PACKAGES_DEBUG += \
+    hci_inject
 
 # Bluetooth
 PRODUCT_PRODUCT_PROPERTIES += \
@@ -204,7 +249,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 # SKU specific RROs
 PRODUCT_PACKAGES += \
-    SettingsOverlayGPQ72
+    SettingsOverlayG0B96
 
 # Trusty liboemcrypto.so
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
@@ -215,7 +260,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 # Set support one-handed mode
 PRODUCT_PRODUCT_PROPERTIES += \
-    ro.support_one_handed_mode=true
+    ro.support_one_handed_mode=false
 
 # Hinge angle sensor
 PRODUCT_COPY_FILES += \
@@ -224,16 +269,62 @@ PRODUCT_COPY_FILES += \
 # Location
 ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
     PRODUCT_COPY_FILES += \
-        device/google/felix/location/gps.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml
+        device/google/felix/location/gps.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml \
+        device/google/felix/location/lhd.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/lhd.conf \
+        device/google/felix/location/scd.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/scd.conf
 else
     PRODUCT_COPY_FILES += \
-        device/google/felix/location/gps_user.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml
+        device/google/felix/location/gps_user.xml.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml \
+        device/google/felix/location/lhd_user.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/lhd.conf \
+        device/google/felix/location/scd_user.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/scd.conf
 endif
 
 # WiFi
 PRODUCT_PACKAGES += \
         WifiOverlay2023Mid_F10
 
+# MIPI Coex Configs
+PRODUCT_COPY_FILES += \
+    device/google/felix/felix/radio/felix_camera_front_inner_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/camera_front_inner_mipi_coex_table.csv \
+    device/google/felix/felix/radio/felix_display_secondary_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/display_secondary_mipi_coex_table.csv
+
 PRODUCT_SOONG_NAMESPACES += device/google/felix
 
 DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework_matrix_product_felix.xml
+
+# Device features
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
+
+# Enable adpf cpu hint session for SurfaceFlinger
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+    debug.sf.enable_adpf_cpu_hint=true
+
+# Control camera exif model/make redaction
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.camera.redact_exif=1
+
+# Increase thread priority for nodes stop
+PRODUCT_VENDOR_PROPERTIES += \
+    persist.vendor.camera.increase_thread_priority_nodes_stop=true
+
+##Audio Vendor property
+PRODUCT_PROPERTY_OVERRIDES += \
+	persist.vendor.audio.cca.enabled=true
+
+# Camera
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.vendor.camera.extended_launch_boost=1 \
+    persist.vendor.camera.optimized_tnr_freq=1 \
+    persist.vendor.camera.raise_buf_allocation_priority=1 \
+    camera.enable_landscape_to_portrait=true
+
+# Bluetooth OPUS codec
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.bluetooth.opus.enabled=true
+
+# WLC userdebug specific
+ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
+    PRODUCT_COPY_FILES += \
+        device/google/gs201/init.hardware.wlc.rc.userdebug:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.wlc.rc
+endif

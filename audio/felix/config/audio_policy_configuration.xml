@@ -17,7 +17,6 @@
         <module name="primary" halVersion="2.0">
             <attachedDevices>
                 <item>Speaker</item>
-                <item>Speaker Safe</item>
                 <item>Earpiece</item>
                 <item>Built-In Mic</item>
                 <item>Built-In Back Mic</item>
@@ -27,16 +26,17 @@
             </attachedDevices>
             <defaultOutputDevice>Speaker</defaultOutputDevice>
             <mixPorts>
-                <mixPort name="primary output" role="source" flags="AUDIO_OUTPUT_FLAG_PRIMARY AUDIO_OUTPUT_FLAG_FAST">
+                <mixPort name="primary output" role="source" flags="AUDIO_OUTPUT_FLAG_PRIMARY AUDIO_OUTPUT_FLAG_FAST"
+                         recommendedMuteDurationMs="40">
                     <profile name="" format="AUDIO_FORMAT_PCM_FLOAT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
                 <mixPort name="deep buffer" role="source" flags="AUDIO_OUTPUT_FLAG_DEEP_BUFFER">
-                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
+                    <profile name="" format="AUDIO_FORMAT_PCM_FLOAT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
                 <mixPort name="compressed_offload" role="source"
-                         flags="AUDIO_OUTPUT_FLAG_DIRECT AUDIO_OUTPUT_FLAG_COMPRESS_OFFLOAD AUDIO_OUTPUT_FLAG_NON_BLOCKING">
+                         flags="AUDIO_OUTPUT_FLAG_DIRECT AUDIO_OUTPUT_FLAG_COMPRESS_OFFLOAD AUDIO_OUTPUT_FLAG_NON_BLOCKING AUDIO_OUTPUT_FLAG_GAPLESS_OFFLOAD">
                     <profile name="" format="AUDIO_FORMAT_MP3"
                              samplingRates="8000 16000 24000 32000 44100 48000"
                              channelMasks="AUDIO_CHANNEL_OUT_STEREO AUDIO_CHANNEL_OUT_MONO"/>
@@ -60,11 +60,11 @@
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
                 <mixPort name="mmap_no_irq_out" role="source" flags="AUDIO_OUTPUT_FLAG_DIRECT AUDIO_OUTPUT_FLAG_MMAP_NOIRQ">
-                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
+                    <profile name="" format="AUDIO_FORMAT_PCM_FLOAT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
-                <mixPort name="immersive_out" role="source" flags="AUDIO_OUTPUT_FLAG_FAST AUDIO_OUTPUT_FLAG_DEEP_BUFFER">
-                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
+                <mixPort name="immersive_out" role="source" flags="AUDIO_OUTPUT_FLAG_SPATIALIZER">
+                    <profile name="" format="AUDIO_FORMAT_PCM_32_BIT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </mixPort>
                 <mixPort name="incall playback" role="source"
@@ -132,8 +132,6 @@
                 </devicePort>
                 <devicePort tagName="Speaker" type="AUDIO_DEVICE_OUT_SPEAKER" role="sink">
                 </devicePort>
-                <devicePort tagName="Speaker Safe" type="AUDIO_DEVICE_OUT_SPEAKER_SAFE" role="sink">
-                </devicePort>
                 <devicePort tagName="BT SCO" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO" role="sink">
                 </devicePort>
                 <devicePort tagName="BT SCO Headset" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET" role="sink">
@@ -154,17 +152,17 @@
                 <devicePort tagName="BT SCO Headset Mic" type="AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET" role="source">
                 </devicePort>
                 <devicePort tagName="BT A2DP Out" type="AUDIO_DEVICE_OUT_BLUETOOTH_A2DP" role="sink"
-                            encodedFormats="AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC">
+                            encodedFormats="AUDIO_FORMAT_OPUS AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC">
                     <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
                              samplingRates="44100 48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </devicePort>
                 <devicePort tagName="BT A2DP Headphones" type="AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES" role="sink"
-                            encodedFormats="AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC">
+                            encodedFormats="AUDIO_FORMAT_OPUS AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC">
                     <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
                              samplingRates="44100 48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </devicePort>
                 <devicePort tagName="BT A2DP Speaker" type="AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER" role="sink"
-                            encodedFormats="AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC">
+                            encodedFormats="AUDIO_FORMAT_OPUS AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC">
                     <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
                              samplingRates="44100 48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </devicePort>
@@ -182,8 +180,6 @@
             <routes>
                 <route type="mix" sink="Speaker"
                        sources="primary output,deep buffer,haptic,raw,compressed_offload,mmap_no_irq_out,voip_rx,immersive_out"/>
-                <route type="mix" sink="Speaker Safe"
-                       sources="primary output,deep buffer,haptic,raw,compressed_offload,mmap_no_irq_out,voip_rx"/>
                 <route type="mix" sink="Earpiece"
                        sources="primary output,deep buffer,haptic,raw,compressed_offload,mmap_no_irq_out,voip_rx"/>
                 <route type="mix" sink="BT A2DP Out"
