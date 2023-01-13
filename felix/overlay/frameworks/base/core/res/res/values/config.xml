@@ -219,6 +219,9 @@
     <!-- Indicates whether to enable hinge angle sensor when using unfold animation -->
     <bool name="config_unfoldTransitionHingeAngle">true</bool>
 
+    <!-- If face auth sends the user directly to home/last open app, or stays on keyguard by default-->
+    <bool name="config_faceAuthDismissesKeyguard">true</bool>
+
     <bool name="config_supportsConcurrentInternalDisplays">false</bool>
 
     <!-- Radius of the software rounded corners at the top of primary display in its natural
