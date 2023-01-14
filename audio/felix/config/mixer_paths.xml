@@ -124,9 +124,9 @@
 
     <!-- Cirrus fast switch init -->
     <ctl name="Fast Use Case Switch Enable" value="0" />
-    <ctl name="Fast Use Case Delta File" value="fast_switch5.txt" />
+    <ctl name="Fast Use Case Delta File" value="fast_switch9.txt" />
     <ctl name="R Fast Use Case Switch Enable" value="0" />
-    <ctl name="R Fast Use Case Delta File" value="fast_switch5.txt" />
+    <ctl name="R Fast Use Case Delta File" value="fast_switch9.txt" />
 
     <!-- audio RX route initial/default value -->
     <ctl name="TDM_0_RX Mixer EP1" value="0"/>
@@ -670,8 +670,8 @@
    <path name="voice-speaker">
         <ctl name="ASPTX1 Slot Position" value="1"/>
         <ctl name="R ASPTX1 Slot Position" value="0"/>
-        <ctl name="Digital PCM Volume" value="841"/>
-        <ctl name="R Digital PCM Volume" value="841"/>
+        <ctl name="Digital PCM Volume" value="825"/>
+        <ctl name="R Digital PCM Volume" value="825"/>
         <ctl name="Main AMP Enable Switch" value="1"/>
         <ctl name="R Main AMP Enable Switch" value="1"/>
         <ctl name="Fast Use Case Delta File" value="fast_switch1.txt" />
