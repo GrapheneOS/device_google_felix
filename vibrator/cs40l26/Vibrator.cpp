@@ -765,15 +765,14 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
         }
 
-        if(effectScale < mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)]) {
-            effectScale = mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)];
-        }
-
         if (e_curr.primitive != CompositePrimitive::NOOP) {
             ndk::ScopedAStatus status;
             status = getPrimitiveDetails(e_curr.primitive, &effectIndex);
             if (!status.isOk()) {
                 return status;
+            }
+            if (effectScale < mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)]) {
+                effectScale = mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)];
             }
             effectVolLevel = intensityToVolLevel(effectScale, effectIndex);
             totalDuration += mEffectDurations[effectIndex];
