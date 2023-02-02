@@ -259,6 +259,10 @@
                 {
                     "CdevRequest": "tpu_cooling",
                     "LimitInfo": [0, 2, 3, 4, 5, 5, 5]
+                },
+                {
+                    "CdevRequest": "gxp-cooling",
+                    "LimitInfo": [0, 0, 0, 0, 0, 99, 99]
                 }
             ]
         },
@@ -891,6 +895,11 @@
             "Name":"tpu_cooling",
             "Type":"NPU",
             "WritePath":"/dev/thermal/cdev-by-name/tpu_cooling/user_vote"
+        },
+        {
+            "Name":"gxp-cooling",
+            "Type":"NPU",
+            "WritePath":"/dev/thermal/cdev-by-name/gxp-cooling/user_vote"
         }
     ],
     "PowerRails":[
