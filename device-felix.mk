@@ -30,7 +30,7 @@ DEVICE_PACKAGE_OVERLAYS += device/google/felix/felix/overlay
 include device/google/felix/audio/felix/audio-tables.mk
 include device/google/gs201/device-shipping-common.mk
 $(call soong_config_set,fp_hal_feature,pixel_product, product_a)
-include hardware/google/pixel/vibrator/cs40l26/device-stereo.mk
+include device/google/felix/vibrator/cs40l26/device.mk
 include device/google/gs-common/bcmbt/bluetooth.mk
 include device/google/gs-common/touch/gti/gti.mk
 include device/google/gs-common/touch/stm/stm6.mk
@@ -207,7 +207,9 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 # Vibrator HAL
 PRODUCT_PRODUCT_PROPERTIES +=\
-    ro.vendor.vibrator.hal.long.frequency.shift=0
+    ro.vendor.vibrator.hal.long.frequency.shift=0 \
+    ro.vendor.vibrator.hal.gpio.num=44 \
+    ro.vendor.vibrator.hal.gpio.shift=2
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
 # Fingerprint

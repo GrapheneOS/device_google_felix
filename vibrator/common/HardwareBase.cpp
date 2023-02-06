@@ -71,6 +71,7 @@ void HwApiBase::debug(int fd) {
 
 HwCalBase::HwCalBase() {
     std::ifstream calfile;
+    std::ifstream calfile_dual;
     auto propertyPrefix = std::getenv("PROPERTY_PREFIX");
 
     if (propertyPrefix != NULL) {
@@ -89,6 +90,20 @@ HwCalBase::HwCalBase() {
         std::string key, value;
         if (std::getline(is_line, key, ':') && std::getline(is_line, value)) {
             mCalData[utils::trim(key)] = utils::trim(value);
+        }
+    }
+
+    utils::fileFromEnv("CALIBRATION_FILEPATH_DUAL", &calfile_dual);
+
+    for (std::string line; std::getline(calfile_dual, line);) {
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+        std::istringstream is_line(line);
+        std::string key, value;
+        if (std::getline(is_line, key, ':') && std::getline(is_line, value)) {
+            key = utils::trim(key) + "_dual";
+            mCalData[key] = utils::trim(value);
         }
     }
 }
