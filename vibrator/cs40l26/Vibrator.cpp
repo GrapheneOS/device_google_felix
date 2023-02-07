@@ -33,6 +33,11 @@
 #define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
 #endif
 
+#ifdef LOG_TAG
+#undef LOG_TAG
+#define LOG_TAG std::getenv("HAPTIC_NAME")
+#endif
+
 namespace aidl {
 namespace android {
 namespace hardware {
@@ -48,13 +53,16 @@ static constexpr uint32_t WAVEFORM_LONG_VIBRATION_THRESHOLD_MS = 50;
 static constexpr uint8_t VOLTAGE_SCALE_MAX = 100;
 
 static constexpr int8_t MAX_COLD_START_LATENCY_MS = 6;  // I2C Transaction + DSP Return-From-Standby
-static constexpr uint32_t MIN_ON_OFF_INTERVAL_US = 8500;  // SVC initialization time
-static constexpr int8_t MAX_PAUSE_TIMING_ERROR_MS = 1;    // ALERT Irq Handling
+static constexpr int8_t MAX_PAUSE_TIMING_ERROR_MS = 1;  // ALERT Irq Handling
 static constexpr uint32_t MAX_TIME_MS = UINT16_MAX;
+static constexpr float SETTING_TIME_OVERHEAD = 26;  // This time was combined by
+                                                    // HAL set the effect to
+                                                    // driver and the kernel
+                                                    // executes the effect before
+                                                    // chip play the effect
 
 static constexpr auto ASYNC_COMPLETION_TIMEOUT = std::chrono::milliseconds(100);
 static constexpr auto POLLING_TIMEOUT = 20;
-static constexpr auto POLLING_TIMEOUT_IN_SYNC = 100;
 static constexpr int32_t COMPOSE_DELAY_MAX_MS = 10000;
 
 /* nsections is 8 bits. Need to preserve 1 section for the first delay before the first effect. */
@@ -93,12 +101,12 @@ static constexpr float PWLE_BW_MAP_SIZE =
 /*
  * [15] Edge, 0:Falling, 1:Rising
  * [14:12] GPI_NUM, 1:GPI1 (with CS40L26A, 1 is the only supported GPI)
- * [8] BANK, 0:ROM, 1:RAM
+ * [8] BANK, 0:RAM, 1:R0M
  * [7] USE_BUZZGEN, 0:Not buzzgen, 1:buzzgen
  * [6:0] WAVEFORM_INDEX
- * 0x9100 = 1001 0001 0000 0000: Rising + GPI1 + ROM + Not buzzgen
+ * 0x9100 = 1001 0001 0000 0000: Rising + GPI1 + RAM + Not buzzgen
  */
-static constexpr uint32_t GPIO_TRIGGER_CONFIG = 0x9100;
+static constexpr uint16_t GPIO_TRIGGER_CONFIG = 0x9100;
 
 static uint16_t amplitudeToScale(float amplitude, float maximum) {
     float ratio = 100; /* Unit: % */
@@ -153,8 +161,6 @@ enum vibe_state {
     VIBE_STATE_HAPTIC,
     VIBE_STATE_ASP,
 };
-
-std::mutex mActiveId_mutex;  // protects mActiveId
 
 static int min(int x, int y) {
     return x < y ? x : y;
@@ -230,12 +236,24 @@ static int dspmem_chunk_flush(struct dspmem_chunk *ch) {
     return dspmem_chunk_write(ch, 24 - ch->cachebits, 0);
 }
 
-Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
-    : mHwApi(std::move(hwapi)), mHwCal(std::move(hwcal)), mAsyncHandle(std::async([] {})) {
+Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> hwCalDefault,
+                   std::unique_ptr<HwApi> hwApiDual, std::unique_ptr<HwCal> hwCalDual,
+                   std::unique_ptr<HwGPIO> hwgpio)
+    : mHwApiDef(std::move(hwApiDefault)),
+      mHwCalDef(std::move(hwCalDefault)),
+      mHwApiDual(std::move(hwApiDual)),
+      mHwCalDual(std::move(hwCalDual)),
+      mHwGPIO(std::move(hwgpio)),
+      mAsyncHandle(std::async([] {})) {
     int32_t longFrequencyShift;
     std::string caldata{8, '0'};
     uint32_t calVer;
 
+    // ==================Single actuators and dual actuators checking =============================
+    if ((mHwApiDual != nullptr) && (mHwCalDual != nullptr))
+        mIsDual = true;
+
+    // ==================INPUT Devices== Base =================
     const char *inputEventName = std::getenv("INPUT_EVENT_NAME");
     const char *inputEventPathName = std::getenv("INPUT_EVENT_PATH");
     if ((strstr(inputEventName, "cs40l26") != nullptr) ||
@@ -248,7 +266,7 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
         for (uint8_t retry = 0; retry < 10; retry++) {
             ret = glob(inputEventPathName, 0, nullptr, &inputEventPaths);
             if (ret) {
-                ALOGE("Fail to get input event paths (%d): %s", errno, strerror(errno));
+                ALOGE("Failed to get input event paths (%d): %s", errno, strerror(errno));
             } else {
                 for (int i = 0; i < inputEventPaths.gl_pathc; i++) {
                     fd = TEMP_FAILURE_RETRY(open(inputEventPaths.gl_pathv[i], O_RDWR));
@@ -278,16 +296,69 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
         }
 
         if (!mInputFd.ok()) {
-            ALOGE("Fail to get an input event with name %s", inputEventName);
+            ALOGE("Failed to get an input event with name %s", inputEventName);
         }
     } else {
         ALOGE("The input name %s is not cs40l26_input or cs40l26_dual_input", inputEventName);
     }
 
+    // ==================INPUT Devices== Flip =================
+    if (mIsDual) {
+        const char *inputEventNameDual = std::getenv("INPUT_EVENT_NAME_DUAL");
+        if ((strstr(inputEventNameDual, "cs40l26_dual_input") != nullptr)) {
+            glob_t inputEventPaths;
+            int fd = -1;
+            int ret;
+            uint32_t val = 0;
+            char str[20] = {0x00};
+            for (uint8_t retry = 0; retry < 10; retry++) {
+                ret = glob(inputEventPathName, 0, nullptr, &inputEventPaths);
+                if (ret) {
+                    ALOGE("Failed to get flip's input event paths (%d): %s", errno,
+                          strerror(errno));
+                } else {
+                    for (int i = 0; i < inputEventPaths.gl_pathc; i++) {
+                        fd = TEMP_FAILURE_RETRY(open(inputEventPaths.gl_pathv[i], O_RDWR));
+                        if (fd > 0) {
+                            if (ioctl(fd, EVIOCGBIT(0, sizeof(val)), &val) > 0 &&
+                                (val & (1 << EV_FF)) &&
+                                ioctl(fd, EVIOCGNAME(sizeof(str)), &str) > 0 &&
+                                strstr(str, inputEventNameDual) != nullptr) {
+                                mInputFdDual.reset(fd);
+                                ALOGI("Control %s through %s", inputEventNameDual,
+                                      inputEventPaths.gl_pathv[i]);
+                                break;
+                            }
+                            close(fd);
+                        }
+                    }
+                }
+
+                if (ret == 0) {
+                    globfree(&inputEventPaths);
+                }
+                if (mInputFdDual.ok()) {
+                    break;
+                }
+
+                sleep(1);
+                ALOGW("Retry #%d to search in %zu input devices.", retry, inputEventPaths.gl_pathc);
+            }
+
+            if (!mInputFdDual.ok()) {
+                ALOGE("Failed to get an input event with name %s", inputEventNameDual);
+            }
+            ALOGE("HWAPI: %s", std::getenv("HWAPI_PATH_PREFIX"));
+        } else {
+            ALOGE("The input name %s is not cs40l26_dual_input", inputEventNameDual);
+        }
+    }
+    // ====================HAL internal effect table== Base ==================================
+
     mFfEffects.resize(WAVEFORM_MAX_INDEX);
     mEffectDurations.resize(WAVEFORM_MAX_INDEX);
     mEffectDurations = {
-            1000, 100, 30, 1000, 300, 130, 150, 500, 100, 15, 20, 1000, 1000, 1000,
+            1000, 100, 32, 1000, 300, 130, 150, 500, 100, 10, 12, 1000, 1000, 1000,
     }; /* 11+3 waveforms. The duration must < UINT16_MAX */
 
     uint8_t effectIndex;
@@ -305,7 +376,7 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
             // Bypass the waveform update due to different input name
             if ((strstr(inputEventName, "cs40l26") != nullptr) ||
                 (strstr(inputEventName, "cs40l26_dual_input") != nullptr)) {
-                if (!mHwApi->setFFEffect(
+                if (!mHwApiDef->setFFEffect(
                             mInputFd, &mFfEffects[effectIndex],
                             static_cast<uint16_t>(mFfEffects[effectIndex].replay.length))) {
                     ALOGE("Failed upload effect %d (%d): %s", effectIndex, errno, strerror(errno));
@@ -327,45 +398,124 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
         }
     }
 
-    if (mHwCal->getF0(&caldata)) {
-        mHwApi->setF0(caldata);
+    // ====================HAL internal effect table== Flip ==================================
+    if (mIsDual) {
+        mFfEffectsDual.resize(WAVEFORM_MAX_INDEX);
+
+        for (effectIndex = 0; effectIndex < WAVEFORM_MAX_INDEX; effectIndex++) {
+            if (effectIndex < WAVEFORM_MAX_PHYSICAL_INDEX) {
+                /* Initialize physical waveforms. */
+                mFfEffectsDual[effectIndex] = {
+                        .type = FF_PERIODIC,
+                        .id = -1,
+                        .replay.length = static_cast<uint16_t>(mEffectDurations[effectIndex]),
+                        .u.periodic.waveform = FF_CUSTOM,
+                        .u.periodic.custom_data = new int16_t[2]{RAM_WVFRM_BANK, effectIndex},
+                        .u.periodic.custom_len = FF_CUSTOM_DATA_LEN,
+                };
+                // Bypass the waveform update due to different input name
+                if ((strstr(inputEventName, "cs40l26") != nullptr) ||
+                    (strstr(inputEventName, "cs40l26_dual_input") != nullptr)) {
+                    if (!mHwApiDual->setFFEffect(
+                                mInputFdDual, &mFfEffectsDual[effectIndex],
+                                static_cast<uint16_t>(mFfEffectsDual[effectIndex].replay.length))) {
+                        ALOGE("Failed upload flip's effect %d (%d): %s", effectIndex, errno,
+                              strerror(errno));
+                    }
+                }
+                if (mFfEffectsDual[effectIndex].id != effectIndex) {
+                    ALOGW("Unexpected effect index: %d -> %d", effectIndex,
+                          mFfEffectsDual[effectIndex].id);
+                }
+            } else {
+                /* Initiate placeholders for OWT effects. */
+                mFfEffectsDual[effectIndex] = {
+                        .type = FF_PERIODIC,
+                        .id = -1,
+                        .replay.length = 0,
+                        .u.periodic.waveform = FF_CUSTOM,
+                        .u.periodic.custom_data = nullptr,
+                        .u.periodic.custom_len = 0,
+                };
+            }
+        }
     }
-    if (mHwCal->getRedc(&caldata)) {
-        mHwApi->setRedc(caldata);
+    // ==============Calibration data checking======================================
+
+    if (mHwCalDef->getF0(&caldata)) {
+        mHwApiDef->setF0(caldata);
     }
-    if (mHwCal->getQ(&caldata)) {
-        mHwApi->setQ(caldata);
+    if (mHwCalDef->getRedc(&caldata)) {
+        mHwApiDef->setRedc(caldata);
+    }
+    if (mHwCalDef->getQ(&caldata)) {
+        mHwApiDef->setQ(caldata);
     }
 
-    mHwCal->getLongFrequencyShift(&longFrequencyShift);
-    if (longFrequencyShift > 0) {
-        mF0Offset = longFrequencyShift * std::pow(2, 14);
-    } else if (longFrequencyShift < 0) {
-        mF0Offset = std::pow(2, 24) - std::abs(longFrequencyShift) * std::pow(2, 14);
+    if (mHwCalDef->getF0SyncOffset(&mF0Offset)) {
+        ALOGD("Vibrator::Vibrator: F0 offset calculated from both base and flip calibration data: "
+              "%u",
+              mF0Offset);
     } else {
-        mF0Offset = 0;
+        mHwCalDef->getLongFrequencyShift(&longFrequencyShift);
+        if (longFrequencyShift > 0) {
+            mF0Offset = longFrequencyShift * std::pow(2, 14);
+        } else if (longFrequencyShift < 0) {
+            mF0Offset = std::pow(2, 24) - std::abs(longFrequencyShift) * std::pow(2, 14);
+        } else {
+            mF0Offset = 0;
+        }
+        ALOGD("Vibrator::Vibrator: F0 offset calculated from long shift frequency: %u", mF0Offset);
     }
 
-    mHwCal->getVersion(&calVer);
+    if (mIsDual) {
+        if (mHwCalDual->getF0(&caldata)) {
+            mHwApiDual->setF0(caldata);
+        }
+        if (mHwCalDual->getRedc(&caldata)) {
+            mHwApiDual->setRedc(caldata);
+        }
+        if (mHwCalDual->getQ(&caldata)) {
+            mHwApiDual->setQ(caldata);
+        }
+
+        if (mHwCalDual->getF0SyncOffset(&mF0OffsetDual)) {
+            ALOGD("Vibrator::Vibrator: Dual: F0 offset calculated from both base and flip "
+                  "calibration data: "
+                  "%u",
+                  mF0OffsetDual);
+        }
+    }
+
+    mHwCalDef->getVersion(&calVer);
     if (calVer == 2) {
-        mHwCal->getTickVolLevels(&mTickEffectVol);
-        mHwCal->getClickVolLevels(&mClickEffectVol);
-        mHwCal->getLongVolLevels(&mLongEffectVol);
+        mHwCalDef->getTickVolLevels(&(mTickEffectVol));
+        mHwCalDef->getClickVolLevels(&(mClickEffectVol));
+        mHwCalDef->getLongVolLevels(&(mLongEffectVol));
     } else {
         ALOGW("Unsupported calibration version! Using the default calibration value");
-        mHwCal->getTickVolLevels(&mTickEffectVol);
-        mHwCal->getClickVolLevels(&mClickEffectVol);
-        mHwCal->getLongVolLevels(&mLongEffectVol);
+        mHwCalDef->getTickVolLevels(&(mTickEffectVol));
+        mHwCalDef->getClickVolLevels(&(mClickEffectVol));
+        mHwCalDef->getLongVolLevels(&(mLongEffectVol));
     }
 
-    mHwApi->setF0CompEnable(mHwCal->isF0CompEnabled());
-    mHwApi->setRedcCompEnable(mHwCal->isRedcCompEnabled());
+    // ================Project specific setting to driver===============================
 
+    mHwApiDef->setF0CompEnable(mHwCalDef->isF0CompEnabled());
+    mHwApiDef->setRedcCompEnable(mHwCalDef->isRedcCompEnabled());
+    mHwApiDef->setMinOnOffInterval(MIN_ON_OFF_INTERVAL_US);
+    if (mIsDual) {
+        mHwApiDual->setF0CompEnable(mHwCalDual->isF0CompEnabled());
+        mHwApiDual->setRedcCompEnable(mHwCalDual->isRedcCompEnabled());
+        mHwApiDual->setMinOnOffInterval(MIN_ON_OFF_INTERVAL_US);
+    }
+    // ===============Audio coupled haptics bool init ========
     mIsUnderExternalControl = false;
 
-    mIsChirpEnabled = mHwCal->isChirpEnabled();
+    // =============== Compose PWLE check =====================================
+    mIsChirpEnabled = mHwCalDef->isChirpEnabled();
 
-    mHwCal->getSupportedPrimitives(&mSupportedPrimitivesBits);
+    mHwCalDef->getSupportedPrimitives(&mSupportedPrimitivesBits);
     if (mSupportedPrimitivesBits > 0) {
         for (auto e : defaultSupportedPrimitives) {
             if (mSupportedPrimitivesBits & (1 << uint32_t(e))) {
@@ -378,7 +528,14 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwapi, std::unique_ptr<HwCal> hwcal)
         }
         mSupportedPrimitives = defaultSupportedPrimitives;
     }
-    mHwApi->setMinOnOffInterval(MIN_ON_OFF_INTERVAL_US);
+
+    mPrimitiveMinScale = {0.0f, 0.01f, 0.11f, 0.23f, 0.0f, 0.25f, 0.02f, 0.03f, 0.16f};
+
+    // ====== Get GPIO status and init it ================
+    mGPIOStatus = mHwGPIO->getGPIO();
+    if (!mGPIOStatus || !mHwGPIO->initGPIO()) {
+        ALOGE("Vibrator: GPIO initialization process error");
+    }
 }
 
 ndk::ScopedAStatus Vibrator::getCapabilities(int32_t *_aidl_return) {
@@ -392,7 +549,7 @@ ndk::ScopedAStatus Vibrator::getCapabilities(int32_t *_aidl_return) {
     } else {
         ALOGE("No haptics ALSA device");
     }
-    if (mHwApi->hasOwtFreeSpace()) {
+    if (mHwApiDef->hasOwtFreeSpace()) {
         ret |= IVibrator::CAP_COMPOSE_EFFECTS;
         if (mIsChirpEnabled) {
             ret |= IVibrator::CAP_FREQUENCY_CONTROL | IVibrator::CAP_COMPOSE_PWLE_EFFECTS;
@@ -408,31 +565,48 @@ ndk::ScopedAStatus Vibrator::off() {
     const std::scoped_lock<std::mutex> lock(mActiveId_mutex);
 
     if (mActiveId >= 0) {
-        ALOGV("Off: Stop the active effect: %d", mActiveId);
+        ALOGD("Off: Stop the active effect: %d", mActiveId);
         /* Stop the active effect. */
-        if (!mHwApi->setFFPlay(mInputFd, mActiveId, false)) {
-            ALOGE("Failed to stop effect %d (%d): %s", mActiveId, errno, strerror(errno));
+        if (!mHwApiDef->setFFPlay(mInputFd, mActiveId, false)) {
+            ALOGE("Off: Failed to stop effect %d (%d): %s", mActiveId, errno, strerror(errno));
             ret = false;
         }
-
+        if (mIsDual && (!mHwApiDual->setFFPlay(mInputFdDual, mActiveId, false))) {
+            ALOGE("Off: Failed to stop flip's effect %d (%d): %s", mActiveId, errno,
+                  strerror(errno));
+            ret = false;
+        }
+        /* Do erase process */
         if ((mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
-            (!mHwApi->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects))) {
-            ALOGE("Failed to clean up the composed effect %d", mActiveId);
+            (!mHwApiDef->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects))) {
+            ALOGE("Off: Failed to clean up the composed effect %d", mActiveId);
             ret = false;
         }
 
-        mHwApi->clearTrigBtn(mInputFd, &mFfEffects[mActiveId], mActiveId);
+        if (mIsDual && (mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
+            (!mHwApiDual->eraseOwtEffect(mInputFdDual, mActiveId, &mFfEffectsDual))) {
+            ALOGE("Off: Failed to clean up flip's the composed effect %d", mActiveId);
+            ret = false;
+        }
+        if (!mHwGPIO->setGPIOOutput(false)) {
+            ALOGE("Off: Failed to reset GPIO(%d): %s", errno, strerror(errno));
+            return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+        }
     } else {
-        ALOGV("Off: Vibrator is already off");
+        ALOGD("Off: Vibrator is already off");
     }
 
-    mActiveId = -1;
     setGlobalAmplitude(false);
     if (mF0Offset) {
-        mHwApi->setF0Offset(0);
+        mHwApiDef->setF0Offset(0);
+        if (mIsDual && mF0OffsetDual) {
+            mHwApiDual->setF0Offset(0);
+        }
     }
 
     if (ret) {
+        ALOGD("Off: Done.");
+        mActiveId = -1;
         return ndk::ScopedAStatus::ok();
     } else {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
@@ -441,13 +615,8 @@ ndk::ScopedAStatus Vibrator::off() {
 
 ndk::ScopedAStatus Vibrator::on(int32_t timeoutMs,
                                 const std::shared_ptr<IVibratorCallback> &callback) {
-    std::scoped_lock lock(mApiMutex);
     ATRACE_NAME("Vibrator::on");
-
-    if (isBusy()) {
-        ALOGD("Vibrator::on, isBusy");
-        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
-    }
+    ALOGD("Vibrator::on");
 
     if (timeoutMs > MAX_TIME_MS) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
@@ -460,7 +629,10 @@ ndk::ScopedAStatus Vibrator::on(int32_t timeoutMs,
     }
     setGlobalAmplitude(true);
     if (mF0Offset) {
-        mHwApi->setF0Offset(mF0Offset);
+        mHwApiDef->setF0Offset(mF0Offset);
+        if (mIsDual && mF0OffsetDual) {
+            mHwApiDual->setF0Offset(mF0OffsetDual);
+        }
     }
     return on(timeoutMs, index, nullptr /*ignored*/, callback);
 }
@@ -468,8 +640,8 @@ ndk::ScopedAStatus Vibrator::on(int32_t timeoutMs,
 ndk::ScopedAStatus Vibrator::perform(Effect effect, EffectStrength strength,
                                      const std::shared_ptr<IVibratorCallback> &callback,
                                      int32_t *_aidl_return) {
-    std::scoped_lock lock(mApiMutex);
     ATRACE_NAME("Vibrator::perform");
+    ALOGD("Vibrator::perform");
     return performEffect(effect, strength, callback, _aidl_return);
 }
 
@@ -480,7 +652,6 @@ ndk::ScopedAStatus Vibrator::getSupportedEffects(std::vector<Effect> *_aidl_retu
 }
 
 ndk::ScopedAStatus Vibrator::setAmplitude(float amplitude) {
-    std::scoped_lock lock(mApiMutex);
     ATRACE_NAME("Vibrator::setAmplitude");
 
     if (amplitude <= 0.0f || amplitude > 1.0f) {
@@ -496,17 +667,12 @@ ndk::ScopedAStatus Vibrator::setAmplitude(float amplitude) {
 }
 
 ndk::ScopedAStatus Vibrator::setExternalControl(bool enabled) {
-    std::scoped_lock lock(mApiMutex);
     ATRACE_NAME("Vibrator::setExternalControl");
-
-    if (isSynced()) {
-        return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
-    }
 
     setGlobalAmplitude(enabled);
 
     if (mHasHapticAlsaDevice || mConfigHapticAlsaDeviceDone || hasHapticAlsaDevice()) {
-        if (!mHwApi->setHapticPcmAmp(&mHapticPcm, enabled, mCard, mDevice)) {
+        if (!mHwApiDef->setHapticPcmAmp(&mHapticPcm, enabled, mCard, mDevice)) {
             ALOGE("Failed to %s haptic pcm device: %d", (enabled ? "enable" : "disable"), mDevice);
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
         }
@@ -545,8 +711,8 @@ ndk::ScopedAStatus Vibrator::getPrimitiveDuration(CompositePrimitive primitive,
         if (!status.isOk()) {
             return status;
         }
-
-        *durationMs = mEffectDurations[effectIndex];
+        // Please check the overhead time detail in b/261841035
+        *durationMs = mEffectDurations[effectIndex] + SETTING_TIME_OVERHEAD;
     } else {
         *durationMs = 0;
     }
@@ -555,10 +721,11 @@ ndk::ScopedAStatus Vibrator::getPrimitiveDuration(CompositePrimitive primitive,
 
 ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composite,
                                      const std::shared_ptr<IVibratorCallback> &callback) {
-    std::scoped_lock lock(mApiMutex);
     ATRACE_NAME("Vibrator::compose");
+    ALOGD("Vibrator::compose");
     uint16_t size;
     uint16_t nextEffectDelay;
+    uint16_t totalDuration = 0;
 
     auto ch = dspmem_chunk_create(new uint8_t[FF_CUSTOM_DATA_LEN_MAX_COMP]{0x00},
                                   FF_CUSTOM_DATA_LEN_MAX_COMP);
@@ -569,6 +736,7 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
 
     /* Check if there is a wait before the first effect. */
     nextEffectDelay = composite.front().delayMs;
+    totalDuration += nextEffectDelay;
     if (nextEffectDelay > COMPOSE_DELAY_MAX_MS || nextEffectDelay < 0) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     } else if (nextEffectDelay > 0) {
@@ -592,7 +760,8 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
         auto &e_curr = composite[i_curr];
         uint32_t effectIndex = 0;
         uint32_t effectVolLevel = 0;
-        if (e_curr.scale < 0.0f || e_curr.scale > 1.0f) {
+        float effectScale = e_curr.scale;
+        if (effectScale < 0.0f || effectScale > 1.0f) {
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
         }
 
@@ -602,7 +771,11 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
             if (!status.isOk()) {
                 return status;
             }
-            effectVolLevel = intensityToVolLevel(e_curr.scale, effectIndex);
+            if (effectScale < mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)]) {
+                effectScale = mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)];
+            }
+            effectVolLevel = intensityToVolLevel(effectScale, effectIndex);
+            totalDuration += mEffectDurations[effectIndex];
         }
 
         /* Fetch the next composite effect delay and fill into the current section */
@@ -615,6 +788,7 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
             nextEffectDelay = delay;
+            totalDuration += delay;
         }
 
         if (effectIndex == 0 && nextEffectDelay == 0) {
@@ -631,6 +805,10 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
     if (header_count == dspmem_chunk_bytes(ch)) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     } else {
+        mFfEffects[WAVEFORM_COMPOSE].replay.length = totalDuration;
+        if (mIsDual) {
+            mFfEffectsDual[WAVEFORM_COMPOSE].replay.length = totalDuration;
+        }
         return performEffect(WAVEFORM_MAX_INDEX /*ignored*/, VOLTAGE_SCALE_MAX /*ignored*/, ch,
                              callback);
     }
@@ -660,21 +838,42 @@ ndk::ScopedAStatus Vibrator::on(uint32_t timeoutMs, uint32_t effectIndex, dspmem
         effectIndex = isPwle ? WAVEFORM_PWLE : WAVEFORM_COMPOSE;
 
         uint32_t freeBytes;
-        mHwApi->getOwtFreeSpace(&freeBytes);
+        mHwApiDef->getOwtFreeSpace(&freeBytes);
         if (dspmem_chunk_bytes(ch) > freeBytes) {
             ALOGE("Invalid OWT length: Effect %d: %d > %d!", effectIndex, dspmem_chunk_bytes(ch),
                   freeBytes);
             delete ch;
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
         }
-        int errorStatus;
-        if (isSynced()) {
-            mFfEffects[effectIndex].trigger.button = GPIO_TRIGGER_CONFIG | effectIndex;
+        if (mIsDual) {
+            mHwApiDual->getOwtFreeSpace(&freeBytes);
+            if (dspmem_chunk_bytes(ch) > freeBytes) {
+                ALOGE("Invalid OWT length in flip: Effect %d: %d > %d!", effectIndex,
+                      dspmem_chunk_bytes(ch), freeBytes);
+                delete ch;
+                return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+            }
         }
-        if (!mHwApi->uploadOwtEffect(mInputFd, ch->head, dspmem_chunk_bytes(ch),
-                                     &mFfEffects[effectIndex], &effectIndex, &errorStatus)) {
+
+        int errorStatus;
+        if (mGPIOStatus && mIsDual) {
+            mFfEffects[effectIndex].trigger.button = GPIO_TRIGGER_CONFIG | effectIndex;
+            mFfEffectsDual[effectIndex].trigger.button = GPIO_TRIGGER_CONFIG | effectIndex;
+        } else {
+            ALOGD("Not dual haptics HAL and GPIO status fail");
+        }
+
+        if (!mHwApiDef->uploadOwtEffect(mInputFd, ch->head, dspmem_chunk_bytes(ch),
+                                        &mFfEffects[effectIndex], &effectIndex, &errorStatus)) {
             delete ch;
             ALOGE("Invalid uploadOwtEffect");
+            return ndk::ScopedAStatus::fromExceptionCode(errorStatus);
+        }
+        if (mIsDual && !mHwApiDual->uploadOwtEffect(mInputFdDual, ch->head, dspmem_chunk_bytes(ch),
+                                                    &mFfEffectsDual[effectIndex], &effectIndex,
+                                                    &errorStatus)) {
+            delete ch;
+            ALOGE("Invalid uploadOwtEffect in flip");
             return ndk::ScopedAStatus::fromExceptionCode(errorStatus);
         }
         delete ch;
@@ -683,44 +882,89 @@ ndk::ScopedAStatus Vibrator::on(uint32_t timeoutMs, uint32_t effectIndex, dspmem
                effectIndex == WAVEFORM_LONG_VIBRATION_EFFECT_INDEX) {
         /* Update duration for long/short vibration. */
         mFfEffects[effectIndex].replay.length = static_cast<uint16_t>(timeoutMs);
-        if (isSynced()) {
+        if (mGPIOStatus && mIsDual) {
             mFfEffects[effectIndex].trigger.button = GPIO_TRIGGER_CONFIG | effectIndex;
+            mFfEffectsDual[effectIndex].trigger.button = GPIO_TRIGGER_CONFIG | effectIndex;
+        } else {
+            ALOGD("Not dual haptics HAL and GPIO status fail");
         }
-        if (!mHwApi->setFFEffect(mInputFd, &mFfEffects[effectIndex],
-                                 static_cast<uint16_t>(timeoutMs))) {
+        if (!mHwApiDef->setFFEffect(mInputFd, &mFfEffects[effectIndex],
+                                    static_cast<uint16_t>(timeoutMs))) {
             ALOGE("Failed to edit effect %d (%d): %s", effectIndex, errno, strerror(errno));
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
         }
-    }
-    {
-        const std::scoped_lock<std::mutex> lock(mActiveId_mutex);
-        mActiveId = effectIndex;
-        if (isSynced() &&
-            (effectIndex == WAVEFORM_CLICK_INDEX || effectIndex == WAVEFORM_LIGHT_TICK_INDEX)) {
-            mFfEffects[effectIndex].trigger.button = GPIO_TRIGGER_CONFIG | effectIndex;
-            if (!mHwApi->setFFEffect(mInputFd, &mFfEffects[effectIndex], mFfEffects[effectIndex].replay.length)) {
-                ALOGE("Failed to edit effect %d (%d): %s", effectIndex, errno, strerror(errno));
+        if (mIsDual) {
+            mFfEffectsDual[effectIndex].replay.length = static_cast<uint16_t>(timeoutMs);
+            if (!mHwApiDual->setFFEffect(mInputFdDual, &mFfEffectsDual[effectIndex],
+                                         static_cast<uint16_t>(timeoutMs))) {
+                ALOGE("Failed to edit flip's effect %d (%d): %s", effectIndex, errno,
+                      strerror(errno));
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
             }
-        } else if (!isSynced()) {
-            // /* Play the event now. */
-            if (!mHwApi->setFFPlay(mInputFd, effectIndex, true)) {
+        }
+    }
+
+    {
+        const std::scoped_lock<std::mutex> lock(mActiveId_mutex);
+        /* Play the event now. */
+        mActiveId = effectIndex;
+        if (!mGPIOStatus) {
+            ALOGE("GetVibrator: GPIO status error");
+            // Do playcode to play effect
+            if (!mHwApiDef->setFFPlay(mInputFd, effectIndex, true)) {
                 ALOGE("Failed to play effect %d (%d): %s", effectIndex, errno, strerror(errno));
+                mActiveId = -1;
+                return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+            }
+            if (mIsDual && !mHwApiDual->setFFPlay(mInputFdDual, effectIndex, true)) {
+                ALOGE("Failed to play flip's effect %d (%d): %s", effectIndex, errno,
+                      strerror(errno));
+                mActiveId = -1;
+                return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+            }
+        } else {
+            // Using GPIO to play effect
+            if ((effectIndex == WAVEFORM_CLICK_INDEX || effectIndex == WAVEFORM_LIGHT_TICK_INDEX)) {
+                mFfEffects[effectIndex].trigger.button = GPIO_TRIGGER_CONFIG | effectIndex;
+                if (!mHwApiDef->setFFEffect(mInputFd, &mFfEffects[effectIndex],
+                                            mFfEffects[effectIndex].replay.length)) {
+                    ALOGE("Failed to edit effect %d (%d): %s", effectIndex, errno, strerror(errno));
+                    return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+                }
+                if (mIsDual) {
+                    mFfEffectsDual[effectIndex].trigger.button = GPIO_TRIGGER_CONFIG | effectIndex;
+                    if (!mHwApiDual->setFFEffect(mInputFdDual, &mFfEffectsDual[effectIndex],
+                                                 mFfEffectsDual[effectIndex].replay.length)) {
+                        ALOGE("Failed to edit flip's effect %d (%d): %s", effectIndex, errno,
+                              strerror(errno));
+                        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+                    }
+                }
+            }
+            if (!mHwGPIO->setGPIOOutput(true)) {
+                ALOGE("Failed to trigger effect %d (%d) by GPIO: %s", effectIndex, errno,
+                      strerror(errno));
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
             }
         }
     }
 
     mAsyncHandle = std::async(&Vibrator::waitForComplete, this, callback);
-
+    ALOGD("Vibrator::on, set done.");
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Vibrator::setEffectAmplitude(float amplitude, float maximum) {
     uint16_t scale = amplitudeToScale(amplitude, maximum);
-    if (!mHwApi->setFFGain(mInputFd, scale)) {
+    if (!mHwApiDef->setFFGain(mInputFd, scale)) {
         ALOGE("Failed to set the gain to %u (%d): %s", scale, errno, strerror(errno));
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+    }
+    if (mIsDual) {
+        if (!mHwApiDual->setFFGain(mInputFdDual, scale)) {
+            ALOGE("Failed to set flip's gain to %u (%d): %s", scale, errno, strerror(errno));
+            return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+        }
     }
     return ndk::ScopedAStatus::ok();
 }
@@ -730,6 +974,7 @@ ndk::ScopedAStatus Vibrator::setGlobalAmplitude(bool set) {
     if (!set) {
         mLongEffectScale = 1.0;  // Reset the scale for the later new effect.
     }
+
     return setEffectAmplitude(amplitude, VOLTAGE_SCALE_MAX);
 }
 
@@ -747,7 +992,7 @@ ndk::ScopedAStatus Vibrator::alwaysOnDisable(int32_t /*id*/) {
 
 ndk::ScopedAStatus Vibrator::getResonantFrequency(float *resonantFreqHz) {
     std::string caldata{8, '0'};
-    if (!mHwCal->getF0(&caldata)) {
+    if (!mHwCalDef->getF0(&caldata)) {
         ALOGE("Failed to get resonant frequency (%d): %s", errno, strerror(errno));
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
@@ -758,7 +1003,7 @@ ndk::ScopedAStatus Vibrator::getResonantFrequency(float *resonantFreqHz) {
 
 ndk::ScopedAStatus Vibrator::getQFactor(float *qFactor) {
     std::string caldata{8, '0'};
-    if (!mHwCal->getQ(&caldata)) {
+    if (!mHwCalDef->getQ(&caldata)) {
         ALOGE("Failed to get q factor (%d): %s", errno, strerror(errno));
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
@@ -1049,37 +1294,6 @@ bool Vibrator::isUnderExternalControl() {
     return mIsUnderExternalControl;
 }
 
-// BnVibratorSync APIs
-
-Status Vibrator::prepareSynced(const sp<IVibratorSyncCallback> &callback) {
-    std::scoped_lock lock(mApiMutex);
-    ATRACE_NAME("Vibrator::prepareSynced");
-
-    if (isBusy() || isSynced() || isUnderExternalControl()) {
-        ALOGE("Vibrator::prepareSynced, isBusy or isSynced");
-        return Status::fromExceptionCode(EX_ILLEGAL_STATE);
-    }
-
-    mSyncedCallback = callback;
-
-    return Status::ok();
-}
-
-Status Vibrator::cancelSynced() {
-    std::scoped_lock lock(mApiMutex);
-    ATRACE_NAME("Vibrator::cancelSynced");
-
-    if (!isSynced()) {
-        ALOGE("Vibrator::cancelSynced, isSynced");
-        return Status::fromExceptionCode(EX_ILLEGAL_STATE);
-    }
-
-    off();
-    mSyncedCallback = nullptr;
-
-    return Status::ok();
-}
-
 // BnCInterface APIs
 
 binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
@@ -1093,29 +1307,38 @@ binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
 
     dprintf(fd, "AIDL:\n");
 
-    dprintf(fd, "  F0 Offset: %" PRIu32 "\n", mF0Offset);
+    dprintf(fd, "  F0 Offset: base: %" PRIu32 " flip: %" PRIu32 "\n", mF0Offset, mF0OffsetDual);
 
     dprintf(fd, "  Voltage Levels:\n");
-    dprintf(fd, "    Tick Effect Min: %" PRIu32 " Max: %" PRIu32 "\n", mTickEffectVol[0],
+    dprintf(fd, "     Tick Effect Min: %" PRIu32 " Max: %" PRIu32 "\n", mTickEffectVol[0],
             mTickEffectVol[1]);
-    dprintf(fd, "    Click Effect Min: %" PRIu32 " Max: %" PRIu32 "\n", mClickEffectVol[0],
+    dprintf(fd, "     Click Effect Min: %" PRIu32 " Max: %" PRIu32 "\n", mClickEffectVol[0],
             mClickEffectVol[1]);
-    dprintf(fd, "    Long Effect Min: %" PRIu32 " Max: %" PRIu32 "\n", mLongEffectVol[0],
+    dprintf(fd, "     Long Effect Min: %" PRIu32 " Max: %" PRIu32 "\n", mLongEffectVol[0],
             mLongEffectVol[1]);
 
     dprintf(fd, "  FF effect:\n");
     dprintf(fd, "    Physical waveform:\n");
-    dprintf(fd, "\tId\tIndex\tt   ->\tt'\ttrigger button\n");
-    for (uint8_t effectId = 0; effectId < WAVEFORM_MAX_PHYSICAL_INDEX; effectId++) {
+    dprintf(fd, "==== Base ====\n\tId\tIndex\tt   ->\tt'\ttrigger button\n");
+    uint8_t effectId;
+    for (effectId = 0; effectId < WAVEFORM_MAX_PHYSICAL_INDEX; effectId++) {
         dprintf(fd, "\t%d\t%d\t%d\t%d\t%X\n", mFfEffects[effectId].id,
                 mFfEffects[effectId].u.periodic.custom_data[1], mEffectDurations[effectId],
                 mFfEffects[effectId].replay.length, mFfEffects[effectId].trigger.button);
     }
+    if (mIsDual) {
+        dprintf(fd, "==== Flip ====\n\tId\tIndex\tt   ->\tt'\ttrigger button\n");
+        for (effectId = 0; effectId < WAVEFORM_MAX_PHYSICAL_INDEX; effectId++) {
+            dprintf(fd, "\t%d\t%d\t%d\t%d\t%X\n", mFfEffectsDual[effectId].id,
+                    mFfEffectsDual[effectId].u.periodic.custom_data[1], mEffectDurations[effectId],
+                    mFfEffectsDual[effectId].replay.length,
+                    mFfEffectsDual[effectId].trigger.button);
+        }
+    }
 
-    dprintf(fd, "    OWT waveform:\n");
-    dprintf(fd, "\tId\tBytes\tData\ttrigger button\n");
-    for (uint8_t effectId = WAVEFORM_MAX_PHYSICAL_INDEX; effectId < WAVEFORM_MAX_INDEX;
-         effectId++) {
+    dprintf(fd, "Base: OWT waveform:\n");
+    dprintf(fd, "\tId\tBytes\tData\tt\ttrigger button\n");
+    for (effectId = WAVEFORM_MAX_PHYSICAL_INDEX; effectId < WAVEFORM_MAX_INDEX; effectId++) {
         uint32_t numBytes = mFfEffects[effectId].u.periodic.custom_len * 2;
         std::stringstream ss;
         ss << " ";
@@ -1126,18 +1349,42 @@ binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
                           i))
                << " ";
         }
-        dprintf(fd, "\t%d\t%d\t{%s}\t%X\n", mFfEffects[effectId].id, numBytes, ss.str().c_str(),
-                mFfEffects[effectId].trigger.button);
+        dprintf(fd, "\t%d\t%d\t{%s}\t%u\t%X\n", mFfEffects[effectId].id, numBytes, ss.str().c_str(),
+                mFfEffectsDual[effectId].replay.length, mFfEffects[effectId].trigger.button);
     }
-
+    if (mIsDual) {
+        dprintf(fd, "Flip: OWT waveform:\n");
+        dprintf(fd, "\tId\tBytes\tData\tt\ttrigger button\n");
+        for (effectId = WAVEFORM_MAX_PHYSICAL_INDEX; effectId < WAVEFORM_MAX_INDEX; effectId++) {
+            uint32_t numBytes = mFfEffectsDual[effectId].u.periodic.custom_len * 2;
+            std::stringstream ss;
+            ss << " ";
+            for (int i = 0; i < numBytes; i++) {
+                ss << std::uppercase << std::setfill('0') << std::setw(2) << std::hex
+                   << (uint16_t)(*(reinterpret_cast<uint8_t *>(
+                                           mFfEffectsDual[effectId].u.periodic.custom_data) +
+                                   i))
+                   << " ";
+            }
+            dprintf(fd, "\t%d\t%d\t{%s}\t%u\t%X\n", mFfEffectsDual[effectId].id, numBytes,
+                    ss.str().c_str(), mFfEffectsDual[effectId].replay.length,
+                    mFfEffectsDual[effectId].trigger.button);
+        }
+    }
     dprintf(fd, "\n");
     dprintf(fd, "\n");
 
-    mHwApi->debug(fd);
+    mHwApiDef->debug(fd);
 
     dprintf(fd, "\n");
 
-    mHwCal->debug(fd);
+    mHwCalDef->debug(fd);
+
+    if (mIsDual) {
+        mHwApiDual->debug(fd);
+        dprintf(fd, "\n");
+        mHwCalDual->debug(fd);
+    }
 
     fsync(fd);
     return STATUS_OK;
@@ -1148,7 +1395,7 @@ bool Vibrator::hasHapticAlsaDevice() {
     // constructor is too early in the boot process and the pcm file contents
     // are empty. Hence we make the call here once only right before we need to.
     if (!mConfigHapticAlsaDeviceDone) {
-        if (mHwApi->getHapticAlsaDevice(&mCard, &mDevice)) {
+        if (mHwApiDef->getHapticAlsaDevice(&mCard, &mDevice)) {
             mHasHapticAlsaDevice = true;
             mConfigHapticAlsaDeviceDone = true;
         } else {
@@ -1260,6 +1507,10 @@ ndk::ScopedAStatus Vibrator::getCompoundDetails(Effect effect, EffectStrength st
     }
 
     *outTimeMs = timeMs;
+    mFfEffects[WAVEFORM_COMPOSE].replay.length = static_cast<uint16_t>(timeMs);
+    if (mIsDual) {
+        mFfEffectsDual[WAVEFORM_COMPOSE].replay.length = static_cast<uint16_t>(timeMs);
+    }
 
     return ndk::ScopedAStatus::ok();
 }
@@ -1356,26 +1607,55 @@ ndk::ScopedAStatus Vibrator::performEffect(uint32_t effectIndex, uint32_t volLev
 }
 
 void Vibrator::waitForComplete(std::shared_ptr<IVibratorCallback> &&callback) {
-    ALOGD("Callback status in waitForComplete(): mSync: %d, callBack: %d", isSynced(),
+    ALOGD("waitForComplete: Callback status in waitForComplete(): callBack: %d",
           (callback != nullptr));
 
-    if (!mHwApi->pollVibeState(VIBE_STATE_HAPTIC,
-                               (mSyncedCallback) ? POLLING_TIMEOUT_IN_SYNC : POLLING_TIMEOUT)) {
-        ALOGV("Fail to get state \"Haptic\"");
+    // Bypass checking flip part's haptic state
+    if (!mHwApiDef->pollVibeState(VIBE_STATE_HAPTIC, POLLING_TIMEOUT)) {
+        ALOGD("Failed to get state \"Haptic\"");
     }
 
-    mHwApi->pollVibeState(VIBE_STATE_STOPPED);
+    mHwApiDef->pollVibeState(VIBE_STATE_STOPPED);
+    // Check flip's state after base was done
+    if (mIsDual) {
+        mHwApiDual->pollVibeState(VIBE_STATE_STOPPED);
+    }
+    ALOGD("waitForComplete: get STOP");
     {
         const std::scoped_lock<std::mutex> lock(mActiveId_mutex);
-        if ((mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
-            (!mHwApi->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects))) {
-            ALOGE("Failed to clean up the composed effect %d", mActiveId);
-        }
-        if (mActiveId >= 0) {
-            mHwApi->clearTrigBtn(mInputFd, &mFfEffects[mActiveId], mActiveId);
-            mActiveId = -1;
+        if (mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) {
+            if (!mHwApiDef->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects)) {
+                ALOGE("Failed to clean up the composed effect %d", mActiveId);
+            }
+            if (mIsDual &&
+                (!mHwApiDual->eraseOwtEffect(mInputFdDual, mActiveId, &mFfEffectsDual))) {
+                ALOGE("Failed to clean up flip's composed effect %d", mActiveId);
+            }
         } else {
-            ALOGV("waitForComplete: Vibrator is already off");
+            ALOGD("waitForComplete: Vibrator is already off");
+        }
+        mActiveId = -1;
+        if (mGPIOStatus && !mHwGPIO->setGPIOOutput(false)) {
+            ALOGE("waitForComplete: Failed to reset GPIO(%d): %s", errno, strerror(errno));
+        }
+        // Do waveform number checking
+        uint32_t effectCount = WAVEFORM_MAX_PHYSICAL_INDEX;
+        mHwApiDef->getEffectCount(&effectCount);
+        if (effectCount > WAVEFORM_MAX_PHYSICAL_INDEX) {
+            // Forcibly clean all OWT waveforms
+            if (!mHwApiDef->eraseOwtEffect(mInputFd, WAVEFORM_MAX_INDEX, &mFfEffects)) {
+                ALOGE("Failed to clean up all base's composed effect");
+            }
+        }
+
+        if (mIsDual) {
+            // Forcibly clean all OWT waveforms
+            effectCount = WAVEFORM_MAX_PHYSICAL_INDEX;
+            mHwApiDual->getEffectCount(&effectCount);
+            if ((effectCount > WAVEFORM_MAX_PHYSICAL_INDEX) &&
+                (!mHwApiDual->eraseOwtEffect(mInputFdDual, WAVEFORM_MAX_INDEX, &mFfEffectsDual))) {
+                ALOGE("Failed to clean up all flip's composed effect");
+            }
         }
     }
 
@@ -1385,14 +1665,7 @@ void Vibrator::waitForComplete(std::shared_ptr<IVibratorCallback> &&callback) {
             ALOGE("Failed completion callback: %d", ret.getExceptionCode());
         }
     }
-    if (mSyncedCallback) {
-        auto ret = mSyncedCallback->onComplete();
-        if (!ret.isOk()) {
-            ALOGE("Failed completion mSyncedCallback: %d", ret.exceptionCode());
-        }
-        mSyncedCallback = nullptr;
-    }
-    ALOGV("waitForComplete: Done");
+    ALOGD("waitForComplete: Done.");
 }
 
 uint32_t Vibrator::intensityToVolLevel(float intensity, uint32_t effectIndex) {
@@ -1423,16 +1696,6 @@ uint32_t Vibrator::intensityToVolLevel(float intensity, uint32_t effectIndex) {
             break;
     }
     return volLevel;
-}
-
-bool Vibrator::isBusy() {
-    auto timeout = std::chrono::seconds::zero();
-    auto status = mAsyncHandle.wait_for(timeout);
-    return status != std::future_status::ready;
-}
-
-bool Vibrator::isSynced() {
-    return (mSyncedCallback != nullptr);
 }
 
 }  // namespace vibrator
