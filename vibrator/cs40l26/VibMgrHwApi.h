@@ -21,7 +21,7 @@
 
 #include <map>
 
-#include "VibratorManager.h"
+#include "Vibrator.h"
 #include "utils.h"
 
 namespace aidl {
@@ -29,7 +29,7 @@ namespace android {
 namespace hardware {
 namespace vibrator {
 
-class VibMgrHwApi : public VibratorManager::HwApi {
+class VibMgrHwApi : public Vibrator::HwGPIO {
   private:
     const uint32_t DEBUG_GPI_PIN = UINT16_MAX;
     const uint32_t DEBUG_GPI_PIN_SHIFT = UINT16_MAX;
@@ -54,13 +54,13 @@ class VibMgrHwApi : public VibratorManager::HwApi {
         }
         mGPIOPin = utils::getProperty(mPropertyPrefix + "gpio.num", DEBUG_GPI_PIN);
         if (mGPIOPin == DEBUG_GPI_PIN) {
-            ALOGE("GetGPIO: Fail to get the GPIO num: %s", strerror(errno));
+            ALOGE("GetGPIO: Failed to get the GPIO num: %s", strerror(errno));
             return false;
         }
         mGPIOShift = utils::getProperty(mPropertyPrefix + "gpio.shift", DEBUG_GPI_PIN_SHIFT);
 
         if (mGPIOShift == DEBUG_GPI_PIN_SHIFT) {
-            ALOGE("GetGPIO: Fail to get the GPIO shift num: %s", strerror(errno));
+            ALOGE("GetGPIO: Failed to get the GPIO shift num: %s", strerror(errno));
             return false;
         }
 
@@ -68,9 +68,9 @@ class VibMgrHwApi : public VibratorManager::HwApi {
     }
     bool initGPIO() override {
         const auto gpio_dev = std::string() + "/dev/gpiochip" + std::to_string(mGPIOPin);
-        int fd = open(gpio_dev.c_str(), O_RDONLY);
+        int fd = open(gpio_dev.c_str(), O_CREAT | O_WRONLY, 0777);
         if (fd < 0) {
-            ALOGE("InitGPIO: Unabled to open gpio dev: %s", strerror(errno));
+            ALOGE("InitGPIO: Unable to open gpio dev: %s", strerror(errno));
             return false;
         }
 
@@ -79,10 +79,13 @@ class VibMgrHwApi : public VibratorManager::HwApi {
         mRq.flags = GPIOHANDLE_REQUEST_OUTPUT;
 
         int ret = ioctl(fd, GPIO_GET_LINEHANDLE_IOCTL, &mRq);
-        close(fd);
         if (ret == -1) {
             ALOGE("InitGPIO: Unable to line handle from ioctl : %s", strerror(errno));
             close(fd);
+            return false;
+        }
+        if (close(fd) == -1) {
+            ALOGE("Failed to close GPIO char dev");
             return false;
         }
         // Reset gpio status to LOW
@@ -97,7 +100,7 @@ class VibMgrHwApi : public VibratorManager::HwApi {
         }
         return true;
     }
-    bool setTrigger(bool value) override {
+    bool setGPIOOutput(bool value) override {
         struct gpiohandle_data data;
         data.values[0] = value;
 
@@ -107,7 +110,6 @@ class VibMgrHwApi : public VibratorManager::HwApi {
             close(mRq.fd);
             return false;
         }
-        close(mRq.fd);
 
         return true;
     }

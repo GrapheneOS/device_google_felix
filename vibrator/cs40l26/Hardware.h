@@ -16,6 +16,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 
 #include "HardwareBase.h"
 #include "Vibrator.h"
@@ -66,6 +67,10 @@ namespace vibrator {
 
 class HwApi : public Vibrator::HwApi, private HwApiBase {
   public:
+    static std::unique_ptr<HwApi> Create() {
+        auto hwapi = std::unique_ptr<HwApi>(new HwApi());
+        return hwapi;
+    }
     HwApi() {
         open("calibration/f0_stored", &mF0);
         open("default/f0_offset", &mF0Offset);
@@ -220,7 +225,10 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
             ALOGE("Invalid waveform index for OWT erase: %d", effectIndex);
             return false;
         }
-
+        // Turn off the waiting time for SVC init phase to complete since chip
+        // should already under STOP state
+        setMinOnOffInterval(0);
+        // Do erase flow
         if (effectIndex < WAVEFORM_MAX_INDEX) {
             /* Normal situation. Only erase the effect which we just played. */
             if (ioctl(fd, EVIOCRMFF, effectIndex) < 0) {
@@ -248,18 +256,9 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
                 (*effect)[i].id = -1;
             }
         }
+        // Turn on the waiting time for SVC init phase to complete
+        setMinOnOffInterval(Vibrator::MIN_ON_OFF_INTERVAL_US);
         return true;
-    }
-    void clearTrigBtn(int fd, struct ff_effect *effect, int8_t id) override {
-        if ((*effect).trigger.button != 0x00) {
-            (*effect).trigger.button = 0x00;
-            if (id < WAVEFORM_MAX_PHYSICAL_INDEX) {
-                /* Clear the trigger pin setting */
-                if ((ioctl(fd, EVIOCSFF, effect) < 0)) {
-                    ALOGE("OFF: Failed to edit effect %d (%d): %s", id, errno, strerror(errno));
-                }
-            }
-        }
     }
 
     void debug(int fd) override { HwApiBase::debug(fd); }
@@ -281,6 +280,7 @@ class HwCal : public Vibrator::HwCal, private HwCalBase {
   private:
     static constexpr char VERSION[] = "version";
     static constexpr char F0_CONFIG[] = "f0_measured";
+    static constexpr char F0_CONFIG_DUAL[] = "f0_measured_dual";
     static constexpr char REDC_CONFIG[] = "redc_measured";
     static constexpr char Q_CONFIG[] = "q_measured";
     static constexpr char TICK_VOLTAGES_CONFIG[] = "v_tick";
@@ -295,6 +295,10 @@ class HwCal : public Vibrator::HwCal, private HwCalBase {
 
   public:
     HwCal() {}
+    static std::unique_ptr<HwCal> Create() {
+        auto hwcal = std::unique_ptr<HwCal>(new HwCal());
+        return hwcal;
+    }
 
     bool getVersion(uint32_t *value) override {
         if (getPersist(VERSION, value)) {
@@ -307,6 +311,30 @@ class HwCal : public Vibrator::HwCal, private HwCalBase {
         return getProperty("long.frequency.shift", value, DEFAULT_FREQUENCY_SHIFT);
     }
     bool getF0(std::string *value) override { return getPersist(F0_CONFIG, value); }
+    bool getF0SyncOffset(uint32_t *value) override {
+        std::string cal_0{8, '0'};
+        std::string cal_1{8, '0'};
+
+        if (getPersist(F0_CONFIG, &cal_0) && getPersist(F0_CONFIG_DUAL, &cal_1)) {
+            float f0_0 = static_cast<float>(std::stoul(cal_0, nullptr, 16)) / (1 << 14);
+            float f0_1 = static_cast<float>(std::stoul(cal_1, nullptr, 16)) / (1 << 14);
+            float f0_offset = std::abs(f0_0 - f0_1)/2;
+
+            if (f0_0 < f0_1) {
+                *value = static_cast<uint32_t>(f0_offset * std::pow(2, 14));
+            } else if (f0_0 > f0_1) {
+                *value = static_cast<uint32_t>(std::pow(2, 24) - std::abs(f0_offset) * std::pow(2, 14));
+            } else {
+                *value = 0;
+            }
+
+            return true;
+        } else {
+            ALOGE("Vibrator: Unable to load F0_CONFIG or F0_CONFIG_DUAL config");
+            *value = 0;
+            return false;
+        }
+    }
     bool getRedc(std::string *value) override { return getPersist(REDC_CONFIG, value); }
     bool getQ(std::string *value) override { return getPersist(Q_CONFIG, value); }
     bool getTickVolLevels(std::array<uint32_t, 2> *value) override {
