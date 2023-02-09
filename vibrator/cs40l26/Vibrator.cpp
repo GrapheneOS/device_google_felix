@@ -576,18 +576,7 @@ ndk::ScopedAStatus Vibrator::off() {
                   strerror(errno));
             ret = false;
         }
-        /* Do erase process */
-        if ((mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
-            (!mHwApiDef->eraseOwtEffect(mInputFd, mActiveId, &mFfEffects))) {
-            ALOGE("Off: Failed to clean up the composed effect %d", mActiveId);
-            ret = false;
-        }
 
-        if (mIsDual && (mActiveId >= WAVEFORM_MAX_PHYSICAL_INDEX) &&
-            (!mHwApiDual->eraseOwtEffect(mInputFdDual, mActiveId, &mFfEffectsDual))) {
-            ALOGE("Off: Failed to clean up flip's the composed effect %d", mActiveId);
-            ret = false;
-        }
         if (!mHwGPIO->setGPIOOutput(false)) {
             ALOGE("Off: Failed to reset GPIO(%d): %s", errno, strerror(errno));
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
