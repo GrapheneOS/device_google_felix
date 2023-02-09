@@ -300,10 +300,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     debug.sf.enable_adpf_cpu_hint=true
 
-# Control camera exif model/make redaction
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.camera.redact_exif=1
-
 # Increase thread priority for nodes stop
 PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.camera.increase_thread_priority_nodes_stop=true
