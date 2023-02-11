@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- * Copyright (c) 2021, The Android Open Source Project
+ * Copyright (c) 2023, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,7 @@
 -->
 
 <resources>
-  <!-- Normalized location on the screen of the center of the physical usb charger port in portrait
-       mode. -->
-    <item name="physical_charger_port_location_normalized_x" type="dimen" format="float">0.784</item>
-
-    <!-- Location on the screen of the center of the physical fingerprint sensor -->
-    <dimen name="physical_fingerprint_sensor_center_screen_location_x">2208px</dimen>
-
-    <!-- Lock pattern view size, align sysui biometric_auth_pattern_view_size -->
-    <dimen name="biometric_auth_pattern_view_size">298dp</dimen>
+    <!-- Auth credential PIN/PATTERN/PASSWORD -->
+    <dimen name="biometric_auth_pattern_view_size">248dp</dimen>
     <dimen name="biometric_auth_pattern_view_max_size">348dp</dimen>
 </resources>
