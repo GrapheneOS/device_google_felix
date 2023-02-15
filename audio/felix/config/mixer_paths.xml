@@ -746,7 +746,7 @@
 
     <path name="voice-recog-mic">
         <path name="builtin-3mics" />
-        <ctl name="Mic Spatial Module Enable" value="1"/>
+        <ctl name="Mic Spatial Module Enable" value="0"/>
         <ctl name="MIC DC Blocker" value="1"/>
     </path>
 
