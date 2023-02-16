@@ -204,9 +204,6 @@
     <!-- default refresh rate in the zone defined by birghtness and ambient thresholds -->
     <integer name="config_defaultRefreshRateInZone">120</integer>
 
-    <!-- Default refresh rate while the device has high brightness mode enabled for HDR. -->
-    <integer name="config_defaultRefreshRateInHbmHdr">60</integer>
-
     <!-- The device states (supplied by DeviceStateManager) that should be treated as folded by the
          display fold controller. -->
     <integer-array name="config_foldedDeviceStates" translatable="false">
