@@ -438,7 +438,7 @@
             "Formula":"MAXIMUM",
             "Combination":["VIRTUAL-SKIN"],
             "Coefficient":[1.0],
-            "HotThreshold":["NAN", 25.0, 41.0, 43.0, 45.0, 46.5, 54.0],
+            "HotThreshold":["NAN", 25.0, 39.0, 41.0, 45.0, 46.5, 54.0],
             "HotHysteresis":[0.0, 1.9, 1.9, 1.9, 1.9, 1.4, 1.9],
             "Multiplier":0.001,
             "PollingDelay":60000,
@@ -449,10 +449,11 @@
                 "K_I":["NAN", "NAN", 5, "NAN", "NAN", "NAN", "NAN"],
                 "K_D":["NAN", "NAN", 0, "NAN", "NAN", "NAN", "NAN"],
                 "I_Max":["NAN", "NAN", 1500, "NAN", "NAN", "NAN", "NAN"],
-                "S_Power":["NAN", "NAN", 4500, "NAN", "NAN", "NAN", "NAN"],
+                "S_Power":["NAN", "NAN", 3500, "NAN", "NAN", "NAN", "NAN"],
                 "MinAllocPower":["NAN", "NAN", 0, "NAN", "NAN", "NAN", "NAN"],
                 "MaxAllocPower":["NAN", "NAN", 10000, "NAN", "NAN", "NAN", "NAN"],
-                "I_Cutoff":["NAN", "NAN", 4, "NAN", "NAN", "NAN", "NAN"]
+                "I_Cutoff":["NAN", "NAN", 14, "NAN", "NAN", "NAN", "NAN"],
+                "I_Default":1000
             },
             "ExcludedPowerInfo": [
                 {
