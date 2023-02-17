@@ -199,7 +199,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     ro.vendor.build.svn=1
 
 # Vibrator HAL
-PRODUCT_PRODUCT_PROPERTIES +=\
+PRODUCT_VENDOR_PROPERTIES +=\
     ro.vendor.vibrator.hal.long.frequency.shift=0 \
     ro.vendor.vibrator.hal.gpio.num=44 \
     ro.vendor.vibrator.hal.gpio.shift=2
