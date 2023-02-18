@@ -152,8 +152,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # declare use of spatial audio
 PRODUCT_PROPERTY_OVERRIDES += \
-       ro.audio.spatializer_enabled=true \
-       persist.vendor.audio.spatializer.speaker_enabled=true
+       ro.audio.spatializer_enabled=true
 
 # Keymaster HAL
 #LOCAL_KEYMASTER_PRODUCT_PACKAGE ?= android.hardware.keymaster@4.1-service
@@ -199,7 +198,7 @@ PRODUCT_VENDOR_PROPERTIES += \
     ro.vendor.build.svn=1
 
 # Vibrator HAL
-PRODUCT_PRODUCT_PROPERTIES +=\
+PRODUCT_VENDOR_PROPERTIES +=\
     ro.vendor.vibrator.hal.long.frequency.shift=0 \
     ro.vendor.vibrator.hal.gpio.num=44 \
     ro.vendor.vibrator.hal.gpio.shift=2
