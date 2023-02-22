@@ -77,7 +77,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 
 #config of display brightness dimming
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.0.brightness.dimming.usage=1
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.1.brightness.dimming.usage=0
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.1.brightness.dimming.usage=2
 
 # Early wake up sysfs path for the secondary display
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
@@ -147,7 +147,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # declare use of spatial audio
 PRODUCT_PROPERTY_OVERRIDES += \
-       ro.audio.spatializer_enabled=true
+       ro.audio.spatializer_enabled=true \
+       persist.vendor.audio.spatializer.speaker_enabled=true
 
 # Bluetooth SAR test tool
 PRODUCT_PACKAGES_DEBUG += \
