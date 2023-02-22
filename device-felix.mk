@@ -316,6 +316,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
     camera.enable_landscape_to_portrait=true \
     persist.vendor.camera.debug.bypass_csi_link_error=true
 
+# Enable camera exif model/make reporting
+PRODUCT_VENDOR_PROPERTIES += \
+    persist.vendor.camera.exif_reveal_make_model=true
+
 # Bluetooth OPUS codec
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.bluetooth.opus.enabled=true
