@@ -317,7 +317,3 @@ ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
         device/google/gs201/init.hardware.wlc.rc.userdebug:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.wlc.rc
 endif
 
-# Biometrics virtual HAL for e2e testing
-PRODUCT_PACKAGES_DEBUG += \
-    android.hardware.biometrics.fingerprint-service.example
-
