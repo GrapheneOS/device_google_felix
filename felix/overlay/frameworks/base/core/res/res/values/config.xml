@@ -132,6 +132,7 @@
         <item>10000</item>
         <item>14000</item>
         <item>20000</item>
+        <item>25000</item>
     </integer-array>
 
     <!-- Array of desired screen brightness in nits corresponding to the lux values
@@ -169,9 +170,10 @@
         <item>328.5869521</item>    <!--  3000 - 6000 -->
         <item>627.4315413</item>    <!--  6000 - 9000 -->
         <item>826.8584866</item>    <!--  9000 - 10000 -->
-        <item>867.0494638</item>    <!--  10000 -14000 -->
-        <item>901.4496943</item>    <!--  14000 -20000 -->
-        <item>1100.0</item>         <!--  20000+ -->
+        <item>867.85582302</item>   <!--  10000 -14000 -->
+        <item>1041.39662279</item>  <!--  14000 -20000 -->
+        <item>1227.52633489</item>  <!--  20000 -25000 -->
+        <item>1331.28933608</item>  <!--  25000+ -->
     </array>
 
     <!-- Stability requirements in milliseconds for accepting a new brightness level.  This is used
