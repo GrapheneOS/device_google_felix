@@ -431,7 +431,7 @@
         {
             "Name":"VIRTUAL-SKIN-CHARGE",
             "Type":"UNKNOWN",
-            "Version":"0.2",
+            "Version":"0.3",
             "Hidden":true,
             "VirtualSensor":true,
             "TriggerSensor":"skin_therm",
@@ -446,14 +446,14 @@
             "PIDInfo": {
                 "K_Po":["NAN", "NAN", 1000, "NAN", "NAN", "NAN", "NAN"],
                 "K_Pu":["NAN", "NAN", 30, "NAN", "NAN", "NAN", "NAN"],
-                "K_I":["NAN", "NAN", 5, "NAN", "NAN", "NAN", "NAN"],
+                "K_I":["NAN", "NAN", 40, "NAN", "NAN", "NAN", "NAN"],
                 "K_D":["NAN", "NAN", 0, "NAN", "NAN", "NAN", "NAN"],
                 "I_Max":["NAN", "NAN", 1500, "NAN", "NAN", "NAN", "NAN"],
-                "S_Power":["NAN", "NAN", 3500, "NAN", "NAN", "NAN", "NAN"],
+                "S_Power":["NAN", "NAN", 3000, "NAN", "NAN", "NAN", "NAN"],
                 "MinAllocPower":["NAN", "NAN", 0, "NAN", "NAN", "NAN", "NAN"],
                 "MaxAllocPower":["NAN", "NAN", 10000, "NAN", "NAN", "NAN", "NAN"],
                 "I_Cutoff":["NAN", "NAN", 14, "NAN", "NAN", "NAN", "NAN"],
-                "I_Default":1000
+                "I_Default":1500
             },
             "ExcludedPowerInfo": [
                 {
@@ -466,7 +466,7 @@
                     "CdevRequest": "chg_mdis",
                     "CdevWeightForPID": [1, 1, 1, 1, 1, 1, 1],
                     "MaxReleaseStep": 1,
-                    "MaxThrottleStep": 1,
+                    "MaxThrottleStep": 2,
                     "CdevCeiling": [0, 10, 11, 11, 12, 12, 12],
                     "LimitInfo": [0, 0, 0, 0, 0, 12, 12]
                 }
