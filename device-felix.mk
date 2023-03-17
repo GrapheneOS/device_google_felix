@@ -301,6 +301,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.camera.extended_launch_boost=1 \
     persist.vendor.camera.optimized_tnr_freq=1 \
     persist.vendor.camera.raise_buf_allocation_priority=1 \
+    persist.vendor.camera.start_cpu_throttling_at_moderate_thermal=1 \
     camera.enable_landscape_to_portrait=true \
     persist.vendor.camera.debug.bypass_csi_link_error=true \
     vendor.camera.allow_sensor_binning_aspect_ratio_to_override_itp_output=false
