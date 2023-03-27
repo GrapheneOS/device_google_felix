@@ -1039,7 +1039,7 @@
       "PowerHint": "GCA_CAMERA_SHOT_ALLCPU",
       "Node": "CPUBigClusterMinFreq",
       "Duration": 3000,
-      "Value": "9999999"
+      "Value": "1826000"
     },
     {
       "PowerHint": "GCA_CAMERA_SHOT_ALLCPU",
@@ -1051,7 +1051,7 @@
       "PowerHint": "GCA_CAMERA_SHOT_ALLCPU",
       "Node": "CPUMidClusterMinFreq",
       "Duration": 3000,
-      "Value": "9999999"
+      "Value": "1836000"
     },
     {
       "PowerHint": "GCA_CAMERA_SHOT_ALLCPU",
@@ -1063,7 +1063,7 @@
       "PowerHint": "GCA_CAMERA_SHOT_ALLCPU",
       "Node": "CPULittleClusterMinFreq",
       "Duration": 3000,
-      "Value": "9999999"
+      "Value": "1401000"
     },
     {
       "PowerHint": "GCA_CAMERA_SHOT_GPU_EXTREME",
