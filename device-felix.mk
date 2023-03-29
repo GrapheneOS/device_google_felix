@@ -306,7 +306,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.camera.start_cpu_throttling_at_moderate_thermal=1 \
     camera.enable_landscape_to_portrait=true \
     persist.vendor.camera.debug.bypass_csi_link_error=true \
-    vendor.camera.allow_sensor_binning_aspect_ratio_to_override_itp_output=false
+    vendor.camera.allow_sensor_binning_aspect_ratio_to_override_itp_output=false \
+    vendor.camera.support_specific_stream_aspect_ratio=0.75
 
 # Enable camera exif model/make reporting
 PRODUCT_VENDOR_PROPERTIES += \
