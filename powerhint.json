@@ -2174,7 +2174,7 @@
       "PowerHint": "ML_ACC",
       "Node": "PMQoSCpuDmaLatency",
       "Duration": 2000,
-      "Value": "55"
+      "Value": "44"
     }
   ],
   "AdpfConfig": [
