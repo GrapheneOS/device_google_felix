@@ -20,6 +20,13 @@ BOARD_USES_GENERIC_AUDIO := true
 USES_DEVICE_GOOGLE_FELIX := true
 BOARD_KERNEL_CMDLINE += swiotlb=noforce
 
+# Enable load module in parallel
+BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
+
+# The modules which need to be loaded in sequential
+BOARD_KERNEL_CMDLINE += exynos_drm.load_sequential=1
+BOARD_KERNEL_CMDLINE += panel-samsung-ana6707-f10.load_sequential=1
+
 #Display
 USES_IDISPLAY_INTF_SEC := true
 
