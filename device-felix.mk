@@ -197,7 +197,7 @@ PRODUCT_SOONG_NAMESPACES += \
 
 # Increment the SVN for any official public releases
 PRODUCT_VENDOR_PROPERTIES += \
-    ro.vendor.build.svn=5
+    ro.vendor.build.svn=6
 
 # Vibrator HAL
 PRODUCT_VENDOR_PROPERTIES +=\
