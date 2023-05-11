@@ -86,7 +86,7 @@
             "Multiplier":1
         },
         {
-            "Name":"CLOSE-SUB1",
+            "Name":"CLOSE-SUB1-RAW",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
@@ -94,6 +94,16 @@
             "Combination":["neutral_therm", "skin_therm", "usb_pwr_therm", "outer_disp_therm"],
             "Coefficient":[-0.15, -0.45, 0.2, 1.5],
             "Offset":-670,
+            "Multiplier":0.001
+        },
+        {
+            "Name":"CLOSE-SUB1",
+            "Type":"UNKNOWN",
+            "Hidden":true,
+            "VirtualSensor":true,
+            "Formula":"MINIMUM",
+            "Combination":["CLOSE-SUB1-RAW", "IS_CLOSE"],
+            "Coefficient":[1.0, 49000.0],
             "Multiplier":0.001
         },
         {
