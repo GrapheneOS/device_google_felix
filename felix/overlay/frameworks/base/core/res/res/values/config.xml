@@ -252,9 +252,6 @@
         corners. -->
     <dimen name="rounded_corner_radius_bottom_adjustment">4px</dimen>
 
-    <!-- the number of the max cached processes in the system. -->
-    <integer name="config_customizedMaxCachedProcesses">64</integer>
-
     <string-array name="config_displayUniqueIdArray" translatable="false">
         <item>"local:4619827677550801152"</item>
         <item>"local:4619827677550801153"</item>
