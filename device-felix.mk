@@ -227,7 +227,8 @@ PRODUCT_PRODUCT_PROPERTIES += \
 
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.gms.dck.eligible_wcc=3
+    ro.gms.dck.eligible_wcc=3 \
+    ro.gms.dck.se_capability=1
 
 # Graphics
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.surface_flinger.enable_frame_rate_override=true
