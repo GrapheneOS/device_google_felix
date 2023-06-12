@@ -136,10 +136,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Bluetooth Tx power caps
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/bluetooth/bluetooth_power_limits_felix_US.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits.csv \
-    $(LOCAL_PATH)/bluetooth/bluetooth_power_limits_felix_JP.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_JP.csv \
-    $(LOCAL_PATH)/bluetooth/bluetooth_power_limits_felix_EU.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_EU.csv \
-    $(LOCAL_PATH)/bluetooth/bluetooth_power_limits_felix_US.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_US.csv
+    device/google/felix/bluetooth/bluetooth_power_limits_felix_US.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits.csv \
+    device/google/felix/bluetooth/bluetooth_power_limits_felix_JP.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_JP.csv \
+    device/google/felix/bluetooth/bluetooth_power_limits_felix_EU.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_EU.csv \
+    device/google/felix/bluetooth/bluetooth_power_limits_felix_US.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_US.csv
 
 # Spatial Audio
 PRODUCT_PACKAGES += \
