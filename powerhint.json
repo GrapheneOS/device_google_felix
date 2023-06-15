@@ -1358,6 +1358,24 @@
       "Value": "0"
     },
     {
+      "PowerHint": "CAMERA_MULTI_CAM_STREAMING",
+      "Node": "CPUBigClusterMaxFreq",
+      "Duration": 0,
+      "Value": "9999999"
+    },
+    {
+      "PowerHint": "CAMERA_MULTI_CAM_STREAMING",
+      "Node": "CPUMidClusterMaxFreq",
+      "Duration": 0,
+      "Value": "9999999"
+    },
+    {
+      "PowerHint": "CAMERA_MULTI_CAM_STREAMING",
+      "Node": "CPULittleClusterMaxFreq",
+      "Duration": 0,
+      "Value": "9999999"
+    },
+    {
       "PowerHint": "CAMERA_VIDEO_RECORDING",
       "Type": "MaskHint",
       "Value": "CDCPUSET_RESTRICTED"
