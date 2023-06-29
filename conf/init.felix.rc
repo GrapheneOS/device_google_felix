@@ -117,6 +117,9 @@ on post-fs-data
 on init && property:ro.bootmode=normal
     write /sys/devices/platform/hall_sensor/enable 0
 
+on init && property:ro.bootmode=unknown
+    write /sys/devices/platform/hall_sensor/enable 0
+
 on init && property:ro.bootmode=factory
     write /sys/devices/platform/hall_sensor/enable 0
 
