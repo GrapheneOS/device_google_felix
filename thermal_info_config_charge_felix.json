@@ -60,23 +60,26 @@
             "Multiplier":1
         },
         {
-            "Name":"IS_OPEN",
+            "Name":"OPEN_WEIGHT",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"COUNT_THRESHOLD",
+            "StepRatio":0.2,
             "Combination":["inner-disp"],
             "Coefficient":[1.0],
-            "Multiplier":1
+            "Multiplier":1,
+            "PassiveDelay":7000
         },
         {
-            "Name":"IS_CLOSE",
+            "Name":"CLOSE_WEIGHT",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
-            "Formula":"COUNT_THRESHOLD",
-            "Combination":["inner-disp"],
-            "Coefficient":[-1.0],
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["1", "OPEN_WEIGHT"],
+            "CombinationType":["CONSTANT", "SENSOR"],
+            "Coefficient":[1.0, -1.0],
             "Multiplier":1
         },
         {
@@ -145,16 +148,6 @@
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-SKIN-CLOSE",
-            "Type":"UNKNOWN",
-            "Hidden":true,
-            "VirtualSensor":true,
-            "Formula":"WEIGHTED_AVG",
-            "Combination":["CLOSE-SUB-MAX", "IS_OPEN"],
-            "Coefficient":[1.0, -1000000],
-            "Multiplier":0.001
-        },
-        {
             "Name":"OPEN-SUB1",
             "Type":"UNKNOWN",
             "Hidden":true,
@@ -204,9 +197,9 @@
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
-            "Combination":["neutral_therm", "skin_therm", "usb_pwr_therm", "usb_pwr_therm2", "inner_disp_therm"],
-            "Coefficient":[0.15, 1.05, -0.65, 1, -0.55],
-            "Offset":3540,
+            "Combination":["quiet_therm", "skin_therm", "usb_pwr_therm"],
+            "Coefficient":[0.429, 0.314, 0.205],
+            "Offset":2600,
             "Multiplier":0.001
         },
         {
@@ -220,25 +213,16 @@
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-SKIN-OPEN",
-            "Type":"UNKNOWN",
-            "Hidden":true,
-            "VirtualSensor":true,
-            "Formula":"WEIGHTED_AVG",
-            "Combination":["OPEN-SUB-MAX", "IS_CLOSE"],
-            "Coefficient":[1.0, -1000000],
-            "Multiplier":0.001
-        },
-        {
             "Name":"VIRTUAL-SKIN-CHARGE",
             "Type":"UNKNOWN",
             "Version":"0.3",
             "Hidden":true,
             "VirtualSensor":true,
             "TriggerSensor":"skin_therm",
-            "Formula":"MAXIMUM",
-            "Combination":["VIRTUAL-SKIN-CLOSE", "VIRTUAL-SKIN-OPEN"],
-            "Coefficient":[1.0, 1.0],
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["OPEN-SUB-MAX", "CLOSE-SUB-MAX"],
+            "Coefficient":["OPEN_WEIGHT", "CLOSE_WEIGHT"],
+            "CoefficientType":["SENSOR", "SENSOR"],
             "HotThreshold":["NAN", 25.0, 39.0, 41.0, 45.0, 46.5, 54.0],
             "HotHysteresis":[0.0, 1.9, 1.9, 1.9, 1.9, 1.4, 1.9],
             "Multiplier":0.001,
