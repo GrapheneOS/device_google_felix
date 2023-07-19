@@ -106,6 +106,10 @@ on property:vendor.mfgapi.touchpanel.permission=1
 on property:persist.device_config.vendor_system_native_boot.thermal_proactive_skin=1
     setprop vendor.thermal.config "thermal_info_config_proactive_skin.json"
 
+on property:vendor.thermal.link_ready=1
+    write /dev/thermal/tz-by-name/skin_therm/trip_point_1_temp 61000
+    write /dev/thermal/tz-by-name/skin_therm/trip_point_2_temp 63000
+
 # Bluetooth
 on post-fs-data
     chown bluetooth system /proc/bluetooth/timesync
