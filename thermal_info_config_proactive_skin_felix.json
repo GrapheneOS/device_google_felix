@@ -228,7 +228,7 @@
             "Combination":["OPEN-SUB-MAX", "CLOSE-SUB-MAX"],
             "Coefficient":["OPEN_WEIGHT", "CLOSE_WEIGHT"],
             "CoefficientType":["SENSOR", "SENSOR"],
-            "HotThreshold":["NAN", 37.0, 41.0, 45.0, 46.5, 51.0, 54.0],
+            "HotThreshold":["NAN", 37.0, 41.0, 45.0, 46.5, 53.0, 57.0],
             "HotHysteresis":[0.0, 1.9, 1.9, 1.9, 1.4, 1.9, 1.9],
             "Multiplier":0.001,
             "PollingDelay":300000,
