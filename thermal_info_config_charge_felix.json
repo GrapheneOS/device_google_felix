@@ -80,25 +80,14 @@
             "Multiplier":1
         },
         {
-            "Name":"CLOSE-SUB1",
-            "Type":"UNKNOWN",
-            "Hidden":true,
-            "VirtualSensor":true,
-            "Formula":"WEIGHTED_AVG",
-            "Combination":["neutral_therm", "skin_therm", "usb_pwr_therm", "outer_disp_therm"],
-            "Coefficient":[-0.15, -0.45, 0.2, 1.5],
-            "Offset":-670,
-            "Multiplier":0.001
-        },
-        {
             "Name":"CLOSE-SUB2",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
-            "Combination":["neutral_therm", "skin_therm", "usb_pwr_therm", "outer_disp_therm", "gnss_tcxo_therm"],
-            "Coefficient":[0.3, 0.3, -0.1, 0.4, 0.1],
-            "Offset":2500,
+            "Combination":["neutral_therm", "skin_therm", "usb_pwr_therm", "gnss_tcxo_therm"],
+            "Coefficient":[0.259, 0.652, -0.161, 0.03],
+            "Offset":8450,
             "Multiplier":0.001
         },
         {
@@ -151,8 +140,8 @@
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"MAXIMUM",
-            "Combination":["CLOSE-SUB1", "CLOSE-SUB2", "CLOSE-SUB3", "CLOSE-SUB4", "CLOSE-SUB5"],
-            "Coefficient":[1.0, 1.0, 1.0, 1.0, 1.0],
+            "Combination":["CLOSE-SUB2", "CLOSE-SUB3", "CLOSE-SUB4", "CLOSE-SUB5"],
+            "Coefficient":[1.0, 1.0, 1.0, 1.0],
             "Multiplier":0.001
         },
         {
@@ -182,9 +171,9 @@
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"WEIGHTED_AVG",
-            "Combination":["neutral_therm", "quiet_therm", "skin_therm", "usb_pwr_therm", "inner_disp_therm", "gnss_tcxo_therm"],
-            "Coefficient":[-0.15, -1.05, 0.1, 0.25, 1.85, 0.05],
-            "Offset":-990,
+            "Combination":["skin_therm", "usb_pwr_therm", "inner_disp_therm", "gnss_tcxo_therm"],
+            "Coefficient":[0.385, 0.075, 0.348, 0.302],
+            "Offset":-4950,
             "Multiplier":0.001
         },
         {

@@ -28,6 +28,7 @@
 #include <android/binder_manager.h>
 #include <android/binder_process.h>
 #include <log/log.h>
+#include <sys/stat.h>
 
 using aidl::android::hardware::power::stats::DevfreqStateResidencyDataProvider;
 using aidl::android::hardware::power::stats::DisplayStateResidencyDataProvider;
@@ -39,7 +40,9 @@ void addDisplay(std::shared_ptr<PowerStats> p) {
     // Add display residency stats for inner display
     std::vector<std::string> inner_states = {
         "Off",
+        "LP: 1840x2208@1",
         "LP: 1840x2208@30",
+        "On: 1840x2208@1",
         "On: 1840x2208@10",
         "On: 1840x2208@60",
         "On: 1840x2208@120",
@@ -138,6 +141,18 @@ void addGPU(std::shared_ptr<PowerStats> p) {
             stateCoeffs));
 }
 
+std::string getNfcPath() {
+    struct stat buffer;
+    int size = 128;
+    char path[size];
+    for (int i = 0; i < 10; i++) {
+        std::snprintf(path, size,
+                "/sys/devices/platform/10970000.hsi2c/i2c-%d/i2c-st21nfc/power_stats", i);
+        if (!stat(path, &buffer)) break;
+    }
+    return std::string(path);
+}
+
 int main() {
     LOG(INFO) << "Pixel PowerStats HAL AIDL Service is starting.";
 
@@ -158,7 +173,7 @@ int main() {
     addWifi(p);
     addTPU(p);
     addUfs(p);
-    addNFC(p, "/sys/devices/platform/10970000.hsi2c/i2c-4/i2c-st21nfc/power_stats");
+    addNFC(p, getNfcPath());
     addUwb(p);
     addPowerDomains(p);
     addDevfreq(p);
