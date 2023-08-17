@@ -214,7 +214,8 @@ PRODUCT_VENDOR_PROPERTIES += \
 PRODUCT_VENDOR_PROPERTIES +=\
     ro.vendor.vibrator.hal.long.frequency.shift=0 \
     ro.vendor.vibrator.hal.gpio.num=44 \
-    ro.vendor.vibrator.hal.gpio.shift=2
+    ro.vendor.vibrator.hal.gpio.shift=2 \
+    persist.vendor.vibrator.hal.chirp.enabled=0
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
 # Fingerprint
