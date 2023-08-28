@@ -11,9 +11,6 @@ on post-fs-data
     chown system system /sys/devices/platform/odm/odm:fp_fpc1020/irq
     chown system system /sys/devices/platform/odm/odm:fp_fpc1020/wakeup_enable
 
-on fs
-    exec_background - system shell -- /vendor/bin/trusty_apploader /vendor/firmware/1540.app
-
 # Permissions for hwcomposer
 on fs
     chown system system /sys/class/backlight/panel1-backlight/als_table
@@ -56,24 +53,6 @@ on property:vendor.device.modules.ready=1
     chown system input /dev/touch_offload_fts_ext
     chmod 660 /dev/touch_offload_fts
     chmod 660 /dev/touch_offload_fts_ext
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/force_active
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/fw_ver
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ms_base
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ms_diff
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ms_raw
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/self_test
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ss_base
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ss_diff
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.0/ss_raw
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/force_active
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/fw_ver
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ms_base
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ms_diff
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ms_raw
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/self_test
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ss_base
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ss_diff
-    chown system system /sys/devices/virtual/goog_touch_interface/gti.1/ss_raw
     # Start the twoshay touch service
     start twoshay
 
@@ -105,7 +84,7 @@ on early-boot
     wait_for_prop vendor.common.modules.ready 1
     start insmod_sh_felix
 
-service insmod_sh_felix /vendor/bin/init.insmod.sh /vendor/etc/init.insmod.felix.cfg
+service insmod_sh_felix /vendor/bin/insmod.sh /vendor/etc/init.insmod.felix.cfg
     class main
     user root
     group root system
@@ -160,14 +139,6 @@ on property:sys.retaildemo.enabled=1
 on post-fs-data
     setprop wifi.direct.interface p2p-dev-wlan0
     setprop wifi.aware.interface aware_nmi0
-
-# Override SF and RE uclamps to 0 on boot after being set elsewhere, for adpf cpu hints
-on property:sys.boot_completed=1
-    trigger override-sf-uclamp
-
-on override-sf-uclamp
-    write /proc/vendor_sched/rt_uclamp_min 0
-    write /proc/vendor_sched/sf_uclamp_min 0
 
 # For Japan sku, always enforce camera shutter sound
 # Since this property is read by the audio server in system service,

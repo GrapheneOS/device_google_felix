@@ -31,7 +31,10 @@ include device/google/felix/audio/felix/audio-tables.mk
 include device/google/gs201/device-shipping-common.mk
 $(call soong_config_set,fp_hal_feature,pixel_product, product_a)
 include device/google/felix/vibrator/cs40l26/device.mk
-include device/google/gs101/bluetooth/bluetooth.mk
+include device/google/gs-common/bcmbt/bluetooth.mk
+include device/google/gs-common/display/dump_second_display.mk
+include device/google/gs-common/touch/gti/gti.mk
+include device/google/gs-common/touch/stm/stm6.mk
 ifeq ($(filter factory_felix, $(TARGET_PRODUCT)),)
 include device/google/felix/uwb/uwb_calibration.mk
 endif
@@ -121,13 +124,6 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
 
 # Bluetooth HAL
-DEVICE_MANIFEST_FILE += \
-	device/google/felix/bluetooth/manifest_bluetooth.xml
-PRODUCT_SOONG_NAMESPACES += \
-        vendor/broadcom/bluetooth
-PRODUCT_PACKAGES += \
-	android.hardware.bluetooth@1.1-service.bcmbtlinux \
-	bt_vendor.conf
 PRODUCT_COPY_FILES += \
 	device/google/felix/bluetooth/bt_vendor_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth/bt_vendor_overlay.conf
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -155,6 +151,22 @@ PRODUCT_PROPERTY_OVERRIDES += \
        ro.audio.spatializer_enabled=true \
        ro.audio.spatializer_transaural_enabled_default=false \
        persist.vendor.audio.spatializer.speaker_enabled=true
+
+# Bluetooth SAR test tool
+PRODUCT_PACKAGES_DEBUG += \
+    sar_test
+
+# Bluetooth hci_inject test tool
+PRODUCT_PACKAGES_DEBUG += \
+    hci_inject
+
+# Bluetooth
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.bluetooth.a2dp_aac.vbr_supported=true
+
+# default BDADDR for EVB only
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.vendor.bluetooth.evb_bdaddr="22:22:22:33:44:55"
 
 # Keymaster HAL
 #LOCAL_KEYMASTER_PRODUCT_PACKAGE ?= android.hardware.keymaster@4.1-service
@@ -186,10 +198,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # 	ro.hardware.keystore=software \
 # 	ro.hardware.gatekeeper=software
 
-# default BDADDR for EVB only
-PRODUCT_PROPERTY_OVERRIDES += \
-	ro.vendor.bluetooth.evb_bdaddr="22:22:22:33:44:55"
-
 # PowerStats HAL
 PRODUCT_SOONG_NAMESPACES += \
     device/google/felix/powerstats/felix \
@@ -197,7 +205,7 @@ PRODUCT_SOONG_NAMESPACES += \
 
 # Increment the SVN for any official public releases
 PRODUCT_VENDOR_PROPERTIES += \
-    ro.vendor.build.svn=1
+    ro.vendor.build.svn=18
 
 # Vibrator HAL
 PRODUCT_VENDOR_PROPERTIES +=\
@@ -219,23 +227,8 @@ PRODUCT_PRODUCT_PROPERTIES += \
 
 # DCK properties based on target
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.gms.dck.eligible_wcc=3
-
-# Bluetooth SAR test tool
-PRODUCT_PACKAGES_DEBUG += \
-    sar_test
-
-# Bluetooth hci_inject test tool
-PRODUCT_PACKAGES_DEBUG += \
-    hci_inject
-
-# Bluetooth
-PRODUCT_PRODUCT_PROPERTIES += \
-    persist.bluetooth.a2dp_aac.vbr_supported=true
-
-# Bluetooth HAL
-PRODUCT_PACKAGES += \
-	bt_vendor.conf
+    ro.gms.dck.eligible_wcc=3 \
+    ro.gms.dck.se_capability=1
 
 # Graphics
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.surface_flinger.enable_frame_rate_override=true
@@ -281,8 +274,8 @@ else
         device/google/felix/location/scd_user.conf.f10:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/scd.conf
 endif
 
-# WiFi
 PRODUCT_PACKAGES += \
+        UwbOverlayF10 \
         WifiOverlay2023Mid_F10
 
 # MIPI Coex Configs
@@ -298,10 +291,6 @@ DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
 
-# Enable adpf cpu hint session for SurfaceFlinger
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    debug.sf.enable_adpf_cpu_hint=true
-
 # Increase thread priority for nodes stop
 PRODUCT_VENDOR_PROPERTIES += \
     persist.vendor.camera.increase_thread_priority_nodes_stop=true
@@ -312,7 +301,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
+    persist.vendor.camera.adjust_backend_min_freq_for_1p_front_video_1080p_30fps=1 \
     persist.vendor.camera.extended_launch_boost=1 \
+    persist.vendor.camera.multicam_streaming_boost=1 \
     persist.vendor.camera.optimized_tnr_freq=1 \
     persist.vendor.camera.raise_buf_allocation_priority=1 \
     persist.vendor.camera.start_cpu_throttling_at_moderate_thermal=1 \
@@ -338,3 +329,38 @@ ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
     PRODUCT_COPY_FILES += \
         device/google/gs201/init.hardware.wlc.rc.userdebug:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.wlc.rc
 endif
+
+# Bluetooth LE Audio
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.bluetooth.leaudio_offload.supported=true \
+    persist.bluetooth.leaudio_offload.disabled=false \
+    ro.bluetooth.leaudio_switcher.supported=true \
+    bluetooth.profile.bap.unicast.client.enabled=true \
+    bluetooth.profile.csip.set_coordinator.enabled=true \
+    bluetooth.profile.hap.client.enabled=true \
+    bluetooth.profile.mcp.server.enabled=true \
+    bluetooth.profile.ccp.server.enabled=true \
+    bluetooth.profile.vcp.controller.enabled=true \
+
+# Override BQR mask to enable LE Audio Choppy report
+ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.bluetooth.bqr.event_mask=262238
+else
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.bluetooth.bqr.event_mask=94
+endif
+
+# Bluetooth LE Audio CIS handover to SCO
+# Set the property only if the controller doesn't support CIS and SCO
+# simultaneously. More details in b/242908683.
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.bluetooth.leaudio.notify.idle.during.call=true
+
+# LE Audio Offload Capabilities Setting
+PRODUCT_COPY_FILES += \
+    device/google/felix/bluetooth/le_audio_codec_capabilities.xml:$(TARGET_COPY_OUT_VENDOR)/etc/le_audio_codec_capabilities.xml
+
+# Bluetooth EWP test tool
+PRODUCT_PACKAGES_DEBUG += \
+    ewp_tool
