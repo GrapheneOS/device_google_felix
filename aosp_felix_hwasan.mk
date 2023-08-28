@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 The Android Open-Source Project
+# Copyright 2023 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # limitations under the License.
 #
 
-PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/aosp_felix.mk \
-    $(LOCAL_DIR)/aosp_felix_hwasan.mk \
-    $(LOCAL_DIR)/factory_felix.mk
+$(call inherit-product, device/google/felix/aosp_felix.mk)
+PRODUCT_NAME := aosp_felix_hwasan
 
-
-COMMON_LUNCH_CHOICES := \
-    aosp_felix-userdebug
+# Add "hwaddress" as a global sanitizer if it's missing.
+ifeq ($(filter hwaddress,$(SANITIZE_TARGET)),)
+  SANITIZE_TARGET := $(strip $(SANITIZE_TARGET) hwaddress)
+endif
