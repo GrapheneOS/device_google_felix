@@ -42,7 +42,7 @@
     <integer name="config_defaultRefreshRate">0</integer>
 
     <!-- Whether to show Fold lock behavior setting feature in Settings App -->
-    <bool name="config_fold_lock_behavior">true</bool>
+    <bool name="config_fold_lock_behavior">false</bool>
 
     <!-- The default peak refresh rate. -->
     <integer name="config_defaultPeakRefreshRate">120</integer>
