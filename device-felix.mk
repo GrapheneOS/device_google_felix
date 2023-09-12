@@ -361,6 +361,10 @@ endif
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.bluetooth.leaudio.notify.idle.during.call=true
 
+# BT controller not able to support LE Audio dual mic SWB call
+PRODUCT_PRODUCT_PROPERTIES += \
+    bluetooth.leaudio.dual_bidirection_swb.supported=false
+
 # LE Audio Offload Capabilities Setting
 PRODUCT_COPY_FILES += \
     device/google/felix/bluetooth/le_audio_codec_capabilities.xml:$(TARGET_COPY_OUT_VENDOR)/etc/le_audio_codec_capabilities.xml
