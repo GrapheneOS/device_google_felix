@@ -372,3 +372,7 @@ PRODUCT_COPY_FILES += \
 # Bluetooth EWP test tool
 PRODUCT_PACKAGES_DEBUG += \
     ewp_tool
+
+# Enable DeviceAsWebcam support
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.usb.uvc.enabled=true
