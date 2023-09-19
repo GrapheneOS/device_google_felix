@@ -83,9 +83,9 @@
 
     <string translatable="false" name="config_secondaryBuiltInDisplayCutoutRectApproximation">
         M 503.2,0
-        h 73
+        h 74
         v 133
-        h 73
+        h -74
         Z
         @left
     </string>
