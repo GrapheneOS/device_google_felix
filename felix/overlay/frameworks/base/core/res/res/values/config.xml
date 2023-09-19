@@ -382,4 +382,8 @@
     <!-- Whether we should persist the brightness value in nits for the default display even if
          the underlying display device changes. -->
     <bool name="config_persistBrightnessNitsForDefaultDisplay">true</bool>
+
+    <!-- Boolean indicating whether allow sending null to modem to clear the previous initial attach
+         data profile -->
+    <bool name="allow_clear_initial_attach_data_profile">true</bool>
 </resources>
