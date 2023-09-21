@@ -208,13 +208,14 @@ PRODUCT_SOONG_NAMESPACES += \
 
 # Increment the SVN for any official public releases
 PRODUCT_VENDOR_PROPERTIES += \
-    ro.vendor.build.svn=24
+    ro.vendor.build.svn=27
 
 # Vibrator HAL
 PRODUCT_VENDOR_PROPERTIES +=\
     ro.vendor.vibrator.hal.long.frequency.shift=0 \
     ro.vendor.vibrator.hal.gpio.num=44 \
-    ro.vendor.vibrator.hal.gpio.shift=2
+    ro.vendor.vibrator.hal.gpio.shift=2 \
+    persist.vendor.vibrator.hal.chirp.enabled=0
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
 # Fingerprint
@@ -360,6 +361,10 @@ endif
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.bluetooth.leaudio.notify.idle.during.call=true
 
+# BT controller not able to support LE Audio dual mic SWB call
+PRODUCT_PRODUCT_PROPERTIES += \
+    bluetooth.leaudio.dual_bidirection_swb.supported=false
+
 # LE Audio Offload Capabilities Setting
 PRODUCT_COPY_FILES += \
     device/google/felix/bluetooth/le_audio_codec_capabilities.xml:$(TARGET_COPY_OUT_VENDOR)/etc/le_audio_codec_capabilities.xml
@@ -367,3 +372,7 @@ PRODUCT_COPY_FILES += \
 # Bluetooth EWP test tool
 PRODUCT_PACKAGES_DEBUG += \
     ewp_tool
+
+# Enable DeviceAsWebcam support
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.usb.uvc.enabled=true
