@@ -83,6 +83,7 @@ on early-boot
     # Wait for insmod_sh to finish all common modules
     wait_for_prop vendor.common.modules.ready 1
     start insmod_sh_felix
+    chown system system /sys/class/power_supply/dualbatt/dbatt_stats
 
 service insmod_sh_felix /vendor/bin/insmod.sh /vendor/etc/init.insmod.felix.cfg
     class main
