@@ -1,6 +1,19 @@
 {
   "Nodes": [
     {
+      "Name": "GPUMinFreq",
+      "Path": "/sys/devices/platform/28000000.mali/hint_min_freq",
+      "Values": [
+        "848000",
+        "762000",
+        "572000",
+        "471000",
+        "302000",
+        "202000"
+      ],
+      "ResetOnInit": true
+    },
+    {
       "Name": "MemFreq",
       "Path": "/sys/devices/platform/17000010.devfreq_mif/devfreq/17000010.devfreq_mif/min_freq",
       "Values": [
@@ -115,19 +128,6 @@
       "ResetOnInit": true
     },
     {
-      "Name": "GPUMinFreq",
-      "Path": "/sys/devices/platform/28000000.mali/hint_min_freq",
-      "Values": [
-        "848000",
-        "762000",
-        "572000",
-        "471000",
-        "302000",
-        "202000"
-      ],
-      "ResetOnInit": true
-    },
-    {
       "Name": "GPUDvfsPeriod",
       "Path": "/sys/devices/platform/28000000.mali/dvfs_period",
       "Values": [
@@ -156,6 +156,16 @@
       "ResetOnInit": true
     },
     {
+      "Name": "CPUDVFSHeadroom",
+      "Path": "/proc/vendor_sched/dvfs_headroom",
+      "Values": [
+        "1280",
+        "1100 1078 1024"
+      ],
+      "DefaultIndex": 0,
+      "ResetOnInit": true
+    },
+    {
       "Name": "MIFTargetLoad",
       "Path": "/sys/class/devfreq/17000010.devfreq_mif/interactive/target_load",
       "Values": [
@@ -169,7 +179,7 @@
       "Name": "CAMUClampBoost",
       "Path": "/proc/vendor_sched/cam_uclamp_min",
       "Values": [
-        "612",
+        "764",
         "0"
       ],
       "ResetOnInit": true
@@ -178,7 +188,7 @@
       "Name": "TAUClampBoost",
       "Path": "/proc/vendor_sched/ta_uclamp_min",
       "Values": [
-        "612",
+        "764",
         "1"
       ],
       "ResetOnInit": true
@@ -196,8 +206,8 @@
       "Name": "MLUclampBoost",
       "Path": "/proc/vendor_sched/nnapi_uclamp_min",
       "Values": [
-          "180",
-          "650"
+          "225",
+          "813"
       ],
       "DefaultIndex": 0,
       "ResetOnInit": true
@@ -345,6 +355,7 @@
       "Path": "/sys/devices/platform/17000030.devfreq_intcam/devfreq/17000030.devfreq_intcam/min_freq",
       "Values": [
         "664000",
+        "233000",
         "67000"
       ],
       "ResetOnInit": true
@@ -364,6 +375,7 @@
       "Path": "/sys/devices/platform/17000060.devfreq_tnr/devfreq/17000060.devfreq_tnr/min_freq",
       "Values": [
         "664000",
+        "233000",
         "67000"
       ],
       "ResetOnInit": true
@@ -560,6 +572,16 @@
         "0,1,2,3,4,5,6,7"
       ],
       "Type": "Property"
+    },
+    {
+      "Name": "Dex2oatGroup",
+      "Path": "/proc/vendor_sched/dex2oat_ug",
+      "Values": [
+        "1",
+        "0"
+      ],
+      "DefaultIndex": 0,
+      "ResetOnInit": true
     }
   ],
   "Actions": [
@@ -632,7 +654,7 @@
       "PowerHint": "LAUNCH",
       "Node": "TAUClampBoost",
       "Duration": 5000,
-      "Value": "612"
+      "Value": "764"
     },
     {
       "PowerHint": "LAUNCH",
@@ -700,6 +722,18 @@
       "Value": "9999999"
     },
     {
+      "PowerHint": "CPU_LOAD_RESET",
+      "Node": "GPUMinFreq",
+      "Duration": 50,
+      "Value": "302000"
+    },
+    {
+      "PowerHint": "CPU_LOAD_RESET",
+      "Node": "MemFreq",
+      "Duration": 33,
+      "Value": "1014000"
+    },
+    {
       "PowerHint": "CAMERA_LAUNCH",
       "Node": "MemFreq",
       "Duration": 1000,
@@ -745,7 +779,7 @@
       "PowerHint": "CAMERA_LAUNCH",
       "Node": "CAMUClampBoost",
       "Duration": 1000,
-      "Value": "612"
+      "Value": "764"
     },
     {
       "PowerHint": "CAMERA_LAUNCH",
@@ -1145,6 +1179,12 @@
     },
     {
       "PowerHint": "CAMERA_STREAMING_HIGH",
+      "Node": "CPUDVFSHeadroom",
+      "Duration": 0,
+      "Value": "1100 1078 1024"
+    },
+    {
+      "PowerHint": "CAMERA_STREAMING_HIGH",
       "Node": "CPUMidClusterMaxFreq",
       "Duration": 0,
       "Value": "1491000"
@@ -1318,6 +1358,24 @@
       "Value": "0"
     },
     {
+      "PowerHint": "CAMERA_MULTI_CAM_STREAMING",
+      "Node": "CPUBigClusterMaxFreq",
+      "Duration": 0,
+      "Value": "9999999"
+    },
+    {
+      "PowerHint": "CAMERA_MULTI_CAM_STREAMING",
+      "Node": "CPUMidClusterMaxFreq",
+      "Duration": 0,
+      "Value": "9999999"
+    },
+    {
+      "PowerHint": "CAMERA_MULTI_CAM_STREAMING",
+      "Node": "CPULittleClusterMaxFreq",
+      "Duration": 0,
+      "Value": "9999999"
+    },
+    {
       "PowerHint": "CAMERA_VIDEO_RECORDING",
       "Type": "MaskHint",
       "Value": "CDCPUSET_RESTRICTED"
@@ -1348,6 +1406,18 @@
       "Node": "GPUMinFreq",
       "Duration": 0,
       "Value": "302000"
+    },
+    {
+      "PowerHint": "CAMERA_ADJUST_BACKEND_MIN_FREQ",
+      "Node": "INTCAMFreq",
+      "Duration": 0,
+      "Value": "233000"
+    },
+    {
+      "PowerHint": "CAMERA_ADJUST_BACKEND_MIN_FREQ",
+      "Node": "TNRFreq",
+      "Duration": 0,
+      "Value": "233000"
     },
     {
       "PowerHint": "CAMERA_TNR_LOW",
@@ -1488,6 +1558,72 @@
       "Value": "1"
     },
     {
+      "PowerHint": "LOW_POWER",
+      "Node": "BigControlTempSet",
+      "Duration": 0,
+      "Value": "80000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "MidControlTempSet",
+      "Duration": 0,
+      "Value": "80000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "LittleControlTempSet",
+      "Duration": 0,
+      "Value": "80000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "G3dControlTempSet",
+      "Duration": 0,
+      "Value": "80000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "TpuControlTempSet",
+      "Duration": 0,
+      "Value": "80000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "AurControlTempSet",
+      "Duration": 0,
+      "Value": "80000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "BigSwitchOnTempSet",
+      "Duration": 0,
+      "Value": "60000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "MidSwitchOnTempSet",
+      "Duration": 0,
+      "Value": "60000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "LittleSwitchOnTempSet",
+      "Duration": 0,
+      "Value": "60000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "G3dSwitchOnTempSet",
+      "Duration": 0,
+      "Value": "60000"
+    },
+    {
+      "PowerHint": "LOW_POWER",
+      "Node": "TpuSwitchOnTempSet",
+      "Duration": 0,
+      "Value": "60000"
+    },
+    {
       "PowerHint": "REFRESH_120FPS",
       "Node": "TAUClampBoost",
       "Duration": 0,
@@ -1553,12 +1689,6 @@
       "Value": "572000"
     },
     {
-      "PowerHint": "ADPF_FIRST_FRAME",
-      "Node": "GPUMinFreq",
-      "Duration": 50,
-      "Value": "302000"
-    },
-    {
       "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_LIGHT",
       "Node": "PMU_POLL",
       "Duration": 0,
@@ -1649,6 +1779,12 @@
       "Value": "0,1,2,3"
     },
     {
+      "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_LIGHT",
+      "Node": "Dex2oatGroup",
+      "Duration": 0,
+      "Value": "0"
+    },
+    {
       "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_MODERATE",
       "Node": "PMU_POLL",
       "Duration": 0,
@@ -1737,6 +1873,12 @@
       "Node": "Dex2oatCPUSet",
       "Duration": 0,
       "Value": "0,1,2,3"
+    },
+    {
+      "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_MODERATE",
+      "Node": "Dex2oatGroup",
+      "Duration": 0,
+      "Value": "0"
     },
     {
       "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_SEVERE",
@@ -1829,6 +1971,12 @@
       "Value": "0,1,2,3"
     },
     {
+      "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_SEVERE",
+      "Node": "Dex2oatGroup",
+      "Duration": 0,
+      "Value": "0"
+    },
+    {
       "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_CRITICAL",
       "Node": "PMU_POLL",
       "Duration": 0,
@@ -1917,6 +2065,12 @@
       "Node": "Dex2oatCPUSet",
       "Duration": 0,
       "Value": "0,1,2,3"
+    },
+    {
+      "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_CRITICAL",
+      "Node": "Dex2oatGroup",
+      "Duration": 0,
+      "Value": "0"
     },
     {
       "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_EMERGENCY",
@@ -2025,6 +2179,12 @@
       "Node": "Dex2oatCPUSet",
       "Duration": 0,
       "Value": "0,1,2,3"
+    },
+    {
+      "PowerHint": "THERMAL_VIRTUAL-SKIN-HINT_EMERGENCY",
+      "Node": "Dex2oatGroup",
+      "Duration": 0,
+      "Value": "0"
     },
     {
       "PowerHint": "FACE_UNLOCK_BOOST",
@@ -2096,7 +2256,7 @@
       "PowerHint": "ML_ACC",
       "Node": "MLUclampBoost",
       "Duration": 2000,
-      "Value": "650"
+      "Value": "813"
     },
     {
       "PowerHint": "ML_ACC",
@@ -2118,8 +2278,8 @@
       "PID_Do": 500.0,
       "PID_Du": 0.0,
       "UclampMin_On": true,
-      "UclampMin_Init": 185,
-      "UclampMin_High": 384,
+      "UclampMin_Init": 232,
+      "UclampMin_High": 480,
       "UclampMin_Low": 2,
       "SamplingWindow_P": 1,
       "SamplingWindow_I": 0,
@@ -2142,8 +2302,8 @@
       "PID_Do": 500.0,
       "PID_Du": 0.0,
       "UclampMin_On": true,
-      "UclampMin_Init": 129,
-      "UclampMin_High": 384,
+      "UclampMin_Init": 162,
+      "UclampMin_High": 480,
       "UclampMin_Low": 2,
       "SamplingWindow_P": 1,
       "SamplingWindow_I": 0,
@@ -2166,8 +2326,8 @@
       "PID_Do": 500.0,
       "PID_Du": 0.0,
       "UclampMin_On": true,
-      "UclampMin_Init": 129,
-      "UclampMin_High": 384,
+      "UclampMin_Init": 162,
+      "UclampMin_High": 480,
       "UclampMin_Low": 2,
       "SamplingWindow_P": 1,
       "SamplingWindow_I": 0,
@@ -2193,9 +2353,9 @@
       "SamplingWindow_I": 1,
       "SamplingWindow_D": 1,
       "UclampMin_On": true,
-      "UclampMin_Init": 200,
-      "UclampMin_High": 157,
-      "UclampMin_Low": 157,
+      "UclampMin_Init": 250,
+      "UclampMin_High": 197,
+      "UclampMin_Low": 197,
       "ReportingRateLimitNs": 1,
       "EarlyBoost_On": false,
       "EarlyBoost_TimeFactor": 0.0,
@@ -2217,9 +2377,9 @@
       "SamplingWindow_I": 1,
       "SamplingWindow_D": 1,
       "UclampMin_On": true,
-      "UclampMin_Init": 200,
-      "UclampMin_High": 42,
-      "UclampMin_Low": 42,
+      "UclampMin_Init": 250,
+      "UclampMin_High": 53,
+      "UclampMin_Low": 53,
       "ReportingRateLimitNs": 1,
       "EarlyBoost_On": false,
       "EarlyBoost_TimeFactor": 0.0,
@@ -2241,7 +2401,7 @@
       "SamplingWindow_I": 1,
       "SamplingWindow_D": 1,
       "UclampMin_On": true,
-      "UclampMin_Init": 200,
+      "UclampMin_Init": 250,
       "UclampMin_High": 0,
       "UclampMin_Low": 0,
       "ReportingRateLimitNs": 1,

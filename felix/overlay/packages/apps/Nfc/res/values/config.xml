@@ -19,4 +19,17 @@
     <item>G9FPL</item>
     <item>G0B96</item>
   </string-array>
+  <bool name="tag_intent_app_pref_supported">true</bool>
+  <!-- NFC Antenna Location API -->
+  <integer name="device_width">160</integer>
+  <integer name="device_height">140</integer>
+  <bool name="device_foldable">true</bool>
+  <integer-array name="antenna_x">
+    <item>90</item>
+    <item>30</item>
+  </integer-array>
+  <integer-array name="antenna_y">
+    <item>103</item>
+    <item>103</item>
+  </integer-array>
 </resources>
