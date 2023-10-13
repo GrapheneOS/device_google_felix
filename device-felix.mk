@@ -28,6 +28,8 @@ $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/felix/
 $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/device-vendor.mk)
 $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/WallpapersFelix.mk)
 
+$(call inherit-product, device/google/felix/uwb/uwb_calibration_country.mk)
+
 DEVICE_PACKAGE_OVERLAYS += device/google/felix/felix/overlay
 
 include device/google/felix/audio/felix/audio-tables.mk
