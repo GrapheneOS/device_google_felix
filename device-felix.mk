@@ -371,6 +371,10 @@ PRODUCT_PRODUCT_PROPERTIES += \
 PRODUCT_COPY_FILES += \
     device/google/felix/bluetooth/le_audio_codec_capabilities.xml:$(TARGET_COPY_OUT_VENDOR)/etc/le_audio_codec_capabilities.xml
 
+# LE Audio Unicast Allowlist
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.bluetooth.leaudio.allow_list=SM-R510
+
 # Bluetooth EWP test tool
 PRODUCT_PACKAGES_DEBUG += \
     ewp_tool
