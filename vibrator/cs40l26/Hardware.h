@@ -373,7 +373,7 @@ class HwCal : public Vibrator::HwCal, private HwCalBase {
     }
     bool isRedcCompEnabled() override {
         bool value;
-        getProperty("redc.comp.enabled", &value, true);
+        getProperty("redc.comp.enabled", &value, false);
         return value;
     }
     void debug(int fd) override { HwCalBase::debug(fd); }
