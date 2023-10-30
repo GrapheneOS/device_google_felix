@@ -21,4 +21,4 @@ PRODUCT_MAKEFILES := \
 
 
 COMMON_LUNCH_CHOICES := \
-    aosp_felix-userdebug
+    aosp_felix-trunk_staging-userdebug
