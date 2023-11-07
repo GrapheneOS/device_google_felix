@@ -303,7 +303,7 @@ PRODUCT_VENDOR_PROPERTIES += \
 
 ##Audio Vendor property
 PRODUCT_PROPERTY_OVERRIDES += \
-	persist.vendor.audio.cca.enabled=true
+	persist.vendor.audio.cca.enabled=false
 
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
