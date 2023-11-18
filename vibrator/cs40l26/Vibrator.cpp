@@ -55,11 +55,6 @@ static constexpr uint8_t VOLTAGE_SCALE_MAX = 100;
 static constexpr int8_t MAX_COLD_START_LATENCY_MS = 6;  // I2C Transaction + DSP Return-From-Standby
 static constexpr int8_t MAX_PAUSE_TIMING_ERROR_MS = 1;  // ALERT Irq Handling
 static constexpr uint32_t MAX_TIME_MS = UINT16_MAX;
-static constexpr float SETTING_TIME_OVERHEAD = 26;  // This time was combined by
-                                                    // HAL set the effect to
-                                                    // driver and the kernel
-                                                    // executes the effect before
-                                                    // chip play the effect
 
 static constexpr auto ASYNC_COMPLETION_TIMEOUT = std::chrono::milliseconds(100);
 static constexpr auto POLLING_TIMEOUT = 20;
@@ -358,7 +353,7 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
     mFfEffects.resize(WAVEFORM_MAX_INDEX);
     mEffectDurations.resize(WAVEFORM_MAX_INDEX);
     mEffectDurations = {
-            1000, 100, 32, 1000, 300, 130, 150, 500, 100, 10, 12, 1000, 1000, 1000,
+            1000, 100, 12, 1000, 300, 130, 150, 500, 100, 5, 12, 1000, 1000, 1000,
     }; /* 11+3 waveforms. The duration must < UINT16_MAX */
 
     uint8_t effectIndex;
@@ -701,8 +696,8 @@ ndk::ScopedAStatus Vibrator::getPrimitiveDuration(CompositePrimitive primitive,
         if (!status.isOk()) {
             return status;
         }
-        // Please check the overhead time detail in b/261841035
-        *durationMs = mEffectDurations[effectIndex] + SETTING_TIME_OVERHEAD;
+
+        *durationMs = mEffectDurations[effectIndex];
     } else {
         *durationMs = 0;
     }
