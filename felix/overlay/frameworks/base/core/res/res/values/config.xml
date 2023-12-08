@@ -41,6 +41,9 @@
          this value to 0 so it has no effect. -->
     <integer name="config_defaultRefreshRate">0</integer>
 
+    <!-- Whether to show Fold lock behavior setting feature in Settings App -->
+    <bool name="config_fold_lock_behavior">false</bool>
+
     <!-- The default peak refresh rate. -->
     <integer name="config_defaultPeakRefreshRate">120</integer>
 
@@ -80,9 +83,9 @@
 
     <string translatable="false" name="config_secondaryBuiltInDisplayCutoutRectApproximation">
         M 503.2,0
-        h 73
+        h 74
         v 133
-        h 73
+        h -74
         Z
         @left
     </string>
@@ -379,4 +382,8 @@
     <!-- Whether we should persist the brightness value in nits for the default display even if
          the underlying display device changes. -->
     <bool name="config_persistBrightnessNitsForDefaultDisplay">true</bool>
+
+    <!-- Boolean indicating whether allow sending null to modem to clear the previous initial attach
+         data profile -->
+    <bool name="allow_clear_initial_attach_data_profile">true</bool>
 </resources>

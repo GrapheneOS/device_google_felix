@@ -66,23 +66,26 @@
             "Multiplier":1
         },
         {
-            "Name":"IS_OPEN",
+            "Name":"OPEN_WEIGHT",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
             "Formula":"COUNT_THRESHOLD",
+            "StepRatio":0.2,
             "Combination":["inner-disp"],
             "Coefficient":[1.0],
-            "Multiplier":1
+            "Multiplier":1,
+            "PassiveDelay":7000
         },
         {
-            "Name":"IS_CLOSE",
+            "Name":"CLOSE_WEIGHT",
             "Type":"UNKNOWN",
             "Hidden":true,
             "VirtualSensor":true,
-            "Formula":"COUNT_THRESHOLD",
-            "Combination":["inner-disp"],
-            "Coefficient":[-1.0],
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["1", "OPEN_WEIGHT"],
+            "CombinationType":["CONSTANT", "SENSOR"],
+            "Coefficient":[1.0, -1.0],
             "Multiplier":1
         },
         {
@@ -151,16 +154,6 @@
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-SKIN-CLOSE",
-            "Type":"UNKNOWN",
-            "Hidden":true,
-            "VirtualSensor":true,
-            "Formula":"WEIGHTED_AVG",
-            "Combination":["CLOSE-SUB-MAX", "IS_OPEN"],
-            "Coefficient":[1.0, -1000000],
-            "Multiplier":0.001
-        },
-        {
             "Name":"OPEN-SUB1",
             "Type":"UNKNOWN",
             "Hidden":true,
@@ -226,24 +219,15 @@
             "Multiplier":0.001
         },
         {
-            "Name":"VIRTUAL-SKIN-OPEN",
-            "Type":"UNKNOWN",
-            "Hidden":true,
-            "VirtualSensor":true,
-            "Formula":"WEIGHTED_AVG",
-            "Combination":["OPEN-SUB-MAX", "IS_CLOSE"],
-            "Coefficient":[1.0, -1000000],
-            "Multiplier":0.001
-        },
-        {
             "Name":"VIRTUAL-SKIN",
             "Type":"SKIN",
             "Version":"6.2",
             "VirtualSensor":true,
             "TriggerSensor":"skin_therm",
-            "Formula":"MAXIMUM",
-            "Combination":["VIRTUAL-SKIN-CLOSE", "VIRTUAL-SKIN-OPEN"],
-            "Coefficient":[1.0, 1.0],
+            "Formula":"WEIGHTED_AVG",
+            "Combination":["OPEN-SUB-MAX", "CLOSE-SUB-MAX"],
+            "Coefficient":["OPEN_WEIGHT", "CLOSE_WEIGHT"],
+            "CoefficientType":["SENSOR", "SENSOR"],
             "HotThreshold":["NAN", 39.0, 43.0, 45.0, 46.5, 53.0, 57.0],
             "HotHysteresis":[0.0, 1.9, 1.9, 1.9, 1.4, 1.9, 1.9],
             "Multiplier":0.001,
