@@ -266,7 +266,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
 ifneq (,$(filter AP1%,$(RELEASE_PLATFORM_VERSION)))
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts/trusty/24Q1
-else ifneq (,$(filter AP2%,$(RELEASE_PLATFORM_VERSION)))
+else ifneq (,$(filter AP2% AP3%,$(RELEASE_PLATFORM_VERSION)))
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts/trusty/24Q2
 else
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts/trusty/trunk
@@ -390,7 +390,7 @@ PRODUCT_COPY_FILES += \
 
 # LE Audio Unicast Allowlist
 PRODUCT_PRODUCT_PROPERTIES += \
-    persist.bluetooth.leaudio.allow_list=SM-R510,WF-1000XM5
+    persist.bluetooth.leaudio.allow_list=SM-R510
 
 # Bluetooth EWP test tool
 PRODUCT_PACKAGES_DEBUG += \
