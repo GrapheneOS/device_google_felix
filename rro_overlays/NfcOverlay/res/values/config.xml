@@ -32,4 +32,5 @@
     <item>103</item>
     <item>103</item>
   </integer-array>
+  <bool name="nfc_observe_mode_supported">true</bool>
 </resources>
