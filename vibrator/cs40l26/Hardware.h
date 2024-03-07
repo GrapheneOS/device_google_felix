@@ -184,7 +184,7 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
         *haptic_pcm = NULL;
         return false;
     }
-    bool uploadOwtEffect(int fd, uint8_t *owtData, uint32_t numBytes, struct ff_effect *effect,
+    bool uploadOwtEffect(int fd, const uint8_t *owtData, const uint32_t numBytes, struct ff_effect *effect,
                          uint32_t *outEffectIndex, int *status) override {
         (*effect).u.periodic.custom_len = numBytes / sizeof(uint16_t);
         delete[] ((*effect).u.periodic.custom_data);
@@ -223,6 +223,10 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
 
         if (effectIndex < WAVEFORM_MAX_PHYSICAL_INDEX) {
             ALOGE("Invalid waveform index for OWT erase: %d", effectIndex);
+            return false;
+        }
+        if (effect == nullptr || (*effect).empty()) {
+            ALOGE("Invalid argument effect");
             return false;
         }
         // Turn off the waiting time for SVC init phase to complete since chip

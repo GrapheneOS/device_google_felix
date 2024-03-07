@@ -89,7 +89,7 @@ class Vibrator : public BnVibrator {
         virtual bool setHapticPcmAmp(struct pcm **haptic_pcm, bool enable, int card,
                                      int device) = 0;
         // Set OWT waveform for compose or compose PWLE request
-        virtual bool uploadOwtEffect(int fd, uint8_t *owtData, uint32_t numBytes,
+        virtual bool uploadOwtEffect(int fd, const uint8_t *owtData, const uint32_t numBytes,
                                      struct ff_effect *effect, uint32_t *outEffectIndex,
                                      int *status) = 0;
         // Erase OWT waveform
@@ -178,7 +178,7 @@ class Vibrator : public BnVibrator {
     static constexpr uint32_t MIN_ON_OFF_INTERVAL_US = 8500;  // SVC initialization time
 
   private:
-    ndk::ScopedAStatus on(uint32_t timeoutMs, uint32_t effectIndex, struct dspmem_chunk *ch,
+    ndk::ScopedAStatus on(uint32_t timeoutMs, uint32_t effectIndex, const class DspMemChunk *ch,
                           const std::shared_ptr<IVibratorCallback> &callback);
     // set 'amplitude' based on an arbitrary scale determined by 'maximum'
     ndk::ScopedAStatus setEffectAmplitude(float amplitude, float maximum);
@@ -189,13 +189,13 @@ class Vibrator : public BnVibrator {
                                         uint32_t *outVolLevel);
     // 'compound' effects are those composed by stringing multiple 'simple' effects
     ndk::ScopedAStatus getCompoundDetails(Effect effect, EffectStrength strength,
-                                          uint32_t *outTimeMs, struct dspmem_chunk *outCh);
+                                          uint32_t *outTimeMs, class DspMemChunk *outCh);
     ndk::ScopedAStatus getPrimitiveDetails(CompositePrimitive primitive, uint32_t *outEffectIndex);
     ndk::ScopedAStatus performEffect(Effect effect, EffectStrength strength,
                                      const std::shared_ptr<IVibratorCallback> &callback,
                                      int32_t *outTimeMs);
     ndk::ScopedAStatus performEffect(uint32_t effectIndex, uint32_t volLevel,
-                                     struct dspmem_chunk *ch,
+                                     const class DspMemChunk *ch,
                                      const std::shared_ptr<IVibratorCallback> &callback);
     ndk::ScopedAStatus setPwle(const std::string &pwleQueue);
     bool isUnderExternalControl();
