@@ -44,7 +44,6 @@ namespace aidl {
 namespace android {
 namespace hardware {
 namespace vibrator {
-static constexpr uint8_t FF_CUSTOM_DATA_LEN = 2;
 static constexpr uint16_t FF_CUSTOM_DATA_LEN_MAX_COMP = 2044;  // (COMPOSE_SIZE_MAX + 1) * 8 + 4
 static constexpr uint16_t FF_CUSTOM_DATA_LEN_MAX_PWLE = 2302;
 
@@ -488,19 +487,23 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
     mEffectDurations = {
             1000, 100, 12, 1000, 300, 130, 150, 500, 100, 5, 12, 1000, 1000, 1000,
     }; /* 11+3 waveforms. The duration must < UINT16_MAX */
+    mEffectCustomData.reserve(WAVEFORM_MAX_INDEX);
 
     uint8_t effectIndex;
+    uint16_t numBytes = 0;
     for (effectIndex = 0; effectIndex < WAVEFORM_MAX_INDEX; effectIndex++) {
         if (effectIndex < WAVEFORM_MAX_PHYSICAL_INDEX) {
             /* Initialize physical waveforms. */
+            mEffectCustomData.push_back({RAM_WVFRM_BANK, effectIndex});
             mFfEffects[effectIndex] = {
                     .type = FF_PERIODIC,
                     .id = -1,
                     // Length == 0 to allow firmware control of the duration
                     .replay.length = 0,
                     .u.periodic.waveform = FF_CUSTOM,
-                    .u.periodic.custom_data = new int16_t[2]{RAM_WVFRM_BANK, effectIndex},
-                    .u.periodic.custom_len = FF_CUSTOM_DATA_LEN,
+                    .u.periodic.custom_data = mEffectCustomData[effectIndex].data(),
+                    .u.periodic.custom_len =
+                            static_cast<uint32_t>(mEffectCustomData[effectIndex].size()),
             };
             // Bypass the waveform update due to different input name
             if ((strstr(inputEventName, "cs40l26") != nullptr) ||
@@ -518,12 +521,16 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
             }
         } else {
             /* Initiate placeholders for OWT effects. */
+            numBytes = effectIndex == WAVEFORM_COMPOSE ? FF_CUSTOM_DATA_LEN_MAX_COMP
+                                                       : FF_CUSTOM_DATA_LEN_MAX_PWLE;
+            std::vector<int16_t> tempVec(numBytes, 0);
+            mEffectCustomData.push_back(std::move(tempVec));
             mFfEffects[effectIndex] = {
                     .type = FF_PERIODIC,
                     .id = -1,
                     .replay.length = 0,
                     .u.periodic.waveform = FF_CUSTOM,
-                    .u.periodic.custom_data = nullptr,
+                    .u.periodic.custom_data = mEffectCustomData[effectIndex].data(),
                     .u.periodic.custom_len = 0,
             };
         }
@@ -532,18 +539,21 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
     // ====================HAL internal effect table== Flip ==================================
     if (mIsDual) {
         mFfEffectsDual.resize(WAVEFORM_MAX_INDEX);
+        mEffectCustomDataDual.reserve(WAVEFORM_MAX_INDEX);
 
         for (effectIndex = 0; effectIndex < WAVEFORM_MAX_INDEX; effectIndex++) {
             if (effectIndex < WAVEFORM_MAX_PHYSICAL_INDEX) {
                 /* Initialize physical waveforms. */
+                mEffectCustomDataDual.push_back({RAM_WVFRM_BANK, effectIndex});
                 mFfEffectsDual[effectIndex] = {
                         .type = FF_PERIODIC,
                         .id = -1,
                         // Length == 0 to allow firmware control of the duration
                         .replay.length = 0,
                         .u.periodic.waveform = FF_CUSTOM,
-                        .u.periodic.custom_data = new int16_t[2]{RAM_WVFRM_BANK, effectIndex},
-                        .u.periodic.custom_len = FF_CUSTOM_DATA_LEN,
+                        .u.periodic.custom_data = mEffectCustomDataDual[effectIndex].data(),
+                        .u.periodic.custom_len =
+                                static_cast<uint32_t>(mEffectCustomDataDual[effectIndex].size()),
                 };
                 // Bypass the waveform update due to different input name
                 if ((strstr(inputEventName, "cs40l26") != nullptr) ||
@@ -563,12 +573,16 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
                 }
             } else {
                 /* Initiate placeholders for OWT effects. */
+                numBytes = effectIndex == WAVEFORM_COMPOSE ? FF_CUSTOM_DATA_LEN_MAX_COMP
+                                                       : FF_CUSTOM_DATA_LEN_MAX_PWLE;
+                std::vector<int16_t> tempVec(numBytes, 0);
+                mEffectCustomDataDual.push_back(std::move(tempVec));
                 mFfEffectsDual[effectIndex] = {
                         .type = FF_PERIODIC,
                         .id = -1,
                         .replay.length = 0,
                         .u.periodic.waveform = FF_CUSTOM,
-                        .u.periodic.custom_data = nullptr,
+                        .u.periodic.custom_data = mEffectCustomDataDual[effectIndex].data(),
                         .u.periodic.custom_len = 0,
                 };
             }

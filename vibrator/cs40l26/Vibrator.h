@@ -218,6 +218,8 @@ class Vibrator : public BnVibrator {
     std::vector<ff_effect> mFfEffects;
     std::vector<ff_effect> mFfEffectsDual;
     std::vector<uint32_t> mEffectDurations;
+    std::vector<std::vector<int16_t>> mEffectCustomData;
+    std::vector<std::vector<int16_t>> mEffectCustomDataDual;
     std::future<void> mAsyncHandle;
     ::android::base::unique_fd mInputFd;
     ::android::base::unique_fd mInputFdDual;
