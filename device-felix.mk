@@ -19,18 +19,10 @@ $(call inherit-product-if-exists, vendor/google/products/sources_pixel.mk)
 
 TARGET_RECOVERY_DEFAULT_ROTATION := ROTATION_RIGHT
 
-ifdef RELEASE_GOOGLE_FELIX_KERNEL_VERSION
-TARGET_LINUX_KERNEL_VERSION := $(RELEASE_GOOGLE_FELIX_KERNEL_VERSION)
-endif
-
-ifdef RELEASE_GOOGLE_FELIX_KERNEL_DIR
+TARGET_LINUX_KERNEL_VERSION := $(RELEASE_KERNEL_FELIX_VERSION)
 # Keeps flexibility for kasan and ufs builds
-TARGET_KERNEL_DIR ?= $(RELEASE_GOOGLE_FELIX_KERNEL_DIR)
-TARGET_BOARD_KERNEL_HEADERS ?= $(RELEASE_GOOGLE_FELIX_KERNEL_DIR)/kernel-headers
-else
-TARGET_KERNEL_DIR ?= device/google/felix-kernel
-TARGET_BOARD_KERNEL_HEADERS ?= device/google/felix-kernel/kernel-headers
-endif
+TARGET_KERNEL_DIR ?= $(RELEASE_KERNEL_FELIX_DIR)
+TARGET_BOARD_KERNEL_HEADERS ?= $(RELEASE_KERNEL_FELIX_DIR)/kernel-headers
 
 $(call inherit-product-if-exists, vendor/google_devices/felix/prebuilts/device-vendor-felix.mk)
 $(call inherit-product-if-exists, vendor/google_devices/gs201/prebuilts/device-vendor.mk)
