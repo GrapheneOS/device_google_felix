@@ -454,3 +454,4 @@ PRODUCT_PACKAGES += \
 # Felix: 0x410C
 PRODUCT_PRODUCT_PROPERTIES += \
     bluetooth.device_id.product_id=16652
+PRODUCT_VENDOR_PROPERTIES := $(filter-out ro.vendor.build.svn=% , $(PRODUCT_VENDOR_PROPERTIES))
