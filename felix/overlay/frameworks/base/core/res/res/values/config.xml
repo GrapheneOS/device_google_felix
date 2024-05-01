@@ -221,6 +221,9 @@
     <!-- Indicates whether to enable hinge angle sensor when using unfold animation -->
     <bool name="config_unfoldTransitionHingeAngle">true</bool>
 
+    <!-- Indicates whether to enable haptics during unfold animation -->
+    <bool name="config_unfoldTransitionHapticsEnabled">true</bool>
+
     <!-- Timeout for receiving the keyguard drawn event from System UI.  -->
     <integer name="config_keyguardDrawnTimeout">1700</integer>
 
