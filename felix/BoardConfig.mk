@@ -21,9 +21,9 @@ USES_DEVICE_GOOGLE_FELIX := true
 BOARD_KERNEL_CMDLINE += swiotlb=noforce
 
 RELEASE_GOOGLE_PRODUCT_RADIO_DIR := $(RELEASE_GOOGLE_FELIX_RADIO_DIR)
-RELEASE_GOOGLE_BOOTLOADER_FELIX_DIR ?= trunk # Keep this for pdk TODO: b/327119000
+RELEASE_GOOGLE_BOOTLOADER_FELIX_DIR ?= pdk# Keep this for pdk TODO: b/327119000
 RELEASE_GOOGLE_PRODUCT_BOOTLOADER_DIR := bootloader/$(RELEASE_GOOGLE_BOOTLOADER_FELIX_DIR)
-$(call soong_config_set,bootloader,prebuilt_dir,$(RELEASE_GOOGLE_BOOTLOADER_FELIX_DIR))
+$(call soong_config_set,felix_bootloader,prebuilt_dir,$(RELEASE_GOOGLE_BOOTLOADER_FELIX_DIR))
 
 # Enable load module in parallel
 BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
