@@ -417,3 +417,6 @@ PRODUCT_PACKAGES += \
     NoCutoutOverlay \
     AvoidAppsInCutoutOverlay
 
+# Bluetooth device id
+PRODUCT_PRODUCT_PROPERTIES += \
+    bluetooth.device_id.product_id=20494
