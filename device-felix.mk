@@ -217,8 +217,15 @@ PRODUCT_SOONG_NAMESPACES += \
     device/google/felix
 
 # Increment the SVN for any official public releases
+ifdef RELEASE_SVN_FELIX
+TARGET_SVN ?= $(RELEASE_SVN_FELIX)
+else
+# Set this for older releases that don't use build flag
+TARGET_SVN ?= 53
+endif
+
 PRODUCT_VENDOR_PROPERTIES += \
-    ro.vendor.build.svn=53
+    ro.vendor.build.svn=$(TARGET_SVN)
 
 # Vibrator HAL
 $(call soong_config_set,haptics,kernel_ver,v$(subst .,_,$(TARGET_LINUX_KERNEL_VERSION)))
