@@ -221,7 +221,7 @@ ifdef RELEASE_SVN_FELIX
 TARGET_SVN ?= $(RELEASE_SVN_FELIX)
 else
 # Set this for older releases that don't use build flag
-TARGET_SVN ?= 53
+TARGET_SVN ?= 54
 endif
 
 PRODUCT_VENDOR_PROPERTIES += \
