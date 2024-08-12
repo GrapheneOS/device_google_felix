@@ -39,6 +39,10 @@ class MockApi : public ::aidl::android::hardware::vibrator::Vibrator::HwApi {
     MOCK_METHOD1(setRedc, bool(std::string value));
     MOCK_METHOD1(setQ, bool(std::string value));
     MOCK_METHOD1(getEffectCount, bool(uint32_t *value));
+    MOCK_METHOD0(hasEffectBrakingTimeBank, bool());
+    MOCK_METHOD1(setEffectBrakingTimeBank, bool(uint32_t value));
+    MOCK_METHOD1(setEffectBrakingTimeIndex, bool(uint32_t value));
+    MOCK_METHOD1(getEffectBrakingTimeMs, bool(uint32_t *value));
     MOCK_METHOD2(pollVibeState, bool(uint32_t value, int32_t timeoutMs));
     MOCK_METHOD0(hasOwtFreeSpace, bool());
     MOCK_METHOD1(getOwtFreeSpace, bool(uint32_t *value));

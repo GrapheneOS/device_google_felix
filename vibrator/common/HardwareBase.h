@@ -24,6 +24,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 #include "utils.h"
 
@@ -67,7 +68,8 @@ class HwApiBase {
     void saveName(const std::string &name, const std::ios *stream);
     template <typename T>
     void open(const std::string &name, T *stream);
-    bool has(const std::ios &stream);
+    template <typename T>
+    bool has(const T &stream);
     template <typename T>
     bool get(T *value, std::istream *stream);
     template <typename T>
@@ -91,6 +93,16 @@ template <typename T>
 void HwApiBase::open(const std::string &name, T *stream) {
     saveName(name, stream);
     utils::openNoCreate(mPathPrefix + name, stream);
+}
+
+template <typename T>
+bool HwApiBase::has(const T &stream) {
+    if constexpr (std::is_same<T, std::fstream>::value || std::is_same<T, std::ofstream>::value ||
+                  std::is_same<T, std::ifstream>::value)
+        return stream.is_open() && !stream.fail();
+
+    ALOGE("File stream is not of the correct type");
+    return false;
 }
 
 template <typename T>

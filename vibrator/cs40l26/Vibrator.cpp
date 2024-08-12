@@ -485,8 +485,9 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
     mFfEffects.resize(WAVEFORM_MAX_INDEX);
     mEffectDurations.resize(WAVEFORM_MAX_INDEX);
     mEffectDurations = {
-            1000, 100, 12, 1000, 300, 130, 150, 500, 100, 5, 12, 1000, 1000, 1000,
+            1000, 100, 9, 1000, 300, 130, 150, 500, 100, 5, 12, 1000, 1000, 1000,
     }; /* 11+3 waveforms. The duration must < UINT16_MAX */
+    mEffectBrakingDurations.resize(WAVEFORM_MAX_INDEX);
     mEffectCustomData.reserve(WAVEFORM_MAX_INDEX);
 
     uint8_t effectIndex;
@@ -518,6 +519,11 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
             }
             if (mFfEffects[effectIndex].id != effectIndex) {
                 ALOGW("Unexpected effect index: %d -> %d", effectIndex, mFfEffects[effectIndex].id);
+            }
+
+            if (mHwApiDef->hasEffectBrakingTimeBank()) {
+                mHwApiDef->setEffectBrakingTimeIndex(effectIndex);
+                mHwApiDef->getEffectBrakingTimeMs(&mEffectBrakingDurations[effectIndex]);
             }
         } else {
             /* Initiate placeholders for OWT effects. */
@@ -850,7 +856,7 @@ ndk::ScopedAStatus Vibrator::getPrimitiveDuration(CompositePrimitive primitive,
             return status;
         }
 
-        *durationMs = mEffectDurations[effectIndex];
+        *durationMs = mEffectDurations[effectIndex] + mEffectBrakingDurations[effectIndex];
     } else {
         *durationMs = 0;
     }
@@ -863,7 +869,6 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
     ALOGD("Vibrator::compose");
     uint16_t size;
     uint16_t nextEffectDelay;
-    uint16_t totalDuration = 0;
 
     if (composite.size() > COMPOSE_SIZE_MAX || composite.empty()) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
@@ -871,7 +876,6 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
 
     /* Check if there is a wait before the first effect. */
     nextEffectDelay = composite.front().delayMs;
-    totalDuration += nextEffectDelay;
     if (nextEffectDelay > COMPOSE_DELAY_MAX_MS || nextEffectDelay < 0) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     } else if (nextEffectDelay > 0) {
@@ -913,7 +917,6 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
                 effectScale = mPrimitiveMinScale[static_cast<uint32_t>(e_curr.primitive)];
             }
             effectVolLevel = intensityToVolLevel(effectScale, effectIndex);
-            totalDuration += mEffectDurations[effectIndex];
         }
 
         /* Fetch the next composite effect delay and fill into the current section */
@@ -926,12 +929,13 @@ ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect> &composi
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
             nextEffectDelay = delay;
-            totalDuration += delay;
         }
 
         if (effectIndex == 0 && nextEffectDelay == 0) {
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
         }
+
+        nextEffectDelay += mEffectBrakingDurations[effectIndex];
 
         ch.constructComposeSegment(effectVolLevel, effectIndex, 0 /*repeat*/, 0 /*flags*/,
                                    nextEffectDelay /*delay*/);
@@ -1395,19 +1399,20 @@ binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
 
     dprintf(fd, "  FF effect:\n");
     dprintf(fd, "    Physical waveform:\n");
-    dprintf(fd, "==== Base ====\n\tId\tIndex\tt   ->\tt'\ttrigger button\n");
+    dprintf(fd, "==== Base ====\n\tId\tIndex\tt   ->\tt'\tBrake\ttrigger button\n");
     uint8_t effectId;
     for (effectId = 0; effectId < WAVEFORM_MAX_PHYSICAL_INDEX; effectId++) {
-        dprintf(fd, "\t%d\t%d\t%d\t%d\t%X\n", mFfEffects[effectId].id,
+        dprintf(fd, "\t%d\t%d\t%d\t%d\t%d\t%X\n", mFfEffects[effectId].id,
                 mFfEffects[effectId].u.periodic.custom_data[1], mEffectDurations[effectId],
-                mFfEffects[effectId].replay.length, mFfEffects[effectId].trigger.button);
+                mFfEffects[effectId].replay.length, mEffectBrakingDurations[effectId],
+                mFfEffects[effectId].trigger.button);
     }
     if (mIsDual) {
-        dprintf(fd, "==== Flip ====\n\tId\tIndex\tt   ->\tt'\ttrigger button\n");
+        dprintf(fd, "==== Flip ====\n\tId\tIndex\tt   ->\tt'\tBrake\ttrigger button\n");
         for (effectId = 0; effectId < WAVEFORM_MAX_PHYSICAL_INDEX; effectId++) {
-            dprintf(fd, "\t%d\t%d\t%d\t%d\t%X\n", mFfEffectsDual[effectId].id,
+            dprintf(fd, "\t%d\t%d\t%d\t%d\t%d\t%X\n", mFfEffectsDual[effectId].id,
                     mFfEffectsDual[effectId].u.periodic.custom_data[1], mEffectDurations[effectId],
-                    mFfEffectsDual[effectId].replay.length,
+                    mFfEffectsDual[effectId].replay.length, mEffectBrakingDurations[effectId],
                     mFfEffectsDual[effectId].trigger.button);
         }
     }

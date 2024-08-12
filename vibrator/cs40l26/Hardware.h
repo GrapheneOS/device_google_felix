@@ -78,6 +78,9 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
         open("calibration/q_stored", &mQ);
         open("default/vibe_state", &mVibeState);
         open("default/num_waves", &mEffectCount);
+        open("default/braking_time_bank", &mEffectBrakingTimeBank);
+        open("default/braking_time_index", &mEffectBrakingTimeIndex);
+        open("default/braking_time_ms", &mEffectBrakingTimeMs);
         open("default/owt_free_space", &mOwtFreeSpace);
         open("default/f0_comp_enable", &mF0CompEnable);
         open("default/redc_comp_enable", &mRedcCompEnable);
@@ -89,6 +92,16 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
     bool setRedc(std::string value) override { return set(value, &mRedc); }
     bool setQ(std::string value) override { return set(value, &mQ); }
     bool getEffectCount(uint32_t *value) override { return get(value, &mEffectCount); }
+    bool hasEffectBrakingTimeBank() override { return has(mEffectBrakingTimeBank); }
+    bool setEffectBrakingTimeBank(uint32_t value) override {
+        return set(value, &mEffectBrakingTimeBank);
+    }
+    bool setEffectBrakingTimeIndex(uint32_t value) override {
+        return set(value, &mEffectBrakingTimeIndex);
+    }
+    bool getEffectBrakingTimeMs(uint32_t *value) override {
+        return get(value, &mEffectBrakingTimeMs);
+    }
     bool pollVibeState(uint32_t value, int32_t timeoutMs) override {
         return poll(value, &mVibeState, timeoutMs);
     }
@@ -282,6 +295,9 @@ class HwApi : public Vibrator::HwApi, private HwApiBase {
     std::ofstream mRedc;
     std::ofstream mQ;
     std::ifstream mEffectCount;
+    std::ofstream mEffectBrakingTimeBank;
+    std::ofstream mEffectBrakingTimeIndex;
+    std::ifstream mEffectBrakingTimeMs;
     std::ifstream mVibeState;
     std::ifstream mOwtFreeSpace;
     std::ofstream mF0CompEnable;

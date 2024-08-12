@@ -62,6 +62,15 @@ class Vibrator : public BnVibrator {
         virtual bool setQ(std::string value) = 0;
         // Reports the number of effect waveforms loaded in firmware.
         virtual bool getEffectCount(uint32_t *value) = 0;
+        // Checks whether braking time bank is supported.
+        virtual bool hasEffectBrakingTimeBank() = 0;
+        // Specifies the bank of the effect for querying braking time.
+        // 0: RAM bank, 2: OWT bank
+        virtual bool setEffectBrakingTimeBank(uint32_t value) = 0;
+        // Specifies the index of an effect whose braking time is to be read.
+        virtual bool setEffectBrakingTimeIndex(uint32_t value) = 0;
+        // Gets the braking time duration of SVC effects (returns 0 if not SVC).
+        virtual bool getEffectBrakingTimeMs(uint32_t *value) = 0;
         // Blocks until timeout or vibrator reaches desired state
         // (2 = ASP enabled, 1 = haptic enabled, 0 = disabled).
         virtual bool pollVibeState(uint32_t value, int32_t timeoutMs = -1) = 0;
@@ -218,6 +227,7 @@ class Vibrator : public BnVibrator {
     std::vector<ff_effect> mFfEffects;
     std::vector<ff_effect> mFfEffectsDual;
     std::vector<uint32_t> mEffectDurations;
+    std::vector<uint32_t> mEffectBrakingDurations;
     std::vector<std::vector<int16_t>> mEffectCustomData;
     std::vector<std::vector<int16_t>> mEffectCustomDataDual;
     std::future<void> mAsyncHandle;

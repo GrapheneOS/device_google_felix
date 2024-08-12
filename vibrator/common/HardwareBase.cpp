@@ -40,10 +40,6 @@ void HwApiBase::saveName(const std::string &name, const std::ios *stream) {
     mNames[stream] = name;
 }
 
-bool HwApiBase::has(const std::ios &stream) {
-    return !!stream;
-}
-
 void HwApiBase::debug(int fd) {
     dprintf(fd, "Kernel:\n");
 

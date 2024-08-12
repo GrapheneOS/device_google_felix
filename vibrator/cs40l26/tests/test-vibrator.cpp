@@ -74,7 +74,7 @@ static constexpr std::array<EffectLevel, 2> V_TICK_DEFAULT = {1, 100};
 static constexpr std::array<EffectLevel, 2> V_CLICK_DEFAULT{1, 100};
 static constexpr std::array<EffectLevel, 2> V_LONG_DEFAULT{1, 100};
 static constexpr std::array<EffectDuration, 14> EFFECT_DURATIONS{
-        0, 100, 30, 1000, 300, 130, 150, 500, 100, 15, 20, 1000, 1000, 1000};
+        1000, 100, 9, 1000, 300, 130, 150, 500, 100, 5, 12, 1000, 1000, 1000};
 
 // Constants With Prescribed Values
 
@@ -375,6 +375,11 @@ TEST_F(VibratorTest, Constructor) {
             .WillOnce(DoAll(SetArgPointee<0>(supportedPrimitivesBits), Return(true)));
 
     EXPECT_CALL(*mMockApi, setMinOnOffInterval(MIN_ON_OFF_INTERVAL_US)).WillOnce(Return(true));
+    EXPECT_CALL(*mMockApi, setEffectBrakingTimeBank(0)).WillRepeatedly(Return(true));
+    for (uint32_t i = 0; i < WAVEFORM_MAX_PHYSICAL_INDEX; i++) {
+        EXPECT_CALL(*mMockApi, setEffectBrakingTimeIndex(i)).WillRepeatedly(Return(true));
+        EXPECT_CALL(*mMockApi, getEffectBrakingTimeMs(_)).WillRepeatedly(Return(true));
+    }
     createVibrator(std::move(mockapi), std::move(mockcal), std::move(mockgpio), false);
 }
 
