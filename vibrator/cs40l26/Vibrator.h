@@ -243,8 +243,8 @@ class Vibrator : public BnVibrator {
     bool mIsChirpEnabled;
     uint32_t mSupportedPrimitivesBits = 0x0;
     std::vector<CompositePrimitive> mSupportedPrimitives;
-    std::vector<float> mPrimitiveMaxScale;
-    std::vector<float> mPrimitiveMinScale;
+    std::vector<uint32_t> mPrimitiveMaxScale;
+    std::vector<uint32_t> mPrimitiveMinScale;
     bool mConfigHapticAlsaDeviceDone{false};
     bool mGPIOStatus;
     bool mIsDual{false};
