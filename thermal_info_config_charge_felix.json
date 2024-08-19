@@ -3,20 +3,17 @@
         {
             "Name":"neutral_therm",
             "Type":"UNKNOWN",
-            "TempPath":"/dev/thermal/tz-by-name/neutral_therm/tz_temp",
             "Multiplier":0.001
         },
         {
             "Name":"quiet_therm",
             "Type":"UNKNOWN",
-            "TempPath":"/dev/thermal/tz-by-name/quiet_therm/tz_temp",
             "Multiplier":0.001
         },
         {
             "Name":"skin_therm",
             "Type":"UNKNOWN",
             "HotThreshold":["NAN", 32.0, "NAN", "NAN", "NAN", "NAN", "NAN"],
-            "TempPath":"/dev/thermal/tz-by-name/skin_therm/tz_temp",
             "Multiplier":0.001,
             "PollingDelay":300000,
             "PassiveDelay":7000
@@ -24,14 +21,12 @@
         {
             "Name":"usb_pwr_therm",
             "Type":"UNKNOWN",
-            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm/tz_temp",
             "Multiplier":0.001
         },
         {
             "Name":"usb_pwr_therm2",
             "Type":"UNKNOWN",
             "HotThreshold":["NAN", 40.0, "NAN", "NAN", "NAN", "NAN", "NAN"],
-            "TempPath":"/dev/thermal/tz-by-name/usb_pwr_therm2/tz_temp",
             "Multiplier":0.001,
             "PollingDelay":300000,
             "PassiveDelay":7000
@@ -39,19 +34,16 @@
         {
             "Name":"inner_disp_therm",
             "Type":"UNKNOWN",
-            "TempPath":"/dev/thermal/tz-by-name/inner_disp_therm/tz_temp",
             "Multiplier":0.001
         },
         {
             "Name":"outer_disp_therm",
             "Type":"UNKNOWN",
-            "TempPath":"/dev/thermal/tz-by-name/outer_disp_therm/tz_temp",
             "Multiplier":0.001
         },
         {
             "Name":"gnss_tcxo_therm",
             "Type":"UNKNOWN",
-            "TempPath":"/dev/thermal/tz-by-name/gnss_tcxo_therm/tz_temp",
             "Multiplier":0.001
         },
         {
