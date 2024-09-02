@@ -20,6 +20,7 @@
 #include <sys/epoll.h>
 #include <utils/Trace.h>
 
+#include <chrono>
 #include <list>
 #include <map>
 #include <sstream>
@@ -48,17 +49,19 @@ class HwApiBase {
     class Record : public RecordInterface {
       public:
         Record(const char *func, const T &value, const std::ios *stream)
-            : mFunc(func), mValue(value), mStream(stream) {}
+            : mFunc(func), mValue(value), mStream(stream),
+              mTp(std::chrono::system_clock::system_clock::now()) {}
         std::string toString(const NamesMap &names) override;
 
       private:
         const char *mFunc;
         const T mValue;
         const std::ios *mStream;
+        const std::chrono::system_clock::time_point mTp;
     };
     using Records = std::list<std::unique_ptr<RecordInterface>>;
 
-    static constexpr uint32_t RECORDS_SIZE = 32;
+    static constexpr uint32_t RECORDS_SIZE = 2048;
 
   public:
     HwApiBase();
@@ -181,9 +184,14 @@ template <typename T>
 std::string HwApiBase::Record<T>::toString(const NamesMap &names) {
     using utils::operator<<;
     std::stringstream ret;
+    auto lTp = std::chrono::system_clock::to_time_t(mTp);
+    struct tm buf;
+    auto lTime = localtime_r(&lTp, &buf);
 
-    ret << mFunc << " '" << names.at(mStream) << "' = '" << mValue << "'";
-
+    ret << std::put_time(lTime, "%Y-%m-%d %H:%M:%S.") << std::setfill('0') << std::setw(3)
+        << (std::chrono::duration_cast<std::chrono::milliseconds>(mTp.time_since_epoch()) % 1000)
+                    .count()
+        << "    " << mFunc << " '" << names.at(mStream) << "' = '" << mValue << "'";
     return ret.str();
 }
 

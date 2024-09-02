@@ -71,6 +71,14 @@ static constexpr int32_t COMPOSE_PWLE_SIZE_MAX_DEFAULT = 127;
 // See the LRA Calibration Support documentation for more details.
 static constexpr int32_t Q14_BIT_SHIFT = 14;
 
+// Measured ReDC. The LRA series resistance (ReDC), expressed as follows
+// redc(ohms) = redc_measured / 2^Q15_BIT_SHIFT.
+// This value represents the unit-specific ReDC input to the click compensation
+// algorithm. It can be overwritten at a later time by writing to the redc_stored
+// sysfs control.
+// See the LRA Calibration Support documentation for more details.
+static constexpr int32_t Q15_BIT_SHIFT = 15;
+
 // Measured Q factor, q_measured, is represented by Q8.16 fixed
 // point format on cs40l26 devices. The expression to calculate q is:
 //   q = q_measured / 2^Q16_BIT_SHIFT
@@ -113,6 +121,10 @@ static uint16_t amplitudeToScale(float amplitude, float maximum) {
         ratio = 100;
 
     return std::round(ratio);
+}
+
+static float redcToFloat(std::string *caldata) {
+    return static_cast<float>(std::stoul(*caldata, nullptr, 16)) / (1 << Q15_BIT_SHIFT);
 }
 
 enum WaveformBankID : uint8_t {
@@ -598,9 +610,12 @@ Vibrator::Vibrator(std::unique_ptr<HwApi> hwApiDefault, std::unique_ptr<HwCal> h
 
     if (mHwCalDef->getF0(&caldata)) {
         mHwApiDef->setF0(caldata);
+        mResonantFrequency =
+                static_cast<float>(std::stoul(caldata, nullptr, 16)) / (1 << Q14_BIT_SHIFT);
     }
     if (mHwCalDef->getRedc(&caldata)) {
         mHwApiDef->setRedc(caldata);
+        mRedc = redcToFloat(&caldata);
     }
     if (mHwCalDef->getQ(&caldata)) {
         mHwApiDef->setQ(caldata);
@@ -1138,12 +1153,7 @@ ndk::ScopedAStatus Vibrator::alwaysOnDisable(int32_t /*id*/) {
 }
 
 ndk::ScopedAStatus Vibrator::getResonantFrequency(float *resonantFreqHz) {
-    std::string caldata{8, '0'};
-    if (!mHwCalDef->getF0(&caldata)) {
-        ALOGE("Failed to get resonant frequency (%d): %s", errno, strerror(errno));
-        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
-    }
-    *resonantFreqHz = static_cast<float>(std::stoul(caldata, nullptr, 16)) / (1 << Q14_BIT_SHIFT);
+    *resonantFreqHz = mResonantFrequency;
 
     return ndk::ScopedAStatus::ok();
 }
@@ -1392,7 +1402,10 @@ binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
 
     dprintf(fd, "AIDL:\n");
 
+    dprintf(fd, "  Active Effect ID: %" PRId32 "\n", mActiveId);
+    dprintf(fd, "  F0: %.02f\n", mResonantFrequency);
     dprintf(fd, "  F0 Offset: base: %" PRIu32 " flip: %" PRIu32 "\n", mF0Offset, mF0OffsetDual);
+    dprintf(fd, "  Redc: %.02f\n", mRedc);
 
     dprintf(fd, "  Voltage Levels:\n");
     dprintf(fd, "     Tick Effect Min: %" PRIu32 " Max: %" PRIu32 "\n", mTickEffectVol[0],
@@ -1464,7 +1477,73 @@ binder_status_t Vibrator::dump(int fd, const char **args, uint32_t numArgs) {
         }
     }
     dprintf(fd, "\n");
-    dprintf(fd, "\n");
+
+    dprintf(fd, "Versions:\n");
+    std::ifstream verFile;
+    const auto verBinFileMode = std::ifstream::in | std::ifstream::binary;
+    std::string ver;
+    verFile.open("/sys/module/cs40l26_core/version");
+    if (verFile.is_open()) {
+        getline(verFile, ver);
+        dprintf(fd, "  Haptics Driver: %s\n", ver.c_str());
+        verFile.close();
+    }
+    verFile.open("/sys/module/cl_dsp_core/version");
+    if (verFile.is_open()) {
+        getline(verFile, ver);
+        dprintf(fd, "  DSP Driver: %s\n", ver.c_str());
+        verFile.close();
+    }
+    verFile.open("/vendor/firmware/cs40l26.wmfw", verBinFileMode);
+    if (verFile.is_open()) {
+        verFile.seekg(113);
+        dprintf(fd, "  cs40l26.wmfw: %d.%d.%d\n", verFile.get(), verFile.get(), verFile.get());
+        verFile.close();
+    }
+    verFile.open("/vendor/firmware/cs40l26-calib.wmfw", verBinFileMode);
+    if (verFile.is_open()) {
+        verFile.seekg(113);
+        dprintf(fd, "  cs40l26-calib.wmfw: %d.%d.%d\n", verFile.get(), verFile.get(),
+                verFile.get());
+        verFile.close();
+    }
+    verFile.open("/vendor/firmware/cs40l26.bin", verBinFileMode);
+    if (verFile.is_open()) {
+        while (getline(verFile, ver)) {
+            auto pos = ver.find("Date: ");
+            if (pos != std::string::npos) {
+                ver = ver.substr(pos + 6, pos + 15);
+                dprintf(fd, "  cs40l26.bin: %s\n", ver.c_str());
+                break;
+            }
+        }
+        verFile.close();
+    }
+    verFile.open("/vendor/firmware/cs40l26-svc.bin", verBinFileMode);
+    if (verFile.is_open()) {
+        verFile.seekg(36);
+        getline(verFile, ver);
+        ver = ver.substr(ver.rfind('\\') + 1);
+        dprintf(fd, "  cs40l26-svc.bin: %s\n", ver.c_str());
+        verFile.close();
+    }
+    verFile.open("/vendor/firmware/cs40l26-calib.bin", verBinFileMode);
+    if (verFile.is_open()) {
+        verFile.seekg(36);
+        getline(verFile, ver);
+        ver = ver.substr(ver.rfind('\\') + 1);
+        dprintf(fd, "  cs40l26-calib.bin: %s\n", ver.c_str());
+        verFile.close();
+    }
+    verFile.open("/vendor/firmware/cs40l26-dvl.bin", verBinFileMode);
+    if (verFile.is_open()) {
+        verFile.seekg(36);
+        getline(verFile, ver);
+        ver = ver.substr(0, ver.find('\0') + 1);
+        ver = ver.substr(ver.rfind('\\') + 1);
+        dprintf(fd, "  cs40l26-dvl.bin: %s\n", ver.c_str());
+        verFile.close();
+    }
 
     mHwApiDef->debug(fd);
 

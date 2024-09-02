@@ -242,6 +242,8 @@ class Vibrator : public BnVibrator {
     float mLongEffectScale{1.0};
     bool mIsChirpEnabled;
     uint32_t mSupportedPrimitivesBits = 0x0;
+    float mRedc{0.0f};
+    float mResonantFrequency{0.0f};
     std::vector<CompositePrimitive> mSupportedPrimitives;
     std::vector<uint32_t> mPrimitiveMaxScale;
     std::vector<uint32_t> mPrimitiveMinScale;
