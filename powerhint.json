@@ -21,7 +21,8 @@
         "1539000",
         "1352000",
         "1014000",
-        "421000"
+        "421000",
+        "546000"
       ],
       "ResetOnInit": true
     },
@@ -883,6 +884,12 @@
       "Node": "GPUMinFreq",
       "Duration": 50,
       "Value": "302000"
+    },
+    {
+      "PowerHint": "DISPLAY_INACTIVE",
+      "Node": "MemFreq",
+      "Duration": 0,
+      "Value": "421000"
     },
     {
       "PowerHint": "CPU_LOAD_RESET",
