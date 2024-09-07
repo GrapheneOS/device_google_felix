@@ -447,5 +447,6 @@ PRODUCT_PACKAGES += \
     AvoidAppsInCutoutOverlay
 
 # Bluetooth device id
+# Felix: 0x410C
 PRODUCT_PRODUCT_PROPERTIES += \
-    bluetooth.device_id.product_id=20494
+    bluetooth.device_id.product_id=16652
