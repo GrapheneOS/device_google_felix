@@ -101,6 +101,7 @@
   <gll_features
        EnableNicAutoSwitch="true"
        EnableNavic="true"
+       ConstellationAutoSwitchOffNavOnly="true"
   />
 
 </glgps>
