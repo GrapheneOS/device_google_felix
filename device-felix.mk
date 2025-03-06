@@ -24,6 +24,8 @@ TARGET_LINUX_KERNEL_VERSION := $(RELEASE_KERNEL_FELIX_VERSION)
 TARGET_KERNEL_DIR ?= $(RELEASE_KERNEL_FELIX_DIR)
 TARGET_BOARD_KERNEL_HEADERS ?= $(RELEASE_KERNEL_FELIX_DIR)/kernel-headers
 
+ALLOW_MISSING_DEPENDENCIES := true
+
 $(call inherit-product-if-exists, vendor/google_devices/felix/prebuilts/device-vendor-felix.mk)
 $(call inherit-product-if-exists, vendor/google_devices/gs201/prebuilts/device-vendor.mk)
 $(call inherit-product-if-exists, vendor/google_devices/gs201/proprietary/device-vendor.mk)
