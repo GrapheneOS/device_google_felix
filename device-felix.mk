@@ -148,9 +148,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
 	device/google/felix/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
 
-# Bluetooth HAL
-PRODUCT_COPY_FILES += \
-	device/google/felix/bluetooth/bt_vendor_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth/bt_vendor_overlay.conf
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.bluetooth.a2dp_offload.supported=true \
     persist.bluetooth.a2dp_offload.disabled=false \
@@ -159,13 +156,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Enable Bluetooth AutoOn feature
 PRODUCT_PRODUCT_PROPERTIES += \
     bluetooth.server.automatic_turn_on=true
-
-# Bluetooth Tx power caps
-PRODUCT_COPY_FILES += \
-    device/google/felix/bluetooth/bluetooth_power_limits_felix_US.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits.csv \
-    device/google/felix/bluetooth/bluetooth_power_limits_felix_JP.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_JP.csv \
-    device/google/felix/bluetooth/bluetooth_power_limits_felix_EU.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_EU.csv \
-    device/google/felix/bluetooth/bluetooth_power_limits_felix_US.csv:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_power_limits_US.csv
 
 # Spatial Audio
 PRODUCT_PACKAGES += \
@@ -432,10 +422,6 @@ PRODUCT_PRODUCT_PROPERTIES += \
 # BT controller not able to support LE Audio dual mic SWB call
 PRODUCT_PRODUCT_PROPERTIES += \
     bluetooth.leaudio.dual_bidirection_swb.supported=false
-
-# LE Audio Offload Capabilities Setting
-PRODUCT_COPY_FILES += \
-    device/google/felix/bluetooth/le_audio_codec_capabilities.xml:$(TARGET_COPY_OUT_VENDOR)/etc/le_audio_codec_capabilities.xml
 
 # LE Audio Unicast Allowlist
 PRODUCT_PRODUCT_PROPERTIES += \
