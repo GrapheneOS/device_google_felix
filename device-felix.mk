@@ -212,7 +212,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # PowerStats HAL
 PRODUCT_SOONG_NAMESPACES += \
-    device/google/felix/powerstats/felix \
     device/google/felix
 
 # Increment the SVN for any official public releases
