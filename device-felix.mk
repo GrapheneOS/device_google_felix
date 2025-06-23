@@ -60,6 +60,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
 	device/google/felix/conf/init.recovery.device.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.felix.rc
 
+# TODO: Verify this is not needed for current 6.1 release
 # insmod files. Kernel 5.10 prebuilts don't provide these yet, so provide our
 # own copy if they're not in the prebuilts.
 # TODO(b/369686096): drop this when 5.10 is gone.
