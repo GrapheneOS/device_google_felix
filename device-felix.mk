@@ -115,12 +115,6 @@ PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.se.omapi.ese.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.se.omapi.ese.xml \
 	frameworks/native/data/etc/android.hardware.se.omapi.uicc.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.se.omapi.uicc.xml \
 
-# Thermal Config
-PRODUCT_COPY_FILES += \
-	device/google/felix/thermal_info_config_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config.json \
-	device/google/felix/thermal_info_config_proactive_skin_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_proactive_skin.json \
-	device/google/felix/thermal_info_config_charge_felix.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config_charge.json
-
 # Power HAL config
 PRODUCT_COPY_FILES += \
 	device/google/felix/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
