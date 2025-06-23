@@ -186,10 +186,6 @@ DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
 
-# Increase thread priority for nodes stop
-PRODUCT_VENDOR_PROPERTIES += \
-    persist.vendor.camera.increase_thread_priority_nodes_stop=true
-
 ##Audio Vendor property
 PRODUCT_PROPERTY_OVERRIDES += \
 	persist.vendor.audio.cca.enabled=false
