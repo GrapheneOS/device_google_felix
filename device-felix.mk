@@ -190,9 +190,6 @@ PRODUCT_COPY_FILES += \
 ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.bluetooth.bqr.event_mask=262238
-else
-PRODUCT_PRODUCT_PROPERTIES += \
-    persist.bluetooth.bqr.event_mask=94
 endif
 
 # Bluetooth LE Audio CIS handover to SCO
