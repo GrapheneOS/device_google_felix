@@ -180,27 +180,6 @@ DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
 
-# Camera
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.vendor.camera.adjust_backend_min_freq_for_1p_front_video_1080p_30fps=1 \
-    persist.vendor.camera.extended_launch_boost=1 \
-    persist.vendor.camera.multicam_streaming_boost=1 \
-    persist.vendor.camera.optimized_tnr_freq=1 \
-    persist.vendor.camera.raise_buf_allocation_priority=1 \
-    persist.vendor.camera.start_cpu_throttling_at_moderate_thermal=1 \
-    camera.enable_landscape_to_portrait=true \
-    persist.vendor.camera.debug.bypass_csi_link_error=true \
-    vendor.camera.allow_sensor_binning_aspect_ratio_to_override_itp_output=false \
-    vendor.camera.support_specific_stream_aspect_ratio=0.75
-
-# Enable camera exif model/make reporting
-PRODUCT_VENDOR_PROPERTIES += \
-    persist.vendor.camera.exif_reveal_make_model=true
-
-# Enable front camera always binning for 720P or smaller resolution
-PRODUCT_VENDOR_PROPERTIES += \
-    persist.vendor.camera.front_720P_always_binning=true
-
 # Bluetooth OPUS codec
 PRODUCT_PRODUCT_PROPERTIES += \
     persist.bluetooth.opus.enabled=true
