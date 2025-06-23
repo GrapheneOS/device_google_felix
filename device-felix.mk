@@ -78,13 +78,6 @@ PRODUCT_PROPERTY_OVERRIDES += ro.odm.build.media_performance_class=33
 PRODUCT_COPY_FILES += \
 	$(LOCAL_PATH)/product-sysconfig-stock.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/product-sysconfig-stock.xml
 
-# Display Config
-PRODUCT_COPY_FILES += \
-	device/google/felix/felix/display_colordata_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_colordata_cal1.pb \
-	device/google/felix/felix/display_colordata_dev_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_colordata_dev_cal1.pb \
-	device/google/felix/felix/display_golden_cal0.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal0.pb \
-	device/google/felix/felix/display_golden_cal1.pb:$(TARGET_COPY_OUT_VENDOR)/etc/display_golden_cal1.pb
-
 # Display
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	vendor.display.lbe.supported=1 \
