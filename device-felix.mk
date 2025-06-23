@@ -69,9 +69,6 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/init.insmod.felix.cfg:$(TARGET_COPY_OUT_VENDOR_DLKM)/etc/init.insmod.felix.cfg
 endif
 
-# Media Performance Class 13
-PRODUCT_PROPERTY_OVERRIDES += ro.odm.build.media_performance_class=33
-
 # Display
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	vendor.display.lbe.supported=1 \
