@@ -158,11 +158,6 @@ FPC_MODULE_TYPE=1542_C
 # Fingerprint config
 include device/google/felix/fingerprint_config.mk
 
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.set_idle_timer_ms_4619827677550801152=80
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.support_kernel_idle_timer_4619827677550801152=true
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.set_idle_timer_ms_4619827677550801153=1000
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.support_kernel_idle_timer_4619827677550801153=false
-
 # Set zram size
 PRODUCT_VENDOR_PROPERTIES += \
     vendor.zram.size=3g
