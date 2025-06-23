@@ -69,10 +69,6 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/init.insmod.felix.cfg:$(TARGET_COPY_OUT_VENDOR_DLKM)/etc/init.insmod.felix.cfg
 endif
 
-# Camera
-PRODUCT_COPY_FILES += \
-	device/google/felix/media_profiles_felix.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml
-
 # Media Performance Class 13
 PRODUCT_PROPERTY_OVERRIDES += ro.odm.build.media_performance_class=33
 
