@@ -291,11 +291,6 @@ PRODUCT_PACKAGES += \
         UwbOverlayF10 \
         WifiOverlay2023Mid_F10
 
-# MIPI Coex Configs
-PRODUCT_COPY_FILES += \
-    device/google/felix/felix/radio/felix_camera_front_inner_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/camera_front_inner_mipi_coex_table.csv \
-    device/google/felix/felix/radio/felix_display_secondary_mipi_coex_table.csv:$(TARGET_COPY_OUT_VENDOR)/etc/modem/display_secondary_mipi_coex_table.csv
-
 PRODUCT_SOONG_NAMESPACES += device/google/felix
 
 DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework_matrix_product_felix.xml
