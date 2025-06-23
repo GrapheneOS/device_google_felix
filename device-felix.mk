@@ -152,10 +152,6 @@ endif
 
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
-# Override Output Distortion Gain
-PRODUCT_VENDOR_PROPERTIES += \
-    vendor.audio.hapticgenerator.distortion.output.gain=0.52
-
 # Fingerprint
 include device/google/gs101/fingerprint/fpc1540/sw42/fpc1540.mk
 FPC_MODULE_TYPE=1542_C
