@@ -158,10 +158,6 @@ FPC_MODULE_TYPE=1542_C
 # Fingerprint config
 include device/google/felix/fingerprint_config.mk
 
-# Set zram size
-PRODUCT_VENDOR_PROPERTIES += \
-    vendor.zram.size=3g
-
 # SKU specific RROs
 PRODUCT_PACKAGES += \
     SettingsOverlayG0B96 \
@@ -169,10 +165,6 @@ PRODUCT_PACKAGES += \
 
 # Trusty liboemcrypto.so
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
-
-# Set zram size
-PRODUCT_VENDOR_PROPERTIES += \
-       vendor.zram.size=3g
 
 # Set support one-handed mode
 PRODUCT_PRODUCT_PROPERTIES += \
