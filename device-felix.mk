@@ -196,10 +196,6 @@ endif
 PRODUCT_PACKAGES_DEBUG += \
     ewp_tool
 
-# Enable DeviceAsWebcam support
-PRODUCT_VENDOR_PROPERTIES += \
-    ro.usb.uvc.enabled=true
-
 # Quick Start device-specific settings
 PRODUCT_PRODUCT_PROPERTIES += \
     ro.quick_start.oem_id=00e0 \
