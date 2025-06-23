@@ -186,22 +186,6 @@ DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
 
-# Bluetooth OPUS codec
-PRODUCT_PRODUCT_PROPERTIES += \
-    persist.bluetooth.opus.enabled=true
-
-# Bluetooth LE Audio
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.bluetooth.leaudio_offload.supported=true \
-    persist.bluetooth.leaudio_offload.disabled=false \
-    ro.bluetooth.leaudio_switcher.supported=true \
-    bluetooth.profile.bap.unicast.client.enabled=true \
-    bluetooth.profile.csip.set_coordinator.enabled=true \
-    bluetooth.profile.hap.client.enabled=true \
-    bluetooth.profile.mcp.server.enabled=true \
-    bluetooth.profile.ccp.server.enabled=true \
-    bluetooth.profile.vcp.controller.enabled=true \
-
 # Override BQR mask to enable LE Audio Choppy report
 ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
 PRODUCT_PRODUCT_PROPERTIES += \
