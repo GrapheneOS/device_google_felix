@@ -143,13 +143,7 @@ ifeq ($(RELEASE_IS_EMR), true)
         ro.build.version.emergency_base_os=$(RELEASE_BASE_OS_FELIX)
     endif
 endif
-# Vibrator HAL
-$(call soong_config_set,haptics,kernel_ver,v$(subst .,_,$(TARGET_LINUX_KERNEL_VERSION)))
-PRODUCT_VENDOR_PROPERTIES +=\
-    ro.vendor.vibrator.hal.long.frequency.shift=0 \
-    ro.vendor.vibrator.hal.gpio.num=44 \
-    ro.vendor.vibrator.hal.gpio.shift=2 \
-    persist.vendor.vibrator.hal.chirp.enabled=0
+
 ACTUATOR_MODEL := luxshare_ict_lt_xlra1906d
 
 # Override Output Distortion Gain
