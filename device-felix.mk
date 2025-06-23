@@ -180,10 +180,6 @@ DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
 
-##Audio Vendor property
-PRODUCT_PROPERTY_OVERRIDES += \
-	persist.vendor.audio.cca.enabled=false
-
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.camera.adjust_backend_min_freq_for_1p_front_video_1080p_30fps=1 \
