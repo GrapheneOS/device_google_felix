@@ -69,20 +69,6 @@ PRODUCT_COPY_FILES += \
 	device/google/felix/init.insmod.felix.cfg:$(TARGET_COPY_OUT_VENDOR_DLKM)/etc/init.insmod.felix.cfg
 endif
 
-# Display
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-	vendor.display.lbe.supported=1 \
-	vendor.display.async_off.supported=true \
-	ro.surface_flinger.ignore_hdr_camera_layers=true
-
-#config of display brightness dimming
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.0.brightness.dimming.usage=1
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += vendor.display.1.brightness.dimming.usage=2
-
-# Early wake up sysfs path for the secondary display
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-	vendor.display.secondary_early_wakeup_node=/sys/devices/platform/1c241000.drmdecon/early_wakeup
-
 # NFC
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.nfc.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.nfc.xml \
