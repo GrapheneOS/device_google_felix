@@ -190,10 +190,6 @@ endif
 PRODUCT_PACKAGES_DEBUG += \
     ewp_tool
 
-# Set support hide display cutout feature
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.support_hide_display_cutout=true
-
 PRODUCT_PACKAGES += \
     NoCutoutOverlay \
     AvoidAppsInCutoutOverlay
