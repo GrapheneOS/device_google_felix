@@ -33,8 +33,6 @@ $(call inherit-product-if-exists, vendor/google_devices/felix/proprietary/Wallpa
 
 $(call inherit-product, device/google/felix/uwb/uwb_calibration_country.mk)
 
-DEVICE_PACKAGE_OVERLAYS += device/google/felix/felix/overlay
-
 include device/google/felix/audio/felix/audio-tables.mk
 include device/google/gs201/device-shipping-common.mk
 $(call soong_config_set,fp_hal_feature,pixel_product, product_a)
@@ -80,8 +78,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
 	$(RELEASE_PACKAGE_NFC_STACK) \
 	Tag \
-	android.hardware.nfc-service.st \
-	NfcOverlayFelix
+	android.hardware.nfc-service.st
 
 # Shared Modem Platform
 SHARED_MODEM_PLATFORM_VENDOR := lassen
@@ -152,11 +149,6 @@ FPC_MODULE_TYPE=1542_C
 # Fingerprint config
 include device/google/felix/fingerprint_config.mk
 
-# SKU specific RROs
-PRODUCT_PACKAGES += \
-    SettingsOverlayG0B96 \
-    SettingsOverlayG9FPL
-
 # Trusty liboemcrypto.so
 PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
 
@@ -167,10 +159,6 @@ PRODUCT_COPY_FILES += \
 # Location
 PRODUCT_COPY_FILES += \
     device/google/felix/location/gps_user.6.1.xml:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml
-
-PRODUCT_PACKAGES += \
-        UwbOverlayF10 \
-        WifiOverlay2023Mid_F10
 
 PRODUCT_SOONG_NAMESPACES += device/google/felix
 
