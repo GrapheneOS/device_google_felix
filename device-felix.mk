@@ -117,17 +117,6 @@ PRODUCT_PACKAGES_DEBUG += \
 PRODUCT_SOONG_NAMESPACES += \
     device/google/felix
 
-# Increment the SVN for any official public releases
-ifdef RELEASE_SVN_FELIX
-TARGET_SVN ?= $(RELEASE_SVN_FELIX)
-else
-# Set this for older releases that don't use build flag
-TARGET_SVN ?= 55
-endif
-
-PRODUCT_VENDOR_PROPERTIES += \
-    ro.vendor.build.svn=$(TARGET_SVN)
-
 # Set device family property for SMR
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.build.device_family=F10
