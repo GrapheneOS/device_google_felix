@@ -147,10 +147,6 @@ PRODUCT_SOONG_NAMESPACES += vendor/google_devices/felix/prebuilts
 PRODUCT_COPY_FILES += \
 	frameworks/native/data/etc/android.hardware.sensor.hinge_angle.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.hinge_angle.xml
 
-# Location
-PRODUCT_COPY_FILES += \
-    device/google/felix/location/gps_user.6.1.xml:$(TARGET_COPY_OUT_VENDOR)/etc/gnss/gps.xml
-
 PRODUCT_SOONG_NAMESPACES += device/google/felix
 
 DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/felix/device_framework_matrix_product_felix.xml
