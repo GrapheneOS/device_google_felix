@@ -52,10 +52,6 @@ $(call soong_config_set,lyric,camera_hardware,felix)
 $(call soong_config_set,lyric,tuning_product,felix)
 $(call soong_config_set,google3a_config,target_device,felix)
 
-# Init files
-PRODUCT_COPY_FILES += \
-	device/google/felix/conf/init.felix.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.felix.rc
-
 # Recovery files
 PRODUCT_COPY_FILES += \
 	device/google/felix/conf/init.recovery.device.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.felix.rc
